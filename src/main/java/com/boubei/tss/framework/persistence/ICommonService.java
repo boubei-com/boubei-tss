@@ -18,6 +18,10 @@ public interface ICommonService {
 	void update(IEntity entity);
 	void delete(Class<?> entityClass, Long id);
 	
+	void createBatch(List<? extends IEntity> entitys);
+	void updateBatch(List<? extends IEntity> entitys);
+	void deleteBatch(Class<?> entityClass, List<Long> idList);
+	
 	void createWithLog(IEntity entity);
 	void updateWithLog(IEntity entity);
 	void deleteWithLog(Class<?> entityClass, Long id);

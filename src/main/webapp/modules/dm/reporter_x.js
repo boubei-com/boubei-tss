@@ -32,8 +32,8 @@ function getServiceUrl(reportId, displayUri) {
 }
 
 function genQueryForm(title, paramDefine) {
-	var $panel = $("#searchFormDiv");
-	$panel.show(true);
+    var $panel = $("#searchFormDiv");
+    $panel.show(true);
     $panel.html("").panel("【" + title + "】查询条件", '<div id="searchForm"></div>');
 
     var buttonBox = [];
@@ -51,7 +51,7 @@ function genQueryForm(title, paramDefine) {
 }
 
 function getParams() {
-	var searchFormXML = $.cache.XmlDatas["searchFormXML"];
+    var searchFormXML = $.cache.XmlDatas["searchFormXML"];
     var dataNode = searchFormXML.querySelector("data");
 
     var params = {};
@@ -98,6 +98,10 @@ function searchGridReport(reportId, params) {
                 request.send();
             }
         }
+
+        $(".btDownload").click( function () {
+            exportReport(reportId, params);
+        });
     }
     request.send();
 } 

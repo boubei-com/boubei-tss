@@ -72,6 +72,8 @@ public class Channel extends OperateInfo implements IXForm, IDecodable, IResourc
     private Integer seqNo;    // 站点或栏目显示顺序
     private String  decode;   // 层码
     private Integer levelNo;  // 层次值
+    
+    private String domain;
 
 	public Long getId() {
 		return id;
@@ -239,5 +241,13 @@ public class Channel extends OperateInfo implements IXForm, IDecodable, IResourc
 	
 	public Serializable getPK() {
 		return this.id;
+	}
+
+	public String getDomain() {
+		return domain;
+	}
+
+	public void setDomain(String domain) {
+		this.domain = domain;
 	}
 }

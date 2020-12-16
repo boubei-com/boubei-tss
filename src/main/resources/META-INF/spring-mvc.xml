@@ -1,33 +1,17 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:mvc="http://www.springframework.org/schema/mvc" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="
-        http://www.springframework.org/schema/beans     
-        http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
-        http://www.springframework.org/schema/context 
-        http://www.springframework.org/schema/context/spring-context-3.2.xsd
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
         http://www.springframework.org/schema/mvc
-        http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd">
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+ 
+	<!-- 第一步：开启MVC注解 -->
+	<mvc:annotation-driven />
 	  
-	<mvc:annotation-driven conversion-service="conversionService">  
-        <mvc:message-converters>  
-            <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">  
-                <property name="objectMapper" ref="TSSObjectMapper"></property>  
-            </bean>  
-        </mvc:message-converters>  
-    </mvc:annotation-driven>  
-    
-    <bean id="TSSObjectMapper" class="com.boubei.tss.framework.web.json.TSSObjectMapper"></bean> 
-    
-    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">    
-        <property name="converters">    
-            <list>    
-                <bean class="com.boubei.tss.framework.web.json.DateConvert" />    
-            </list>    
-        </property>    
-    </bean>
-
 	<!-- 在springMVC配置文件中将Service注解给去掉，以免注入的service没有事务功能.注：过滤包目录需要spring-framework.xml里一致 -->
 	<context:component-scan base-package="com.boubei"> 
 		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" /> 

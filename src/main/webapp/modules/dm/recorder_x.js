@@ -190,12 +190,13 @@ function showFiled(field) {
  * @example 
  *      addOptBtn('批量打分', function() { batchUpdate("score", "及格") });
  */
-function addOptBtn(name, fn, roles, groups) {
+function addOptBtn(name, fn, roles, groups, readonly) {
     if( !checkRole(roles) && !checkGroup(groups||'-1212') ) {
         return;
     } 
 
-    var batchOpBtn = tssJS.createElement('button', 'tssbutton small white');
+    // readonly 的按钮始终显示，其它的则需要对录入表有编辑权限才会显示
+    var batchOpBtn = tssJS.createElement('button', 'tssbutton small white' + (readonly ? ' readonly' : ''));
     tssJS(batchOpBtn).html(name).click( fn );  
     tssJS('#customizeBox').appendChild(batchOpBtn);
 }
@@ -267,7 +268,8 @@ function checkBatch(field, expectVal, msg) {
     return flag;
 }
 
-/* nextLevel("season", "month", 
+/* 手动二级下拉（只能电脑端用，小程序不支持）：
+ * nextLevel("season", "month", 
  *   {"春":"三月|四月|五月", "夏":"六月|七月|八月", "秋":"九月|十月|十一月", "冬":"十二月|一月|二月"});
  */
 function nextLevel(current, next, map) {
@@ -398,6 +400,53 @@ function loadRemoteAttach(recordId, itemId, appUrl, appCode, callback) {
             });
             callback && callback();
         } 
+    });
+}
+
+function val2Text(colomn, url, _text, _value) {
+    _text  = _text  || 'text';
+    _value = _value || "value";
+
+    var params = {}, grid = tssJS.G("grid");
+    if( colomn.endsWith('_id') && grid) {
+        var values = grid.getColumnValues(colomn);
+        var ids = [];
+        values.each(function(i, val) {
+            val && isInt(val) && ids.push(val);
+        });
+
+        if(ids.length) {
+            params["id"] = ids.join();
+        }
+    }
+
+    $.get(url, params, function(data) {
+        var map = {};
+        data.each(function(i, item) {
+            var text = item[_text], val = item[_value];
+            map[val] = text;
+        })
+
+        var $tds = $("#grid td[name='" +colomn+ "']");
+        $tds.each(function(i, td) { 
+            if( i > 0 ) {
+                var val = $(td).attr("value");
+                $(td).text( map[val] );
+            }
+        })
+    } );
+}
+
+/*
+    function onGridLoad() { 
+        val2TextII("f4");
+    }
+*/
+function val2TextII(colomn, _text, _value) {
+    recordDefine.each(function(i, field){
+        if(  colomn === field.code ) {
+            return val2Text(colomn, field.jsonUrl, _text, _value);
+        }
     });
 }
 

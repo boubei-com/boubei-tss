@@ -23,6 +23,7 @@
 		<column name="logicDel" caption="启用回收站" mode="combo" values="0|1" texts="否|是"/>
 		<column name="showCreator" caption="显示创建信息" mode="combo" values="0|1" texts="隐藏|显示"/>
 		<column name="ignoreDomain" caption="忽略域" mode="combo" values="0|1" texts="否|是"/>
+		<column name="makePublic" caption="审核后公开" mode="combo" values="0|1" texts="否|是"/>
 		
 	</declare>
 	<layout>
@@ -139,8 +140,8 @@
 				<label binding="needLog" />: <input binding="needLog"/><br/>
 				<label binding="needQLog" />: <input binding="needQLog"/><br/>
 				<label binding="logicDel"/>: <input binding="logicDel"/><br/>
-				<label binding="ignoreDomain"/>: <input binding="ignoreDomain"/>
-				
+				<label binding="ignoreDomain"/>: <input binding="ignoreDomain"/><br/>
+				<label binding="makePublic"/>: <input binding="makePublic"/>
 			</TD>
 		</TR>
 	</layout>

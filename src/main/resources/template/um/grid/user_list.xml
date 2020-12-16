@@ -4,21 +4,23 @@
 		<column caption="头像" name="icon" mode="image" width="40px"/>
 		<column caption="账号" name="loginName" width="80px" sortable="true" highlightCol="true"/>
 		<column caption="账号状态" name="disabled" values="1|0" texts="停用|启用" width="55px" display="none"/>
-		<column caption="姓名" name="userName" width="80px"/>
+		<column caption="姓名" name="userName" width="70px" sortable="true" />
         <column caption="手机" name="telephone" width="80px"/>
-        <column caption="电子邮件" name="email" width="100px"/>
+        <column caption="电子邮件" name="email" width="80px"/>
 
         <column caption="拥有角色" name="roleNames" width="150px"/>
 		<column caption="所属组织" name="groupName" width="80px"/>
 		<column caption="所属域" name="domain" width="50px"/>
-		<column caption="入职日期" name="birthday" mode="date" width="80px"/>
+		<column caption="来源" name="origin" width="50px"/>
+		<column name="authMethod"  caption="登录方式" width="70px"
+			values="com.boubei.tss.um.sso.UMPasswordIdentifier|com.boubei.tss.um.sso.SMSIdentifier" texts="密码登录|短信验证码登录"/>
 		
 		<column caption="用户ID" name="id" display="none"/>
 		<column caption="所属组织ID" name="groupId" display="none"/>
 		<column caption="外部用户ID" name="fromUserId" display="none"/>
-		<column caption="创建时间" name="createTime" width="80px"/>
-		<column caption="最后登录" name="lastLogonTime" width="80px"/>
-		<column caption="登录次数" name="logonCount" width="60px"/>
+		<column caption="创建时间" name="createTime" width="80px" sortable="true" />
+		<column caption="最后登录" name="lastLogonTime" width="80px" sortable="true" />
+		<column caption="登录次数" name="logonCount" width="50px" sortable="true" />
 	</declare>
 	<data>
 	</data>

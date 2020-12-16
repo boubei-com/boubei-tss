@@ -10,6 +10,7 @@
 
 package com.boubei.tss.framework.persistence.pagequery;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,8 +18,6 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-
-import org.apache.commons.collections.CollectionUtils;
 
 import com.boubei.tss.framework.exception.BusinessException;
 import com.boubei.tss.util.BeanUtil;
@@ -56,7 +55,7 @@ public abstract class PaginationQuery {
      */
     public PageInfo getResultList() {
         Set<String> ignores = condition.getIgnoreProperties();
-        CollectionUtils.addAll(ignores, COMMON_IGNORE_PROPERTIES);
+        ignores.addAll( Arrays.asList(COMMON_IGNORE_PROPERTIES) );
         Map<String, Object> properties = BeanUtil.getProperties(condition, ignores);
         
         // 过滤空参数、无效参数对应的宏代码 

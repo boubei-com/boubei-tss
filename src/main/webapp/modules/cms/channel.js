@@ -567,5 +567,18 @@ function searchArticles(){
     }, "搜索【" + treeName + "】下所有文章");
 }
 
+function showComments(articleId) {
+    tssJS.get("/tss/auth/article/" + articleId + "/comment?anonymous=true", {}, 
+        function(commonts) {
+            var html = "";
+            commonts.each(function(i, item){
+                html += '<div class="cmt-author"><span>' + item[0] + '</span><time class="time">' + item[2] + '</time></div>' +
+                        '<div class="cmt-summay">' + item[1] + '</div>';
+                
+            });
+            tssJS.alert(html||'暂无评论');
+    });
+}
+
 window.onload = init;
 

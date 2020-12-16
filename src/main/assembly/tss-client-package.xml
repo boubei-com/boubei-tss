@@ -1,0 +1,44 @@
+<assembly  
+	xmlns ="http://maven.apache.org/POM/4.0.0"  
+	xmlns:xsi ="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation ="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.0.0.xsd" > 
+     
+	 <id>client</id> 
+     <formats> 
+         <format>jar</format> 
+     </formats> 
+     <includeBaseDirectory>false</includeBaseDirectory> 
+     <fileSets> 
+         <fileSet> 
+			 <directory>target/classes</directory>
+			 <outputDirectory>/</outputDirectory>
+			 <includes>
+			 	<include>com/boubei/tss/util/**/**.class</include>
+				<include>com/boubei/tss/cache/**/**.class</include>
+				<include>com/boubei/tss/framework/**/**.class</include>
+				<include>com/boubei/tss/modules/**/**.class</include>
+				<include>META-INF/spring.xml</include>
+				<include>META-INF/spring-framework.xml</include>
+				<include>template/cache/*.xml</include>
+				<include>template/log/*.xml</include>
+				<include>template/param/*.xml</include>
+				
+				<include>com/boubei/tss/um/UMConstants.class</include>
+				<include>com/boubei/tss/um/permission/**/**.class</include>
+				<include>com/boubei/tss/um/entity/Operation.class</include>
+				<include>com/boubei/tss/um/entity/permission/RoleUserMapping.class</include>
+				<include>com/boubei/tss/um/entity/permission/RoleUserMappingId.class</include>
+				<include>com/boubei/tss/um/entity/permission/ViewRoleUser.class</include>
+				<include>com/boubei/tss/um/entity/permission/ViewRoleUser4SubAuthorize.class</include>
+				<include>com/boubei/tss/um/entity/permission/ViewRoleUserId.class</include>
+				<include>com/boubei/tss/um/helper/dto/**.class</include>
+				<include>com/boubei/tss/um/helper/PasswordRule.class</include>
+				<include>com/boubei/tss/um/sso/*.class</include>
+				<include>com/boubei/tss/um/servlet/GetLoginInfo.class</include>
+				<include>com/boubei/tss/um/service/ILoginService.class</include>
+				<include>META-INF/remote/*.xml</include>
+			 </includes>
+         </fileSet> 
+     </fileSets> 
+ 
+</assembly>

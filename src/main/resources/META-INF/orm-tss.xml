@@ -11,12 +11,16 @@
 	<entity class="com.boubei.tss.modules.param.Param"/>
 	<entity class="com.boubei.tss.modules.timer.JobDef"/>
 	<entity class="com.boubei.tss.modules.sn.SerialNO"/>
+	<entity class="com.boubei.tss.modules.sn.SelfNO"/>
 	<entity class="com.boubei.tss.modules.cloud.entity.ModuleDef"/>
 	<entity class="com.boubei.tss.modules.cloud.entity.ModuleUser"/>
 	<entity class="com.boubei.tss.modules.cloud.entity.CloudOrder"/>
 	<entity class="com.boubei.tss.modules.cloud.entity.Account"/>
 	<entity class="com.boubei.tss.modules.cloud.entity.AccountFlow"/>
 	<entity class="com.boubei.tss.modules.cloud.entity.DomainInfo"/>
+	<entity class="com.boubei.tss.modules.cloud.entity.DomainConfig"/>
+	<entity class="com.boubei.tss.modules.cloud.entity.ProxyContract"/>
+	<entity class="com.boubei.tss.modules.cloud.entity.ProxyPrice"/>
  
 	<!-- um -->	
 	<entity class="com.boubei.tss.um.sso.online.DBOnlineUser"/>
@@ -46,6 +50,7 @@
 	
 	<entity class="com.boubei.tss.um.entity.Message"/>
 	<entity class="com.boubei.tss.um.entity.UserToken"/>
+	<entity class="com.boubei.tss.um.entity.UserLog"/>
 	
 	<!-- dm -->	
 	<entity class="com.boubei.tss.dm.etl.Task"/>
@@ -58,6 +63,7 @@
 	<entity class="com.boubei.tss.dm.report.log.AccessLog"/>
 	
 	<entity class="com.boubei.tss.dm.record.Record"/>
+	<entity class="com.boubei.tss.dm.record.RecordField"/>
 	<entity class="com.boubei.tss.dm.record.file.RecordAttach"/>
 	<entity class="com.boubei.tss.dm.record.permission.RecordPermission"/>
 	<entity class="com.boubei.tss.dm.record.permission.RecordResource"/>
@@ -66,6 +72,8 @@
 	<entity class="com.boubei.tss.dm.record.workflow.WFStatus"/>
 	<entity class="com.boubei.tss.dm.record.workflow.WFDefine"/>
 	<entity class="com.boubei.tss.dm.ext.EmptyRecord"/>
+	<entity class="com.boubei.tss.dm.record.file.OrignUploadFile"/>
+	<entity class="com.boubei.tss.dm.record.file.RecordImpTL"/>
 	
 	<!-- cms -->	
 	<entity class="com.boubei.tss.cms.entity.Channel"/>
@@ -81,7 +89,6 @@
 	<entity class="com.boubei.tss.portal.entity.ReleaseConfig"/>
 	<entity class="com.boubei.tss.portal.entity.Navigator"/>
 	<entity class="com.boubei.tss.portal.entity.Structure"/>
-	<entity class="com.boubei.tss.portal.entity.ThemePersonal"/>
 	<entity class="com.boubei.tss.portal.entity.Theme"/>
 	<entity class="com.boubei.tss.portal.entity.ThemeInfo"/>
  

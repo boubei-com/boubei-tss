@@ -236,11 +236,10 @@ public class CacheAction extends BaseActionSupport {
     	
         Cacheable item = cache.getPool(code).getObject(key);
         if(item != null) {
-            String returnStr = EasyUtils.obj2Json(item.getValue());
-            print(returnStr);
+            print( EasyUtils.obj2String(item.getValue()) );
         }
         else {
-            print(EX.CACHE_5);
+            print( EX.CACHE_5 );
         }
     }
     

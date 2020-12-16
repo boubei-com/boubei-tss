@@ -11,24 +11,31 @@
            u.code loginName, u.code as password, u.name userName, null email, null sex, null birthday, u.code employeeNo, null authMethod, 0 disabled
      from staff_info u
      where 1 >= :groupId
+     order by u.id desc
    </userSql>
 </params>
 
 
 同步员工基础信息表（自动同步各个域下员工到对应的域组下）: JobConfig : -8,STAFF，【$企业域】上触发手动同步
-<?xml version="1.0" encoding="UTF-8"?>
 <params>
+    <ds>connectionpool</ds>
 	<groupSql>
-select distinct id, parentId, name, null description, 0 disabled  from um_group where parentId = -8 and 999 > :groupId
+select distinct id, parentId, name, null description, 0 disabled  from um_group where parentId = -8
 	</groupSql>
+	
 	<userSql>
 select distinct u.id,
-  (select id from um_group where domain = u.domain and levelNo = 4) groupId, 
+  IFNULL(u.group_id, 
+	  IFNULL( 
+		(select g.id from um_group g, um_groupuser gu, um_user uu where u.phone = uu.loginName and uu.id = gu.userId and gu.groupId = g.id and g.groupType=1 ),
+        (select id from um_group where domain = u.domain and (levelNo = 4 or domainRoot = 1) )
+	  )
+  ) groupId,
   u.phone loginName, u.phone as password, u.name userName,  email,  sex, u.phone telephone, u.code employeeNo, null authMethod, 
   case when outdate is not null then 1 else 0 end  disabled 
 from staff_info u 
-where domain is not null and u.phone is not null and 999 > :groupId 
-  and (u.updatetime > date_sub(now(), interval 3 day) or u.createtime > date_sub(now(), interval 3 day) )
-	</userSql>
+where domain is not null and u.phone is not null 
+    and (u.updatetime > date_sub(now(), interval 3 day) or u.createtime > date_sub(now(), interval 3 day) )
+order by u.id desc
 	</userSql>
 </params>

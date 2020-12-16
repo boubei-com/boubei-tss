@@ -10,9 +10,11 @@
 
 package com.boubei.tss;
 
-import java.util.Calendar;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
@@ -22,10 +24,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
-import org.springframework.test.context.transaction.TransactionConfiguration;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.boubei.tss.dm.DMConstants;
+import com.boubei.tss.dm.dml.SQLExcutor;
+import com.boubei.tss.framework.Config;
 import com.boubei.tss.framework.Global;
 import com.boubei.tss.framework.persistence.ICommonDao;
 import com.boubei.tss.framework.sso.Anonymous;
@@ -33,12 +39,15 @@ import com.boubei.tss.framework.sso.LoginCustomizerFactory;
 import com.boubei.tss.framework.sso.SSOConstants;
 import com.boubei.tss.framework.sso.TokenUtil;
 import com.boubei.tss.framework.sso.context.Context;
+import com.boubei.tss.modules.api.AAPI;
 import com.boubei.tss.modules.api.API;
 import com.boubei.tss.modules.api.APIService;
 import com.boubei.tss.modules.log.LogService;
 import com.boubei.tss.modules.param.ParamConstants;
 import com.boubei.tss.modules.param.ParamManager;
 import com.boubei.tss.modules.param.ParamService;
+import com.boubei.tss.modules.search.GeneralSearchAction;
+import com.boubei.tss.modules.search.GeneralSearchService;
 import com.boubei.tss.um.UMConstants;
 import com.boubei.tss.um.entity.Group;
 import com.boubei.tss.um.entity.Role;
@@ -51,7 +60,13 @@ import com.boubei.tss.um.service.IResourceService;
 import com.boubei.tss.um.service.IRoleService;
 import com.boubei.tss.um.service.IUserService;
 import com.boubei.tss.um.sso.FetchPermissionAfterLogin;
+import com.boubei.tss.um.sso.online.DBOnlineUser;
+import com.boubei.tss.util.BeanUtil;
+import com.boubei.tss.util.DateUtil;
 import com.boubei.tss.util.EasyUtils;
+import com.boubei.tss.util.FileHelper;
+import com.boubei.tss.util.InfoEncoder;
+import com.boubei.tss.util.URLUtil;
 import com.boubei.tss.util.XMLDocUtil;
 
 /**
@@ -67,7 +82,8 @@ import com.boubei.tss.util.XMLDocUtil;
         } 
         , inheritLocations = false // 是否要继承父测试用例类中的 Spring 配置文件，默认为 true
       )
-@TransactionConfiguration(defaultRollback = true) // 自动回滚，每个用力测试完成后自动清空产生的数据
+@Rollback
+@Transactional // 自动回滚，每个用力测试完成后自动清空产生的数据
 public abstract class AbstractTest4TSS extends AbstractTransactionalJUnit4SpringContextTests { 
  
     protected Logger log = Logger.getLogger(this.getClass());    
@@ -86,6 +102,9 @@ public abstract class AbstractTest4TSS extends AbstractTransactionalJUnit4Spring
     @Autowired protected IGroupService groupService;
     
     @Autowired protected API api;
+    @Autowired protected AAPI aapi;
+    @Autowired protected GeneralSearchService generalService;
+    @Autowired protected GeneralSearchAction generalSearcher;
     
     @Autowired protected H2DBServer dbserver;
  
@@ -113,6 +132,7 @@ public abstract class AbstractTest4TSS extends AbstractTransactionalJUnit4Spring
     
     @After
     public void tearDown() throws Exception {
+    	SQLExcutor.excute("delete from x_serialno", DMConstants.LOCAL_CONN_POOL);
     }
  
     /**
@@ -129,6 +149,11 @@ public abstract class AbstractTest4TSS extends AbstractTransactionalJUnit4Spring
 	    	log.info( " sql path : " + sqlpath);
 	        _TestUtil.excuteSQL(sqlpath);
 	        _TestUtil.excuteSQL(sqlpath + "/um");
+	        
+	        // 给“域管理员”管理 企业域 的权限
+	        _TestUtil.mockPermission("um_permission_group", "$企业域", UMConstants.DOMAIN_ROOT_ID, UMConstants.DOMAIN_ROLE_ID, UMConstants.GROUP_EDIT_OPERRATION, 2, 0, 0);
+	        _TestUtil.mockPermission("um_permission_group", "$企业域", UMConstants.DOMAIN_ROOT_ID, UMConstants.DOMAIN_ROLE_ID, UMConstants.GROUP_VIEW_OPERRATION, 2, 0, 0);
+	        
     	}
     	
     	// 初始化虚拟登录用户信息
@@ -137,10 +162,27 @@ public abstract class AbstractTest4TSS extends AbstractTransactionalJUnit4Spring
         /* 初始化应用系统、资源、权限项 */
         Document doc = XMLDocUtil.createDocByAbsolutePath(_TestUtil.getSQLDir() + "/tss-resource-config.xml");
         resourceService.applicationResourceRegister(doc, UMConstants.PLATFORM_SYSTEM_APP);
+        
+        // 设置邮件服务器密码
+        String msName = PX.MAIL_SERVER_+"default";
+        String ms = Config.getAttribute(msName);
+		if(ms.endsWith("yourpasswd") && paramService.getParam(msName) == null) {
+        	URL pwdFile = URLUtil.getResourceFileUrl("passwd");
+        	String realPasswd = InfoEncoder.simpleEncode("don't kown", 12);
+        	if(pwdFile != null) {
+        		realPasswd = FileHelper.readFile( pwdFile.getFile());
+        	}
+        	
+			ms = ms.replaceAll( "yourpasswd", realPasswd );
+        	ParamManager.addSimpleParam(ParamConstants.DEFAULT_PARENT_ID, msName, "163-MS", ms);
+        }
     }
  
     protected void login(User user) {
     	login(user.getId(), user.getLoginName());
+    }
+    protected void login(String loginName) {
+    	login(loginSerivce.getOperatorDTOByLoginName(loginName).getId(), loginName);
     }
     protected void login(Long userId, String loginName) {
     	LoginCustomizerFactory.customizer = null;
@@ -150,6 +192,10 @@ public abstract class AbstractTest4TSS extends AbstractTransactionalJUnit4Spring
 		}
 		
     	apiService.mockLogin(loginName);
+    	
+    	DBOnlineUser dou = new DBOnlineUser();
+    	dou.setUserId(userId);
+    	commonDao.createObject(dou);
     }   
     
     // 切换为匿名用户登陆，
@@ -180,16 +226,23 @@ public abstract class AbstractTest4TSS extends AbstractTransactionalJUnit4Spring
         return u;
 	}
     protected Role createRole(String name, Object userId) {
-		Calendar calendar = new GregorianCalendar();
-        calendar.add(UMConstants.ROLE_LIFE_TYPE, UMConstants.ROLE_LIFE_TIME);
-        
 		Role r = new Role();
         r.setIsGroup(0);
         r.setName(name);
         r.setParentId(UMConstants.ROLE_ROOT_ID);
         r.setStartDate(new Date());
-        r.setEndDate(calendar.getTime());
+        r.setEndDate( DateUtil.addYears(new Date(), UMConstants.ROLE_LIFE_TIME) );
         roleService.saveRole2UserAndRole2Group(r, EasyUtils.obj2String(userId), "");
         return r;
+	}
+    
+	protected void setParameters(Object o){
+		Map<String,Object> map = BeanUtil.getProperties(o);
+		for (Entry<String, ?> entry : map.entrySet()) {
+			String key = entry.getKey();
+			if( !Arrays.asList("createTime","order_date").contains(key) ) {
+				request.setParameter(key, EasyUtils.obj2String(entry.getValue()));
+			}
+		}
 	}
 }

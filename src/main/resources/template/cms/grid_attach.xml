@@ -5,12 +5,18 @@
 		<column caption="附件件序号" name="seqNo" mode="number" display="none"/>
 		<column caption="类型" name="type" mode="string" values="1|2" texts="图片|文档" width="50px;"/>
 		<column caption="文件后缀" name="fileExt" mode="string" display="none"/>
-		
 		<column caption="文件名" name="name" mode="string" width="130px;"/>
-		<column caption="下载地址" name="downloadUrl" mode="string" width="270px;"/>
+		<column caption="文件大小（K）" name="fileSize" mode="string" width="40px;"/>
+		<column caption="上传日期" name="uploadDate" mode="string" width="80px"/>	
+		<column caption="浏览次数" name="hitCount" mode="string" width="55px" />
+		
+		<column caption="下载地址" name="downloadUrl" mode="string" display="none"/>
 		<column caption="相对地址" name="relationUrl" mode="string" display="none"/>
-		<column caption="存放路径" name="localPath" mode="string" width="170px;"/>
-		<column caption="下载次数" name="hitCount" mode="string" width="55px" />
+		<column caption="存放路径" name="localPath" mode="string" display="none"/>
+		
+		<column caption="打开" name="_url"   mode="string" width="40px" showTitle="false"/>
+		<column caption="置顶" name="topOpt" mode="string" width="40px" showTitle="false"/>
+		<column caption="删除" name="delOpt" mode="string" width="40px" showTitle="false"/>
 	</declare>
 	<data>
 	</data>

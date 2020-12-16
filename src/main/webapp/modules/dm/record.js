@@ -89,14 +89,14 @@ function initMenus() {
 		visible:function() { return isRecord() && getOperation("1") && !getOperation("2"); }
 	}
 	var item24 = {
-		label:"测试数据表",
+		label:"预览数据表",
 		callback: function() {
 			window.open( "recorder.html?id=" + getTreeNodeId() );
 		},
 		visible:function() { return isRecord() && getOperation("2"); }
 	}
 	var item25 = {
-		label:"测试数据表接口",
+		label:"调试数据表接口",
 		icon:"icon icon-tools",
 		callback: function() {
 			window.open( "/tss/more/api.html?id=" + getTreeNodeId() );
@@ -299,7 +299,7 @@ function loadRecordDetail(isCreate, type, readonly, isPage) {
 
 			wf_def = (xform.getData("workflow")||"").revertEntry();
 			curr_record_id = isCreate ? 0 : treeNodeID;
-			$("#designerForm>iframe").attr("src", "record_wf_designer.html");
+			$("#designerForm>iframe").attr("src", "wf_designer.html");
 		},
 		onexception : function() { 
 			closeRecordFormDiv();
@@ -453,7 +453,7 @@ function configDefine() {
 	var defVal = (rform.getData("define")||"").revertEntry(); // getData里执行了XML符号处理方法 converEntity，& --> &amp;  需要替换回来
 
 	if(defVal && defVal.indexOf('{') < 0) {  // 根据Excel表头快速定义的录入表，eg: 仓库 货主 库位 货品 包装 数量
-		var columns = defVal.replace(/\t/g, " ").split(" ");  // 替换掉tab
+		var columns = defVal.replace(/\t|，|,/g, " ").split(" ");  // 替换掉tab/中英文逗号
 		defVal = [];
 		columns.each(function(i, column) {
 			column = column.trim().replace(/&amp;|\&|\|/g, ""); // 过滤名称里的特殊字符:|、&;
@@ -664,6 +664,9 @@ function editFieldConfig() {
 					// 且只能为英文字母、数字、下划线
 					if( !/^[a-zA-Z][a-zA-Z0-9_]*$/.test(newValue) ) {
 						return $(fieldEl).notice("不能含有字母、数字、下划线以外的字符");
+					}
+					if( ["id", "creator", "createTime", "updator", "updateTime", "version", "domain"].contains(newValue) ) {
+						return $(fieldEl).notice(newValue + "是数据表自带字段，无需重复创建");
 					}
 				}
 				valuesMap[field] = newValue;   

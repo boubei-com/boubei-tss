@@ -46,6 +46,7 @@ public interface SSOConstants {
     public static final String USER_PASSWD  = "password";
     public static final String USER_GROUP   = "userGroup";
     public static final String USER_GROUP_ID= "userGroupId";
+    public static final String USER_ORG     = "userOrg"; // 用户所属组织（经营组织、运营组织）
     
     public static final String USER_DOMAIN       = "DOMAIN";
     public static final String USER_DOMAIN_CN    = "DOMAIN_CN";

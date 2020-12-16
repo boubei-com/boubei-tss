@@ -5,6 +5,7 @@
 		<column name="name" caption="名称" mode="string" maxLength="50" empty="false"/>	
 		<column name="code" caption="编码" mode="string" maxLength="50" empty="false"/>	
 		<column name="icon" caption="图标" mode="string" maxLength="200"/>	
+		<column name="url" caption="请求地址" mode="string" maxLength="200" empty="false"/>	
 		<column name="description" caption="描述信息" mode="string"/>
 	</declare>
 	<layout>
@@ -19,6 +20,10 @@
 		<TR>
 			<TD><label binding="icon"/></TD>
 			<TD><input binding="icon" style="width:300px;"/></TD>
+		</TR>
+		<TR>
+			<TD><label binding="url"/></TD>
+			<TD><input binding="url" style="width:450px;"/></TD>
 		</TR>
 		<TR>
 			<TD><label binding="description"/></TD>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<servers>
+	<server code="TSS" framework="tss" name="TSS" sessionIdName="JSESSIONID" baseURL="http://localhost:8011/tss"/>
+	<server code="CMS" framework="tss" name="CMS" sessionIdName="JSESSIONID" baseURL="http://localhost:8012/cms"/>
+	<server code="XXX" framework="tss" name="XXX" sessionIdName="JSESSIONID" baseURL="http://localhost:8013/xxx"/>
+	<server code="DOMINO" framework="domino" name="OA" sessionIdName="DomAuthSessId" baseURL="http://192.168.0.12:81"/>
+</servers>

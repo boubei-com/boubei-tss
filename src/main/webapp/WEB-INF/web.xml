@@ -17,6 +17,7 @@
 		<listener-class>com.boubei.tss.framework.web.listener.TSSContextLoaderListener</listener-class>
 	</listener>
 	
+<!-- 此过滤器防止 Matrix 接收到的中文乱码	 -->
 	<filter>  
 	    <filter-name>characterEncodingFilter</filter-name>  
 	    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>  
@@ -33,8 +34,9 @@
 	    <filter-name>characterEncodingFilter</filter-name>  
 	    <url-pattern>/*</url-pattern>  
 	</filter-mapping>
-	
-	<!-- 使用注释@WebFilter配置的Filter执行顺序在不同的操作系统、条件（jar包、普通目录）不一致 -->
+
+ 
+ <!-- 使用注释@WebFilter配置的Filter执行顺序在不同的操作系统、条件（jar包、普通目录）不一致 -->
 	<filter>  
 	    <filter-name>Filter0Security</filter-name>  
 	    <filter-class>com.boubei.tss.framework.web.filter.Filter0Security</filter-class>   
@@ -133,11 +135,9 @@
 	</filter> 
 	<filter-mapping>
 	    <filter-name>Filter8APITokenCheck</filter-name>
-	    <url-pattern>/wx/api/*</url-pattern>
-	    <url-pattern>/img/api/*</url-pattern>
 	    <url-pattern>/api/*</url-pattern>
 	</filter-mapping>
-
+	
 	
 	<servlet>
 		<servlet-name>spring-mvc</servlet-name>

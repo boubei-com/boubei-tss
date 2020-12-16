@@ -40,7 +40,13 @@ import com.boubei.tss.util.DateUtil;
 import com.boubei.tss.util.EasyUtils;
 
 /** 
- * <p>文章Article实体对象</p>
+ * 文章Article实体对象
+ * 
+ * 栏目文章如何分域：
+ * 1、栏目站点可以设置domain值，设置后站点下栏目都会设置上domain值
+ * 2、只对对应domain域的用户可见
+ * 3、域用户新增、修改文章，会设置文章domain = Enviroment.domain，只对相同域的用户可见
+ * 4、如需支持发布到门户匿名访问，除了将栏目和门户授权匿名用户访问，还需将域添加到 系统参数 PUBLIC_DOMAINS （默认值为：'无域','BD'）
  */
 @Entity
 @Table(name = "cms_article")
@@ -196,6 +202,8 @@ public class Article extends OperateInfo implements IGridNode, IXForm {
         
         boolean overdue = overdueDate != null && overdueDate.before(new Date());
         map.put("icon", "images/article_" + EasyUtils.checkTrue(overdue, 1, 0) + ".gif");
+        
+        map.put("commentNum", "<a href='javascript:void(0)' onclick='showComments(" + id + ")'>" + commentNum + "</a>");
         
         return map;
     }

@@ -22,6 +22,8 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import com.boubei.tss.modules.param.ParamConfig;
+
 /**
  * 制作图片文件的缩略图
  */
@@ -101,7 +103,8 @@ public class Imager {
 		File srcFile = new File(src);
 		long fileSize = srcFile.length();
 		String subfix = FileHelper.getFileSuffix(srcFile.getName());
-		List<String> list = Arrays.asList( "jpg,jpeg,bmp,gif".split(",") ); // 这些格式支持有损压缩，png等不支持
+		String zoomableTypes = ParamConfig.getAttribute("ZOOM_PIC_TYPES", "jpg,jpeg,bmp,gif,png"); // 这些格式支持有损压缩，png等不支持
+		List<String> list = Arrays.asList( zoomableTypes.split(",") ); 
 		
 		if (fileSize <= maxPicSize * 1024 || !list.contains(subfix.toLowerCase()))  { // 文件本身已小于size（K）时，不做缩放
 			return;
@@ -120,22 +123,25 @@ public class Imager {
 	}
 	
 	public static String markSLPic(File picFile, int size) {
-		String slPicDir = picFile.getParent() + "/sl";
-		
-		// 检查缩略图是否已存在
-		String slPicPath = slPicDir + "/" + picFile.getName();
-		if( new File(slPicPath).exists() ) {
-			return slPicPath;
+		String picPath = picFile.getPath();
+		if( FileHelper.isImage(picPath) ) {
+			String slPicDir = picFile.getParent() + "/sl";
+			
+			// 检查缩略图是否已存在
+			String slPicPath = slPicDir + "/" + picFile.getName();
+			if( new File(slPicPath).exists() ) {
+				return slPicPath;
+			}
+			
+			try {
+				slPicPath = FileHelper.copyFile( new File(slPicDir), picFile, true, false);
+				Imager.zoomImage(slPicPath, size); // 缩略图大小，不超过size
+				Imager.zoomImage(slPicPath, size);
+				return slPicPath;
+			} 
+			catch (Exception e) {
+			}
 		}
-		
-		try {
-			slPicPath = FileHelper.copyFile( new File(slPicDir), picFile, true, false);
-			Imager.zoomImage(slPicPath, size); // 缩略图大小，不超过size
-			Imager.zoomImage(slPicPath, size);
-			return slPicPath;
-		} 
-		catch (Exception e) {
-			return picFile.getPath(); // 如果缩略失败，则还是采用原图片
-		}
+		return picPath; // 如果缩略失败，则还是采用原图片
 	}
 }

@@ -19,6 +19,8 @@
 		<column name="certificateNo" caption="证件号" maxLength="50"/>
 		<column name="accountLife" caption="账户有效期" mode="date" pattern="yyyy-MM-dd" editable="false"/>
 		<column name="authToken" caption="令牌" maxLength="50" editable="true"/>
+		<column name="authMethod"  caption="登录方式" mode="combo" 
+			values="com.boubei.tss.um.sso.UMPasswordIdentifier|com.boubei.tss.um.sso.SMSIdentifier" texts="密码登录|短信验证码登录" empty="false"/>
 		
 		<column name="groupId" mode="hidden"/>
 		<column name="groupName" mode="hidden"/>
@@ -47,8 +49,8 @@
 			<TD><input binding="email" style="width:250px;"/></TD>
 		</TR>
 		<TR>
-			<TD><label binding="birthday"/></TD>
-			<TD><input binding="birthday"/></TD>
+			<TD><label binding="authMethod"/></TD>
+			<TD><input binding="authMethod"/></TD>
  
 			<TD><label binding="authToken"/></TD>
 			<TD><input binding="authToken" style="width:250px;"/></TD>

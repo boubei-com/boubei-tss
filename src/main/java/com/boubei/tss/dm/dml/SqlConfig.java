@@ -19,7 +19,6 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
-import com.boubei.tss.cache.Cacheable;
 import com.boubei.tss.cache.Pool;
 import com.boubei.tss.cache.extension.CacheHelper;
 import com.boubei.tss.framework.exception.BusinessException;
@@ -32,11 +31,14 @@ import com.boubei.tss.util.XMLDocUtil;
 
 public class SqlConfig {
 
+	static final Logger log = Logger.getLogger(SqlConfig.class);
+	
 	public static final String SQL_CONFIG_INIT = "SQL_CONFIG_INIT";
 
-	static final Logger log = Logger.getLogger(SqlConfig.class);
-
-	static Pool cache = CacheHelper.getNoDeadCache();
+	/**
+	 * 不能用缓存池来缓存，有隐患，当缓存池满了以后，单条SQL缓存可能会被清除掉，get该SQL会取不到。
+	 */
+	static Map<String, Script> cache = new HashMap<>();
 
 	static Map<String, Object> sqlNestFmParams = new HashMap<String, Object>(); // SQL嵌套解析用
 
@@ -52,7 +54,8 @@ public class SqlConfig {
 		sqlPath = (String) EasyUtils.checkNull(sqlPath, "script");
 		String cacheKey = SQL_CONFIG_INIT + "_" + sqlPath.toUpperCase();
 
-		if (!cache.contains(cacheKey)) {
+		Pool pool = CacheHelper.getNoDeadCache(); // 清空NoDeadCache，可触发所有Script重新加载
+		if (!pool.contains(cacheKey)) {
 			File scriptDir = new File(URLUtil.getResourceFileUrl(sqlPath).getPath());
 			List<File> sqlFiles = FileHelper.listFilesByTypeDeeply("xml", scriptDir);
 
@@ -68,28 +71,28 @@ public class SqlConfig {
 					obj.role = sqlNode.attributeValue("role");
 					obj.ds   = sqlNode.attributeValue("datasource");
 					obj.dataProcess = sqlNode.attributeValue("bIDataProcess");
-					obj.noLog = "true".equalsIgnoreCase( sqlNode.attributeValue("noLog") );
+					obj.defaultFilter = sqlNode.attributeValue("defaultFilter");
+					obj.recordLog = "on".equalsIgnoreCase( sqlNode.attributeValue("log") ); // 默认不记日志，log="on"才记
 					obj.sql = sqlNode.getText().trim();
-					
+				
 					obj.name = (String) EasyUtils.checkNull(sqlNode.attributeValue("name"), obj.code);
 					obj.role = EasyUtils.obj2String(rootRole) + "," + EasyUtils.obj2String(obj.role);
 
 					sqlNestFmParams.put("${" + obj.code + "}", obj.sql);
-					cache.putObject(obj.code, obj);
+					cache.put(obj.code, obj);
 				}
 			}
-			cache.putObject(cacheKey, true);
+			pool.putObject(cacheKey, true);
 		}
 
-		Cacheable cacheItem = cache.getObject(sqlCode);
-		if (cacheItem == null) {
+		Script script = cache.get(sqlCode);
+		if (script == null) {
 			throw new BusinessException("没有找到编码为【" + sqlCode + "】的SQL");
 		}
-		Script obj = (Script) cacheItem.getValue();
 
 		// 根据当前登录人的角色判断其是否有权限访问sqlCode对应的SQL
 		List<String> ownRoles = Environment.getOwnRoleNames();
-		String[] permitRoles = EasyUtils.obj2String( obj.role ).split(",");
+		String[] permitRoles = EasyUtils.obj2String( script.role ).split(",");
 
 		boolean flag = true;
 		for (String permitRole : permitRoles) {
@@ -106,9 +109,9 @@ public class SqlConfig {
 			throw new BusinessException("你对数据服务【" + sqlCode + "】没有访问权限");
 		}
 
-		obj.sql = MacrocodeCompiler.run(obj.sql, sqlNestFmParams, true); // 自动解析script里的宏嵌套
+		script.sql = MacrocodeCompiler.run(script.sql, sqlNestFmParams, true); // 自动解析script里的宏嵌套
 
-		return obj;
+		return script;
 	}
 	
 	public static class Script {
@@ -118,7 +121,8 @@ public class SqlConfig {
 		public String name;
 		public String ds;
 		public String dataProcess;
-		public boolean noLog;
+		public String defaultFilter;
+		public boolean recordLog;
 		
 		public String toString() {
 			return sql;

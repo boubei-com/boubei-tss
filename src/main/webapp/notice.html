@@ -16,7 +16,7 @@
 
 html, body { height: 100%; }
 
-.portlet { padding:10px; font-size:14px; line-height:143%;}
+.portlet { padding:10px; font-size:14px; line-height:2;}
 .portlet .title{ font-size: 12px; text-align:left; }
 .portlet .label{ padding-left:3px; font-size:14px; font-weight:bold;}
 .portlet .attach{ padding-left:3px; width:100%; background-color:#eee;
@@ -54,14 +54,14 @@ $(function(){
                 url = url.substring( url.indexOf('/tss') ); // 转成相对地址
                 str[str.length] = "<a href='" + url + "'>" + (i+1) + ". " + name + "</a> ";
             });
-            extendStr += "<div class='attach'>相关附件: " + str.join(" | ") + "</div>";
+            // extendStr += "<div class='attach'>相关附件: " + str.join(" | ") + "</div>";
         }
 
         // 文章内容
         var html = [];
         html[html.length] = "<div>";
         html[html.length] = "<div>";
-        html[html.length] = "   <h6> 发布时间：" + issueDate + "， 出处："+ author + "</h6><hr><br>";
+        // html[html.length] = "   <h6> &nbsp;&nbsp;&nbsp;&nbsp;" + issueDate + " &nbsp;&nbsp;&nbsp; "+ author + "</h6><hr><br>";
         html[html.length] = "   <div class='content'>" + (content||"") + "</div><br>";
         html[html.length] = "</div>";
         html[html.length] = extendStr;
@@ -80,8 +80,8 @@ $(function(){
     var fixPic = function(){
         var imgs = $("div.portlet img");
         imgs.each(function(i, img){
-            if( img.width > 760 ){
-                img.width = "760";
+            if( img.width > 1000 ){
+                img.width = "1000";
                 img.title = "点击查看大图";
                 img.style.cursor = "pointer";
                 img.onclick = function(){

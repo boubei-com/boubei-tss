@@ -38,3 +38,6 @@ div.header { padding: 24px 0 28px; background: #049cdb; }
 
 .modal .bts { padding-left: 150px; padding-top: 10px; }
 .modal h2 { font-size: 120%; }
+
+.back { font-size: 16px; }
+.back:hover { cursor: pointer; }

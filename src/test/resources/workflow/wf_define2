@@ -1,0 +1,12 @@
+{
+	"to": [
+			{"roleId": "${role1}", "role": "部门主管", "when": "员工??"}, 
+			{"user": "Jenny", "name": "大贞", "when": "部门主管?? || 天数 > 9"}
+		  ], 
+	"cc": [
+			{"roleId": "${role2}", "role": "人事主管"}
+		  ],
+	"trans": [
+			{"roleId": "${role3}", "role": "总经理"}
+		  ]
+}

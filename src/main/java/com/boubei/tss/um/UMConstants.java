@@ -45,7 +45,7 @@ public final class UMConstants {
 
     public static final String ADMIN_ROLE      = "系统管理员";      // 管理员角色
     public static final Long ADMIN_ROLE_ID     = new Long(-1);    // 管理员角色的ID
-    public static final String ANONYMOUS_ROLE  = "匿名角色";
+    public static final String ANONYMOUS_ROLE  = "$匿名角色";
     public static final Long ANONYMOUS_ROLE_ID = new Long(-10000);// 匿名角色的ID
     public static final Long DOMAIN_ROLE_ID = new Long(-8);  // 域管理员角色ID
     public static final Long DEV_ROLE_ID    = new Long(-9);  // 开发者角色ID

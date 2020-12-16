@@ -90,7 +90,7 @@ public class ArticleDao extends BaseDao<Article> implements IArticleDao {
  
 	@SuppressWarnings("unchecked")
 	public List<Attachment> getArticleAttachments(Long articleId) {
-        List<Attachment> list = (List<Attachment>)getEntities("from Attachment o where o.articleId = ?", articleId);
+        List<Attachment> list = (List<Attachment>)getEntities("from Attachment o where o.articleId = ? order by seqNo", articleId);
 		for ( Attachment attachment : list ) {
 			attachment.setArticle(getEntity(articleId));
 		}
@@ -109,14 +109,14 @@ public class ArticleDao extends BaseDao<Article> implements IArticleDao {
 	public PageInfo getPageList(Long channelId, Integer pageNum) {
 	    String hql = "select o.id, o.title, o.author, o.issueDate, o.summary, "
 				+ "  o.hitCount, o.creatorName, o.createTime, "
-				+ "  o.status, o.channel, o.isTop, o.overdueDate, o.seqNo"
+				+ "  o.status, o.channel, o.isTop, o.overdueDate, o.seqNo, o.commentNum"
 				+ " from Article o "
 				+ " where o.channel.id = :channelId ${domain} ";
 		
         ArticleQueryCondition condition = new ArticleQueryCondition();
         condition.setChannelId(channelId);
         condition.getPage().setPageNum(pageNum);
-        condition.getOrderByFields().add(" o.seqNo desc, o.id desc ");  //  默认按createTime排序
+        condition.getOrderByFields().add(" o.seqNo desc, o.issueDate desc, o.id desc ");  //  默认按createTime排序
 
 		PaginationQueryByHQL pageQuery = new PaginationQueryByHQL(em, hql, condition);
 		return pageQuery.getResultList();
@@ -125,7 +125,7 @@ public class ArticleDao extends BaseDao<Article> implements IArticleDao {
 	public PageInfo getArticlePageList(ArticleQueryCondition condition) {
 		String hql = "select o.id, o.title, o.author, o.issueDate, o.summary, "
 				+ "  o.hitCount, o.creatorName, o.createTime, "
-				+ "  o.status, o.channel, o.isTop, o.overdueDate, o.seqNo"
+				+ "  o.status, o.channel, o.isTop, o.overdueDate, o.seqNo, o.commentNum"
                 + " from Article o, Temp t"
 				+ " where o.channel.id = t.id and t.thread=" + Environment.threadID()
 				+ "  ${title} ${author} ${keyword} ${summary} ${createTime} ${status} ${domain} " ;
@@ -137,7 +137,7 @@ public class ArticleDao extends BaseDao<Article> implements IArticleDao {
         }
         
         if(orderBy == null) {
-            orderBy = " o.seqNo desc, o.id desc "; // 默认按文章的创建时间排序
+            orderBy = " o.seqNo desc, o.issueDate desc, o.id desc "; // 默认按文章的创建时间排序
         }
         condition.getOrderByFields().add(orderBy);
  

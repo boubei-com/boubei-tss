@@ -31,6 +31,22 @@ body {
   font-family: Arial, sans-serif, "Microsoft Yahei";
   font-size: 12px;
 }
+
+/* 启用自定义滚动条，并设置容器属性 */
+*::-webkit-scrollbar {
+  /* 这里的宽是指竖向滚动条的宽，高是指横向滚动条的高*/      
+  width: 8px; height: 8px; background: #ccc; 
+}
+/* 滚动条凹槽，还可以设置边框属性。此处属性也可以直接在容器中设置 */
+*::-webkit-scrollbar-track-piece {
+  background-color: #fff;
+}
+/* 滚动条 */
+*::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: linear-gradient(#ccc, #bbb); 
+}
+
 *,
 *:before,
 *:after {

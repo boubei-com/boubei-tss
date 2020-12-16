@@ -41,7 +41,7 @@ KindEditor.lang({
 	image : '图片',
 	multiimage : '批量图片上传',
 	flash : 'Flash',
-	media : '视音频',
+	media : '视频',
 	table : '表格',
 	tablecell : '单元格',
 	hr : '插入横线',

@@ -49,7 +49,7 @@ public class ChannelDao extends TreeSupportDao<Channel> implements IChannelDao {
     }
  
     public List<?> getAllSiteChannelList() {
-		return getEntities("from Channel c order by c.decode");
+		return getEntities("from Channel where domain is null or domain = ? order by decode", Environment.getDomain());
 	}
 
 	public List<?> getChannelsBySiteIdNoPermission(Long siteId) {

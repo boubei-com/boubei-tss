@@ -18,9 +18,9 @@
   #d3, #d1, #d2 { display: none; }
   #resetBT { margin-top: 10px; }
 
-  .modal { width: 500px; }
-  .tssForm { line-height: 33px; width: 520px; padding: 15px 25px; font-size: 13px; }
-  .tssForm input { height: 23px; }
+  .modal { width: 620px; }
+  .tssForm { line-height: 33px; width: 600px; padding: 15px 25px; font-size: 13px; }
+  .tssForm input { height: 23px; vertical-align: middle; }
 
 </style>
 
@@ -32,8 +32,8 @@
 
     /* XMLHTTP请求地址汇总 */
     URL_QUESTION = NO_AUTH_PATH + "getQuestion.in";
-    URL_FORGET = NO_AUTH_PATH + "getPassword.in";
-    URL_RESET  = NO_AUTH_PATH + "resetPassword.in";
+    URL_FORGET   = NO_AUTH_PATH + "checkAnswer.in";
+    URL_RESET    = NO_AUTH_PATH + "resetPassword.in";
 
     if( IS_TEST ) {
         URL_QUESTION = "data/_question.xml";
@@ -130,6 +130,10 @@
         }, 3000);
     }
 
+    function backTo(){
+        window.location.href = "/tss/login.html";
+    }
+
 //-->
 </SCRIPT>
 
@@ -140,7 +144,7 @@
 <div class="modal-wrapper">
     <div class="modal">
         <div class="header">
-          <h1 class="sysTitle">重置密码</h1>
+          <h1 class="sysTitle">重置密码&nbsp;&nbsp;&nbsp;<span class="back" onclick="backTo()">返回首页</span></h1>
           <h2 class="subTitle">可以通过注册账号时填写的手机号、邮箱或密码保护找回密码</h2>
         </div>
 
@@ -166,8 +170,7 @@
             </div>
 
             <div id="d2">
-                <label>注册邮箱：</label>
-                <input id="email" style="width: 240px" placeholder="请输入注册时填写的邮箱"/>
+                <label>注册邮箱：</label><input id="email" style="width: 240px" placeholder="请输入注册时填写的邮箱"/>
                 <span class="required">*</span>
                 <button class="tssbutton blue small" id="btn1">获取验证码</button>
                 <br>
@@ -177,8 +180,7 @@
             </div>
 
             <div id="d4">
-                <label>手机号码：</label>
-                <input id="telephone" style="width: 240px" placeholder="请输入注册时填写的手机号码"/>
+                <label>手机号码：</label><input id="telephone" style="width: 240px" placeholder="请输入注册时填写的手机号码"/>
                 <span class="required">*</span>
                 <button class="tssbutton blue small" id="btn2">获取验证码</button>
                 <br>
@@ -294,7 +296,7 @@
             $('#btn2').text( '等待' + waitSeconds-- + '秒' );
             if(waitSeconds <= 0){
                 $('#btn2').text("获取验证码");
-                $('#btn2').attr('disabled', false);
+                $('#btn2')[0].removeAttribute('disabled');
                 clearInterval(interval);
             }
         }, 1000)

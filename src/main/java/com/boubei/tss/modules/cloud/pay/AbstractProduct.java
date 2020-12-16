@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import com.boubei.tss.PX;
 import com.boubei.tss.framework.Global;
 import com.boubei.tss.framework.exception.BusinessException;
@@ -39,6 +41,8 @@ public abstract class AbstractProduct {
     protected static IUserDao dao = (IUserDao) Global.getBean("UserDao");
     protected IUserService userService = (IUserService) Global.getBean("UserService");
     protected CloudService cloudService = (CloudService) Global.getBean("CloudService");
+
+    protected Logger log = Logger.getLogger(this.getClass());
 
     public CloudOrder co;
     public ModuleDef md;
@@ -106,7 +110,8 @@ public abstract class AbstractProduct {
     protected abstract void beforeOrderModuleCheck();
 
     // 实现类自定义检查
-    protected void beforeOrderCustomCheck() { }
+    protected void beforeOrderCustomCheck() {
+    }
 
     public void beforeOrder() {
 
@@ -138,7 +143,7 @@ public abstract class AbstractProduct {
     /**
      * 购买付款成功后，进行初始化
      */
-    public void afterPay(Map<?, ?> trade_map, Double real_money, String payer, String payType) {
+    public void afterPay(Map<?, ?> trade_map, Double real_money, String payer, String payType, String payClazz) {
         // 只有待付款状态的订单可以执行afterPay
         if (!CloudOrder.NEW.equals(co.getStatus())) {
             throw new BusinessException("订单" + co.getStatus());
@@ -151,6 +156,7 @@ public abstract class AbstractProduct {
         co.setMoney_real(real_money);
         co.setPay_date(new Date());
         co.setPay_type(payType);
+        co.setPay_clazz(payClazz);
 
         if (real_money < co.getMoney_cal() && !ADMIN_PAYER.equals(payer)) {
             co.setRemark("订单金额不符");
@@ -158,20 +164,15 @@ public abstract class AbstractProduct {
         } else {
             co.setStatus(CloudOrder.PAYED);
 
-            // 购买成功，正式启用用户（if新用户）;
-            if (ParamConstants.TRUE.equals(this.buyer.getDisabled())) {
-                this.buyer.setDisabled(ParamConstants.FALSE);
-                dao.update(this.buyer);
-            }
-
             handle();
             proxyHandle();
             init();
 
-
-            sendMessage(null, "用户付款通知", "用户：" + buyer.getUserName()
+            sendMessage(null,
+                    "用户付款通知",
+                    "用户：" + ((User) EasyUtils.checkNull(buyer, new User())).getUserName()
                     + "\n支付：" + co.getMoney_real() + "元"
-                    + "\n支付类型：" + co.getPay_type()
+                    + "\n支付方式：" + co.getPay_type()
                     + "\n产品：" + co.getProduct()
                     + "\n账号：" + co.getCreator()
                     + "\n参数：" + EasyUtils.obj2String(co.getParams()));
@@ -183,14 +184,27 @@ public abstract class AbstractProduct {
         dao.update(co);
     }
 
+    /**
+     * 退款
+     *
+     * @param refund_fee    退款金额
+     * @param out_refund_no 退款单号
+     * @return
+     */
+    public Result refund(Double refund_fee, String out_refund_no) {
+        if (EasyUtils.isNullOrEmpty(co.getPay_clazz())) {
+            return new Result(false, "未知的支付类型");
+        }
+        IRefund iRefund = (IRefund) BeanUtil.newInstanceByName(co.getPay_clazz());
+        return iRefund.refund(co, refund_fee, out_refund_no);
+    }
+
     protected abstract void handle();
 
     protected void init() {
     }
 
-    public String getName() {
-        return md.getModule();
-    }
+    public abstract String getName();
 
     protected String toflowType() {
         return AccountFlow.TYPE0;
@@ -231,7 +245,7 @@ public abstract class AbstractProduct {
     public void createFlows(Account account) {
         // 不是余额支付的，认为是先进行了充值行为，再购买
         String pay_type = co.getPay_type();
-		if ( !CloudOrder.PAYTYPE_1.equals(pay_type) ) {
+        if (!CloudOrder.PAYTYPE_1.equals(pay_type)) {
             createIncomeFlow(account);
         }
         createBuyFlow(account);
@@ -337,7 +351,7 @@ public abstract class AbstractProduct {
 
     /* 发送通知 */
     protected void sendMessage(String mailList, final String title, final String content) {
-        if ( !EasyUtils.isProd() ) return;
+        if (!EasyUtils.isProd()) return;
 
         String mails = ParamConfig.getAttribute(PX.NOTIFY_AFTER_PAY_LIST, "boubei@163.com");
         if (!EasyUtils.isNullOrEmpty(mailList)) {
@@ -354,6 +368,6 @@ public abstract class AbstractProduct {
     }
 
     protected void sendSMS2Buyer() {
-    	
+
     }
 }

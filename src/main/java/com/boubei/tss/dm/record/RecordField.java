@@ -22,6 +22,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.boubei.tss.cache.aop.CacheClear;
 import com.boubei.tss.util.EasyUtils;
 
 /**
@@ -42,12 +43,14 @@ import com.boubei.tss.util.EasyUtils;
   {'label':'自定义1','code':'udf1'},
   {'label':'自定义2','code':'udf2'},
   {'label':'自定义3','code':'udf3'},
-  {'label':'用户','code':'user'}
+  {'label':'用户','code':'user'},
+  {'label':'用户组织','code':'user_org'}
 ]
  */
 @Entity
 @Table(name = "dm_record_field")
 @SequenceGenerator(name = "record_field_sequence", sequenceName = "record_field_sequence", initialValue = 1, allocationSize = 10)
+@CacheClear
 public class RecordField extends ARecordTable {
 	
 	@Id
@@ -58,6 +61,7 @@ public class RecordField extends ARecordTable {
 	private String table;  // 自定义表字段所属表，为空表示全域所有表
 	
 	private String user;   // 用户级自定义，为空则是域级自定义
+	private Long user_org; // 用户所属组织（经营组织、运营组织）级自定义
 	
 	private String code;
 	
@@ -88,6 +92,8 @@ public class RecordField extends ARecordTable {
 	private String udf1;
 	private String udf2;
 	private String udf3;
+	
+	private Integer seqNo; // 字段排序，用于Grid及form布局
 	
 	public boolean containsRole1(List<Long> roles) {
 		return EasyUtils.contains(roles, this.role1);
@@ -250,5 +256,19 @@ public class RecordField extends ARecordTable {
 
 	public void setReadonly(String readonly) {
 		this.readonly = readonly;
+	}
+
+	public Long getUser_org() {
+		return user_org;
+	}
+
+	public void setUser_org(Long user_org) {
+		this.user_org = user_org;
+	}
+	public Integer getSeqNo() {
+		return seqNo;
+	}
+	public void setSeqNo(Integer seqNo) {
+		this.seqNo = seqNo;
 	}
 }

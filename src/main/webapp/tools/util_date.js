@@ -1,14 +1,37 @@
-var now = new Date(),
+var server_time = tssJS.Cookie.getValue("server_time");
+var now = server_time ? toDate(server_time) : new Date(),
     cday = now.format("yyyy-MM-dd"), 
     cyear = now.getFullYear(), 
     cmonth = now.format("yyyy-MM"),
     cweek = getWeekNumber(now),
     cseason = Math.ceil( (now.getMonth()+1)/3 );
 
+//日期格式化
+Date.prototype.format = function(format) {
+    var date = {
+        "M+": this.getMonth() + 1,
+        "d+": this.getDate(),
+        "h+": this.getHours(),
+        "m+": this.getMinutes(),
+        "s+": this.getSeconds(),
+        "q+": Math.floor((this.getMonth() + 3) / 3),
+        "S+": this.getMilliseconds()
+    };
+    if (/(y+)/i.test(format)) {
+        format = format.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+    }
+    for (var k in date) {
+        if (new RegExp("(" + k + ")").test(format)) {
+            format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? date[k] : ("00" + date[k]).substr(("" + date[k]).length));
+        }
+    }
+    return format;
+}
+
 function toDate(dataStr) {
     if(!dataStr) return dataStr;
 
-    var d = new Date(dataStr.replace(/-/g, "/"));
+    var d = new Date(dataStr.replace(/\"/g, "").replace(/-/g, "/"));
     return d;
 }
 function subDate(day, x) {
@@ -85,7 +108,7 @@ function getEndDateOfWeek(paraYear, weekIndex){
     return subDate(getBeginDateOfWeek(paraYear, weekIndex), -6);
 }
 
-//计算指定日期为该年的第几周
+//获取日期为某年的第几周
 function getWeekIndex(day) {
     var firstDay = getFirstWeekBeginDay(day.getFullYear());
     if (day < firstDay) {
@@ -152,4 +175,95 @@ function forbidTimeScope(delda, p1, p2) {
             }
         }
     });
+}
+
+function dateDiff(a, b) {
+    if (a == '' || b == '') return '';
+
+    var date1 = toDate(a);
+    var date2 = toDate(b);
+    var s1 = date1.getTime(), s2 = date2.getTime();
+    var total = (s2 - s1) / 1000;
+    var day = parseInt(total / (24 * 60 * 60)); // 计算整数天数
+    var afterDay = total - day * 24 * 60 * 60;  // 取得算出天数后剩余的秒数
+    var hour = parseInt(afterDay / (60 * 60));  // 计算整数小时数
+    var afterHour = total - day * 24 * 60 * 60 - hour * 60 * 60; // 取得算出小时数后剩余的秒数
+    var min = parseInt(afterHour / 60);  // 计算整数分
+    var afterMin = total - day * 24 * 60 * 60 - hour * 60 * 60 - min * 60; // 取得算出分后剩余的秒数
+
+    return {day: day, hour: hour, min: min};
+}
+
+function dateDifferObj(a, b) {
+    if (a == '' || b == '') return '';
+
+    var date1 = toDate(a);
+    var date2 = toDate(b);
+    var s1 = date1.getTime(), s2 = date2.getTime();
+    var total = (s2 - s1) / 1000;
+    var day = parseInt(total / (24 * 60 * 60)); //计算整数天数
+    var afterDay = total - day * 24 * 60 * 60; //取得算出天数后剩余的秒数
+    var hour = parseInt(afterDay / (60 * 60)); //计算整数小时数
+    var afterHour = total - day * 24 * 60 * 60 - hour * 60 * 60; // 取得算出小时数后剩余的秒数
+    var min = parseInt(afterHour / 60);  // 计算整数分
+    var afterMin = total - day * 24 * 60 * 60 - hour * 60 * 60 - min * 60; // 取得算出分后剩余的秒数
+
+    return {day: day, hour: hour, min: min};
+}
+
+///// 《end》时间函数
+function monthBox(id){
+    var id_class = id ? '#' + id : '.monthbox';
+    $(id_class).datebox({
+        onShowPanel: function () {
+            span.trigger('click'); 
+            if (!tds)
+            //延时触发获取月份对象，因为上面的事件触发和对象生成有时间间隔
+            setTimeout(function() { 
+                tds = p.find('div.calendar-menu-month-inner td');
+                tds.click(function(e) {
+                    //禁止冒泡执行easyui给月份绑定的事件
+                    e.stopPropagation(); 
+                    //得到年份
+                    var year = /\d{4}/.exec(span.html())[0] ,
+                    //月份
+                    month = parseInt($(this).attr('abbr'), 10);  
+
+                    //隐藏日期对象                     
+                    $(id_class).datebox('hidePanel') 
+                    //设置日期的值
+                    .datebox('setValue', year + '-' + month); 
+                });
+            }, 0);
+        },
+        //配置parser，返回选择的日期
+        parser: function (s) {
+            if (!s) return new Date();
+            var arr = s.split('-');
+            return new Date(parseInt(arr[0], 10), parseInt(arr[1], 10) - 1, 1);
+        },
+        //配置formatter，只返回年月 之前是这样的d.getFullYear() + '-' +(d.getMonth()); 
+        formatter: function (d) { 
+            var currentMonth = (d.getMonth()+1);
+            var currentMonthStr = currentMonth < 10 ? ('0' + currentMonth) : (currentMonth + '');
+            return d.getFullYear() + '-' + currentMonthStr; 
+        }
+    });
+
+    //日期选择对象
+    var p = $(id_class).datebox('panel'), 
+    //日期选择对象中月份
+    tds = false, 
+    //显示月份层的触发控件
+    span = p.find('span.calendar-text'); 
+}
+
+// function myformatter(date) {
+//     var y = date.getFullYear();
+//     var m = date.getMonth() + 1;
+//     return y + '-' + m;
+// }
+
+function monthBoxValue(id){
+    return $('#' + id).datebox('getValue') + '-01';
 }

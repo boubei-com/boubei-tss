@@ -16,9 +16,8 @@
 <script src="group.js"></script>
 
 <style>
- 
   #ws { 
-    position: absolute; top: 32px; left: 220px;
+    position: absolute; top: 32px; left: 250px;
     z-index: 200; display: none; 
     width: 800px; height: 450px; 
     border-radius: 10px 10px 0 0; 
@@ -55,7 +54,9 @@
           <td id="gridTitle">
             <span class="icon"></span>【<span id="x1"></span>】用户列表&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <button class="tssbutton small white" id="btn_add" onclick="addNewUser(true)"><span class="icon-plus"></span>新增用户</button>
+<button class="tssbutton small white" id="btn_mv" onclick="moveBatch()"><span class="icon-arrow-right"></span>移动到其它组</button>
 <button class="tssbutton small white" id="btn_del" onclick="removeBatch()"><span class="icon-x"></span>删 除</button>
+<button class="tssbutton small white" id="btn_account" onclick="assignAccount()"><span class="icon-key"></span>分配账号</button>
             <span class="buttonBox" id="gridToolBar"></span>
           </td>
           <tr>

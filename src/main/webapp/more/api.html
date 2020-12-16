@@ -29,111 +29,111 @@ body { font-family: "Microsoft Yahei"; }
 
 <script type="text/javascript">
 
-	var record = tssJS.Query.get("id");
+    var record = tssJS.Query.get("id");
 
-	var api_list = [
-		{
-    		name: "数据表定义读取",
-    		url: "/tss/xdata/define/{record} ",
-    		method: "GET",
-    		param: "",
-    		result: "数据表定义 ",
-    		_href: "p3_0",
-    		permission: "录入权限、浏览权限",
-    		test: true
-    	},
-    	{
-    		name: "新增记录",
-    		url: "/tss/xdata/{record}",
-    		method: "POST",
-    		param: "表单数据",
-    		result: '{"result": 新纪录ID}',
-    		permission: "录入权限",
-    		_href: "p3_3",
-    		test: true,
-    		manual: true
-    	},
-    	{
-    		name: "修改记录",
-    		url: "/tss/xdata/{record}/{id}",
-    		method: "POST",
-    		param: "{数据记录ID} + 表单数据",
-    		result: '{"result": "修改成功"}  {"errorMSg": 失败原因} ',
-    		permission: "录入权限、维护权限",
-    		_href: "p3_4",
-    		test: true
-    	},
-    	{
-    		name: "删除记录",
-    		url: "/tss/xdata/{record}/{id}",
-    		method: "DELETE",
-    		param: "{数据记录ID}",
-    		result: '{"result": "删除成功"}  {"errorMSg": 失败原因} ',
-    		permission: "录入权限（只能删除自己创建的）",
-    		_href: "p3_5",
-    		test: true
-    	},
-    	{
-    		name: "获取单条记录",
-    		url: "/tss/xdata/{record}/{id}",
-    		method: "GET",
-    		param: "{数据记录ID}",
-    		result: " Map< String, Object > ",
-    		permission: "录入权限、浏览权限",
-    		_href: "p3_2",
-    		test: true
-    	},
-    	{
-    		name: "查询记录",
-    		url: "/tss/xdata/json/{record} ",
-    		method: "POST、GET",
-    		param: "数据表定义的字段等",
-    		result: "List< Map< String, Object > >",
-    		permission: "录入权限（能查自己创建的记录）<br>浏览权限（能查他人创建的数据）",
-    		_href: "p3_1",
-    		test: true,
-    		mockparams: "{rows:2, page:1}"
-    	},
-    	{
-    		name: "查询记录并导出",
-    		url: "/tss/xdata/export/{record} ",
-    		method: "POST、GET",
-    		param: "同查询接口的参数",
-    		result: "Excel文件",
-    		permission: "录入权限、浏览权限",
-    		_href: "p3_6"
-    	},
-    	{
-    		name: "批量修改（单个字段）",
-    		url: "/tss/xdata/batch/{record}",
-    		method: "POST",
-    		param: "{'ids':'1,2,3,4', 'field': '字段Code', 'value': '字段值'}",
-    		result: "",
-    		permission: "录入权限、维护权限（每一行）",
-    		_href: "p3_7",
-    		test: true,
-    		mockparams: "{'ids':'1,2,3', 'field': 'f1', 'value': 'xxx'}"
-    	},
-    	{
-    		name: "批量增删改",
-    		url: "/tss/xdata/cud/json/{record}",
-    		method: "POST",
-    		param: '{"json": "[{...}, {...}, ...]"}',
-    		result: "{created: 10, updated: 4, deleted: 3}",
-    		permission: "录入权限",
-    		_href: "p3_7"
-    	},
-    	{
-    		name: "批量删除记录",
-    		url: "/tss/xdata/batch/{record}?ids=1,2,3",
-    		method: "DELETE",
-    		param: '{"ids": "id1,id2,id3...."}',
-    		result: '{"result": "删除成功"}',
-    		permission: "录入权限（只能删除自己创建的）<br/>维护权限（可删除其他人创建的）",
-    		_href: "p3_5",
-    		test: true,
-    		manual: true
-    	},
+    var api_list = [
+        {
+            name: "数据表定义读取",
+            url: "/tss/xdata/define/{record} ",
+            method: "GET",
+            param: "",
+            result: "数据表定义 ",
+            _href: "p3_0",
+            permission: "录入权限、浏览权限",
+            test: true
+        },
+        {
+            name: "新增记录",
+            url: "/tss/xdata/{record}",
+            method: "POST",
+            param: "表单数据",
+            result: '{"result": 新纪录ID}',
+            permission: "录入权限",
+            _href: "p3_3",
+            test: true,
+            manual: true
+        },
+        {
+            name: "修改记录",
+            url: "/tss/xdata/{record}/{id}",
+            method: "POST",
+            param: "{数据记录ID} + 表单数据",
+            result: '{"result": "修改成功"}  {"errorMSg": 失败原因} ',
+            permission: "录入权限、维护权限",
+            _href: "p3_4",
+            test: true
+        },
+        {
+            name: "删除记录",
+            url: "/tss/xdata/{record}/{id}",
+            method: "DELETE",
+            param: "{数据记录ID}",
+            result: '{"result": "删除成功"}  {"errorMSg": 失败原因} ',
+            permission: "录入权限（只能删除自己创建的）",
+            _href: "p3_5",
+            test: true
+        },
+        {
+            name: "获取单条记录",
+            url: "/tss/xdata/{record}/{id}",
+            method: "GET",
+            param: "{数据记录ID}",
+            result: " Map< String, Object > ",
+            permission: "录入权限、浏览权限",
+            _href: "p3_2",
+            test: true
+        },
+        {
+            name: "查询记录",
+            url: "/tss/xdata/json/{record} ",
+            method: "POST、GET",
+            param: "数据表定义的字段等",
+            result: "List< Map< String, Object > >",
+            permission: "录入权限（能查自己创建的记录）<br>浏览权限（能查他人创建的数据）",
+            _href: "p3_1",
+            test: true,
+            mockparams: "{rows:2, page:1}"
+        },
+        {
+            name: "查询记录并导出",
+            url: "/tss/xdata/export/{record} ",
+            method: "POST、GET",
+            param: "同查询接口的参数",
+            result: "Excel文件",
+            permission: "录入权限、浏览权限",
+            _href: "p3_6"
+        },
+        {
+            name: "批量修改（单个字段）",
+            url: "/tss/xdata/batch/{record}",
+            method: "POST",
+            param: "{'ids':'1,2,3,4', 'field': '字段Code', 'value': '字段值'}",
+            result: "",
+            permission: "录入权限、维护权限（每一行）",
+            _href: "p3_7",
+            test: true,
+            mockparams: "{'ids':'1,2,3', 'field': 'f1', 'value': 'xxx'}"
+        },
+        {
+            name: "批量增删改",
+            url: "/tss/xdata/cud/json/{record}",
+            method: "POST",
+            param: '{"json": "[{...}, {...}, ...]"}',
+            result: "{created: 10, updated: 4, deleted: 3}",
+            permission: "录入权限",
+            _href: "p3_7"
+        },
+        {
+            name: "批量删除记录",
+            url: "/tss/xdata/batch/{record}?ids=1,2,3",
+            method: "DELETE",
+            param: '{"ids": "id1,id2,id3...."}',
+            result: '{"result": "删除成功"}',
+            permission: "录入权限（只能删除自己创建的）<br/>维护权限（可删除其他人创建的）",
+            _href: "p3_5",
+            test: true,
+            manual: true
+        },
         {
             name: "自定义读写数据表接口",
             url: "/tss/api/dml/multi",
@@ -144,58 +144,58 @@ body { font-family: "Microsoft Yahei"; }
             _href: "p3_10",
             manual: true
         },
-    	{
-    		name: "为记录添加附件",
-    		url: "/tss/remote/upload?afterUploadClass=<br/>com.boubei.tss.dm.record.file.CreateAttach<br/>&record={record}&itemId={itemId}",
-    		method: "POST",
-    		param: "附件流",
-    		result: "",
-    		permission: "对数据记录有录入权限",
-    		_href: "p3_9"
-    	},
-    	{
-    		name: "读取记录的附件列表",
-    		url: "/tss/xdata/attach/json/{record}/{itemId}",
-    		method: "GET",
-    		param: "{数据记录ID}",
-    		result: "List< RecordAttach >",
-    		permission: "对附件所属记录有浏览权限",
-    		_href: "p3_9",
-    		test: true
-    	},
-    	{
-    		name: "下载指定附件",
-    		url: "/tss/xdata/attach/download/{id}",
-    		method: "GET",
-    		param: "{附件记录ID}",
-    		result: "",
-    		permission: "对附件所属记录有浏览权限",
-    		_href: "p3_9"
-    	},
-    	{
-    		name: "删除指定附件的记录",
-    		url: "/tss/xdata/attach/{id}",
-    		method: "DELETE",
-    		param: "{附件记录ID}",
-    		result: '{"result": "删除成功"}',
-    		permission: "对附件所属记录有录入权限",
-    		_href: "p3_9",
-    		test: true
-    	},
-    	{
-    		name: "取号器",
-    		url: "/tss/sn/{coderule}/{count}",
-    		_url: "/tss/sn/JYYMMDDxxxx/10",
-    		method: "POST、GET",
-    		param: "{coderule}{count}",
-    		result: "List< String >",
-    		permission: "对附件所属记录有录入权限",
-    		_href: "p8",
-    		test: true
-    	}
+        {
+            name: "为记录添加附件",
+            url: "/tss/remote/upload?afterUploadClass=<br/>com.boubei.tss.dm.record.file.CreateAttach<br/>&record={record}&itemId={itemId}",
+            method: "POST",
+            param: "附件流",
+            result: "",
+            permission: "对数据记录有录入权限",
+            _href: "p3_9"
+        },
+        {
+            name: "读取记录的附件列表",
+            url: "/tss/xdata/attach/json/{record}/{itemId}",
+            method: "GET",
+            param: "{数据记录ID}",
+            result: "List< RecordAttach >",
+            permission: "对附件所属记录有浏览权限",
+            _href: "p3_9",
+            test: true
+        },
+        {
+            name: "下载指定附件",
+            url: "/tss/xdata/attach/download/{id}",
+            method: "GET",
+            param: "{附件记录ID}",
+            result: "",
+            permission: "对附件所属记录有浏览权限",
+            _href: "p3_9"
+        },
+        {
+            name: "删除指定附件的记录",
+            url: "/tss/xdata/attach/{id}",
+            method: "DELETE",
+            param: "{附件记录ID}",
+            result: '{"result": "删除成功"}',
+            permission: "对附件所属记录有录入权限",
+            _href: "p3_9",
+            test: true
+        },
+        {
+            name: "取号器",
+            url: "/tss/sn/{coderule}/{count}",
+            _url: "/tss/sn/JYYMMDDxxxx/10",
+            method: "POST、GET",
+            param: "{coderule}{count}",
+            result: "List< String >",
+            permission: "对附件所属记录有录入权限",
+            _href: "p8",
+            test: true
+        }
     ];
 
-	var FIELDS = [
+    var FIELDS = [
         { title: '接口名称', field: 'name', width: 80 },
         { title: '请求地址', field: 'url', width: 140 },
         { title: '请求方法', field: 'method', width: 45 },
@@ -220,72 +220,72 @@ body { font-family: "Microsoft Yahei"; }
     });
     
     var define, rctable, rcname;
-	$.getJSON("/tss/xdata/define/"+record, {}, function(data) {
-		define = data[0];
-		rctable = data[data.length - 1];
-		rcname = data[5];
-		$("#x1").text(rcname);
+    $.getJSON("/tss/xdata/define/"+record, {}, function(data) {
+        define = data[0];
+        rctable = data[10];
+        rcname = data[5];
+        $("#x1").text(rcname);
 
-		api_list.each(function(i, api) {
-			if( !api._url ) {
-				api._url = api.url.replace("{record}", rctable);
-				api._url = api._url.replace("{id}", "123");
-				api._url = api._url.replace("{itemId}", "123");
-			}
-	    	api.url = api.url.replace("{record}", "<b style='color:blue;'>" + rctable + "</b>");
-	    	api.url = api.url.replace("{id}", "<b style='color:red;'>{id}</b>");
-	    	api.url = api.url.replace("{itemId}", "<b style='color:red;'>{itemId}</b>");
-	    	api.href_ = api._href ? "<a href='http://www.boubei.com/doc/tss/manual/api-tss.html?id=#" +api._href+ "' target='_blank'>示例</a>" : ""; 
+        api_list.each(function(i, api) {
+            if( !api._url ) {
+                api._url = api.url.replace("{record}", rctable);
+                api._url = api._url.replace("{id}", "123");
+                api._url = api._url.replace("{itemId}", "123");
+            }
+            api.url = api.url.replace("{record}", "<b style='color:blue;'>" + rctable + "</b>");
+            api.url = api.url.replace("{id}", "<b style='color:red;'>{id}</b>");
+            api.url = api.url.replace("{itemId}", "<b style='color:red;'>{itemId}</b>");
+            api.href_ = api._href ? "<a href='http://www.boubei.com/doc/tss/manual/api-tss.html?id=#" +api._href+ "' target='_blank'>示例</a>" : ""; 
 
-	    	if(api.test) {
-	    		api.test = "<a href='javascript:void(0)' target='_blank' onclick='test(" +i+ ");'>调试</a>";  // ifram内嵌页，url、method、params
-	    	}
-	    });
+            if(api.test) {
+                api.test = "<a href='javascript:void(0)' target='_self' onclick='test(" +i+ ");'>调试</a>";  // ifram内嵌页，url、method、params
+            }
+        });
 
-		$('#t1').datagrid("loadData", api_list);
-	});
+        $('#t1').datagrid("loadData", api_list);
+    });
 
-	var cur_api, cur_params;
-	function test(apiIndex) {
-		cur_api = api_list[apiIndex];
-		cur_params = cur_api.mockparams || "{}";
+    var cur_api, cur_params;
+    function test(apiIndex) {
+        cur_api = api_list[apiIndex];
+        cur_params = cur_api.mockparams || "{}";
 
-		if(apiIndex == 1 || apiIndex == 2) {
-			cur_params = {};
-			define.each(function(i, f) {
-				var val = f.defaultValue || f.label;
-				if( f.type == 'number' ) val = 11.1;
-				if( f.type == 'int' )  val = 100;
-				if( f.type == 'date' ) val = '2018-08-08';
-				if( f.type == 'datetime' ) val = '2018-08-08 00:00:00';
-				if( f.type == 'file' ) return true;
+        if(apiIndex == 1 || apiIndex == 2) {
+            cur_params = {};
+            define.each(function(i, f) {
+                var val = f.defaultValue || f.label;
+                if( f.type == 'number' ) val = 11.1;
+                if( f.type == 'int' )  val = 100;
+                if( f.type == 'date' ) val = '2018-08-08';
+                if( f.type == 'datetime' ) val = '2018-08-08 00:00:00';
+                if( f.type == 'file' ) return true;
 
-				cur_params[f.code] = val;
-			});
-			cur_params = JSON.stringify(cur_params);
-		}
+                cur_params[f.code] = val;
+            });
+            cur_params = JSON.stringify(cur_params);
+        }
 
-		showDialog("api_test.html", "调试【" +rcname+ "】接口【" +cur_api.name+ "】", "82%", 600, false);
-	}
+        showDialog("api_test.html", "调试【" +rcname+ "】接口【" +cur_api.name+ "】", "82%", 600, false);
+    }
 
-	function showDialog(url, title, width, height, shadow) {
-	    var content = '<iframe src="' + url + '" width="100%" height="99%" frameborder="0" scrolling="no"></iframe>';
-	    var boarddiv = '<div id="msgwindow" title="' + title + '"></div>';
-	    $(document.body).append(boarddiv);
+    function showDialog(url, title, width, height, shadow) {
+        var content = '<iframe src="' + url + '" width="100%" height="99%" frameborder="0" scrolling="no"></iframe>';
+        var boarddiv = '<div id="msgwindow" title="' + title + '"></div>';
+        $(document.body).append(boarddiv);
 
-	    var win = $('#msgwindow').dialog({
-	        content: content,
-	        width: width,
-	        height: height,
-	        modal: shadow,
-	        title: title,
+        var win = $('#msgwindow').dialog({
+            content: content,
+            width: width,
+            height: height,
+            modal: shadow,
+            title: title,
             resizable: true,
-	        onClose: function () {
-	            $(this).dialog('destroy');//后面可以关闭后的事件
-	        }
-	    });
-	    win.dialog('open');
-	}
+            onClose: function () {
+                $(this).dialog('destroy');//后面可以关闭后的事件
+            }
+        });
+        win.dialog('open');
+    }
 
 </script>
 </body>

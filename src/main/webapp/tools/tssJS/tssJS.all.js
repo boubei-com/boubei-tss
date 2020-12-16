@@ -195,6 +195,14 @@
                 return (value == null || (typeof(value) == 'string' && value.trim() == ""));
             },
 
+            /**
+             * 替换各种分隔符（tab、空格、回车、英文逗号、中文逗号）为统一分隔符
+             */
+            fixSplit: function(value, split) {
+                split = split || ',';
+                return (value||'').trim().replace(/(\t+|\r|\n|,|，|\s+|、)+/ig, split);
+            },
+
             // 抛出一个异常
             error: function(msg) {
                 throw msg;
@@ -234,6 +242,12 @@
 
                 if (!tmp || !tmp.nodeName || tmp.nodeName === "parsererror") {
                     console.log("Invalid XML: " + data);
+                } else {
+                    var errorNode = tmp.querySelector("parsererror");
+                    if( errorNode ) {
+                        console.log("Invalid XML: " + $.XML.getText(errorNode) );
+                        console.log(data);
+                    }
                 }
 
                 return xml;
@@ -875,7 +889,11 @@
                 waitingDiv.id = "_waiting";
                 document.body.appendChild(waitingDiv);
 
-                $(waitingDiv).css("width", "100%").css("height", "100%")
+                var height = "100%";
+                if( document.body.scrollHeight > document.body.clientHeight ) {
+                    height = document.body.scrollHeight + "px";
+                }
+                $(waitingDiv).css("width", "100%").css("height", height)
                              .css("position", "absolute").css("left", "0px").css("top", "0px")
                              .css("cursor", "wait").css("zIndex", "998").css("background", "black");
                 $.setOpacity(waitingDiv, 33);
@@ -933,6 +951,10 @@
     $.extend({        
         Query: {
             items: {},
+
+            getItems: function() {
+                return items;
+            },
 
             get: function(name, decode) {
                 var str = items[name];
@@ -1146,7 +1168,7 @@
 
             /* 将字符串转化成xml节点对象 */
             toNode: function(xml) {
-                xml = xml.revertEntry();
+                xml = xml.revertEntry().replace(/\x02|\x01/g, '');
                 return $.parseXML(xml).documentElement;
             },
 
@@ -1164,6 +1186,7 @@
             },
 
             setText: function(node, textValue) {
+                textValue = (typeof(textValue) == 'string') ? String(textValue).replace(/\x02|\x01/g, '') : textValue;
                 node.text = textValue;
                 if (node.textContent || node.textContent == "") {
                     node.textContent = textValue; // chrome
@@ -1183,6 +1206,8 @@
             },
 
             createCDATA: function(data) {
+                // 替换掉0x01/0x02等一些导致XML失败的特殊字符
+                data = (typeof(data) == 'string') ? String(data).replace(/\x02|\x01/g, '') : data;
                 data = String(data).convertCDATA();
                 if(window.DOMParser) {
                     return $.parseXML("<root><![CDATA[" + data + "]]></root>").documentElement.firstChild;
@@ -1837,19 +1862,7 @@
             $.Cookie.del("token", "/tss");
             $.Cookie.del("token", "/" + CONTEXTPATH);
 
-            if($.relogin) { // 如果不希望弹出登陆小窗口，则再调用ajax之前设置：$.relogin = null;
-                $.relogin( 
-                    function(loginName, password, identifier, randomKey) { 
-                        request.setHeader("loginName", $.encode(loginName, randomKey));
-                        request.setHeader("password",  $.encode(password, randomKey));
-                        request.setHeader("identifier", identifier);
-                        request.setHeader("randomKey", randomKey);
-                        request.send();
-                    }, info.msg );
-            } else {
-                console.log(info.msg);
-                location.href = "/" + CONTEXTPATH + "/login.html";
-            }
+            location.href = "/" + CONTEXTPATH + "/login.html";
         }
     }   
 
@@ -2153,15 +2166,30 @@
     closeBox = function(all) {
         $("#alert_box").hide().remove();
         $.hideWaitingLayer(all);
+    },
+
+    bindEnterKey = function(el, fn) {
+        $(el).addEvent("keydown", function(ev) {
+            if(13 == ev.keyCode) { // enter
+                $.Event.cancel(ev);
+                setTimeout(fn, 10);
+            }
+        });
     };
 
     // content：内容，title：对话框标题  
-    $.tip = function(content, title) {
+    $.tip = function(content, title, callback) {
         var boxEl = popupBox(title || '消息提醒');
         $(".content", boxEl).addClass("tip");
-        $(".btbox", boxEl).hide();
+        $(".btbox .ok", boxEl).attr("value", "我知道了");
         $(".content .message", boxEl).html(content);
         $(boxEl).css("width", "250px").css("position", "fixed").css("right", "1px").css("bottom", "1px").css("top", "").css("left", "");
+
+        function ok() {
+            closeBox();
+            callback && callback();
+        }
+        $(".btbox .ok", boxEl).click(ok);
     };
 
     // content：内容，title：对话框标题，callback：回调函数    
@@ -2216,6 +2244,7 @@
         }
         $(".btbox .ok", boxEl).click(ok);
         $(".btbox .cancel", boxEl).click(closeBox);
+        bindEnterKey(boxEl, ok);
     };
 
     $.checkCode = function(codeType, callback){
@@ -2274,104 +2303,6 @@
 
 })(tssJS);
 
-
-/* relogin */
-;(function($){
-
-    $.relogin = function(callback, msg) {
-        var reloginBox = $("#relogin_box")[0];
-        if(reloginBox == null) {
-            var boxHtml = [];
-            boxHtml[boxHtml.length] = "<h1>重新登录</h1>";
-            boxHtml[boxHtml.length] = "<span> <input type='text' id='loginName' placeholder='请输入您的账号'/> </span>";
-            boxHtml[boxHtml.length] = "<span> <input type='password' id='password' placeholder='请输入您的密码' /> </span>";
-            boxHtml[boxHtml.length] = "<span class='bottonBox'>";
-            boxHtml[boxHtml.length] = "  <button class='tssbutton blue small' id='bt_login'>确  定</button> &nbsp;&nbsp;";
-            boxHtml[boxHtml.length] = "  <button class='tssbutton blue small' id='bt_cancel'>取  消</button>";
-            boxHtml[boxHtml.length] = "</span>";
-
-            reloginBox = $.createElement("div", "popupBox", "relogin_box");    
-            document.body.appendChild(reloginBox);
-            $(reloginBox).html(boxHtml.join(""));
-
-            $("#bt_cancel").click(function() {
-                $(reloginBox).hide();
-            });
-
-            var defaultUserName = $.Cookie.getValue("iUserName");
-            if( defaultUserName ) {
-                $("#loginName").value(defaultUserName);
-            }
-        }
-
-        var title = "请输入账号密码";
-        if(msg) {
-            title = "重新登录，因" + msg.substring(0, 10) + (msg.length > 10 ? "..." : "");
-        }
-        $("h1", reloginBox).html(title);
-
-        $(reloginBox).show(); // 显示登录框
-
-        var loginNameObj = $("#loginName")[0];
-        var passwordObj  = $("#password")[0];
-
-        loginNameObj.focus();
-        passwordObj.value = ""; // 清空上次输入的密码，以防泄密
-        
-        loginNameObj.onblur = function() { 
-            var value = this.value;
-            if(value == null || value == "") return;
-            
-            if(loginNameObj.identifier) {
-                delete loginNameObj.identifier;
-            }
-            
-            $.ajax({
-                url: "/" + CONTEXTPATH + "getLoginInfo.in",
-                params: {"loginName": value},
-                onexcption: function() {
-                    loginNameObj.focus();
-                },
-                onresult: function(){
-                    loginNameObj.identifier = this.getNodeValue("identifier");
-                    loginNameObj.randomKey  = this.getNodeValue("randomKey");
-                    
-                    passwordObj.focus();
-                }
-            });
-        }
-
-        $("#bt_login").click( function() { doLogin(); } );
-        
-        var doLogin = function() {
-            var identifier = loginNameObj.identifier;
-            var randomKey  = loginNameObj.randomKey;
-
-            var loginName  = loginNameObj.value;
-            var password   = passwordObj.value;
-            
-            if( "" == loginName ) {
-                $.alert("请输入账号");
-                loginNameObj.focus();
-                return;
-            } 
-            else if( "" == password ) {
-                $.alert("请输入密码");
-                passwordObj.focus();
-                return;
-            } 
-            else if( identifier == null ) {
-                $.alert("无法登录，用户配置可能有误，请联系管理员。");
-                return;
-            } 
-
-            callback(loginName, password, identifier, randomKey);
-
-            $(reloginBox).hide();
-        }
-    }
-
-})(tssJS);
 
 /* 右键菜单 */
 ;(function ($, factory) {
@@ -4373,6 +4304,7 @@
  * 事件: 
  * 1、onLoad:   Grid更新加载完成后触发 $("#grid").attr("onLoad", "f1"); 注意此时Grid对象还没有完全生成
  * 2、onFinish: Grid生成后触发 $("#grid").attr("onFinish", "f2"); 
+ * 3. onScrollToBottom
  * 
  * TODO:
  *  !. Grid控件表头增加求和功能
@@ -4388,10 +4320,10 @@
         if( data ) {
             grid = new $.Grid($1(id), data);
             GridCache[grid.id] = grid;  
-        }
 
-        var onFinish = $("#" + id).attr("onFinish");
-        onFinish && $.execCommand( onFinish + "()" );
+            var onFinish = $("#" + id).attr("onFinish");
+            onFinish && $.execCommand( onFinish + "()" );
+        }
         
         return grid;
     };
@@ -4644,7 +4576,7 @@
     Grid.prototype = {
         load: function(data, append) {
             if("object" != typeof(data) || data.nodeType != $.XML._NODE_TYPE_ELEMENT) {
-                return $.alert("传入的Grid数据有问题。")  
+                return $.tip("Grid数据加载异常，请刷新重试");   
             } 
 
             // 初始化变量
@@ -4893,8 +4825,10 @@
             $("input[name='grid_cb']", this.tbody).each(function(){
                 if(this.checked){
                     var tr = this.parentNode.parentNode;
-                    var fValue = $("td[name='" + field + "']", tr).attr("value");
-                    result.push(fValue);
+                    var $td = $("td[name='" + field + "']", tr);
+                    if( $td.length ) {
+                        result.push( $td.attr("value") );
+                    }
                 }
             });
             return result;
@@ -5157,6 +5091,7 @@
 
                     var pageInfoNode = this.getNodeValue("PageInfo");
                     $.initGridToolBar(pageBar, pageInfoNode, gotoPage);
+                    $.hideWaitingLayer();
                 }               
                 request.send();
             }

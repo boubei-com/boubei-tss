@@ -51,7 +51,7 @@
 
     var code = $.Query.get("code"), 
         type = $.Query.get("type"),
-        useOrignName = $.Query.get("useOrignName");
+        useOrignName = $.Query.get("useOrignName") !== "false";
 
     function init() {
         loadFileTree();

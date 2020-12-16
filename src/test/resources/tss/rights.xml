@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rights url_404="/tss/_404.html">
+
+	<right uri="/modules/_param/param.htm" role="-1,Admin,JonKing"/>
+	<right uri="/modules/_cache/cache.htm" role="-1,Admin,JonKing"/>
+	<right uri="/modules/_log/log.htm" role="-1,Admin,JonKing"/>
+	
+	<right uri="/login.do" role="-1,Admin,J.K"/>
+	
+</rights>

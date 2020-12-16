@@ -1,0 +1,626 @@
+<html> 
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>    
+<meta charset="UTF-8">
+<title>录入表流程设计器</title>
+
+<link rel="stylesheet" href="../../tools/tssJS/css/boubei.css">
+<link rel="stylesheet" href="../../css/easyui.css">
+<link rel="stylesheet" href="../../tools/easyui/themes/default/easyui.css">
+
+<script src="../../tools/tssJS/tssJS.js"></script>
+<script src="../../tools/easyui/jquery.min.js"></script>
+<script src="../../tools/easyui/jquery.easyui.min.js"></script>
+<script src="../../tools/easyui.js"></script>
+
+<style type="text/css">
+	body { font-family: Tahoma;}
+	#fm{
+		padding:10px 0 10px 20px;
+	}
+	#btns{
+		padding-left:20px;
+	}
+	td { height: 33px; padding:5px;}
+	table tr>td:nth-child(5){
+		padding-left:30px;
+	}
+	.setting-btn{
+		width:50px!important;
+	}
+	.small-btn{
+		width:30px!important;
+	}
+	.ta{
+		margin-left:10px;
+	}
+
+</style>
+
+</head>
+
+<body>
+<div id="designerForm">
+	<form id="fm">
+		<table class="l">
+			<tr class="tr11">
+			    <td>抄送</td>
+				<td colspan="3"> <input id="sp11" name="sp11" class="easyui-combobox" style="width:100%;height:100%;"></td>
+				<td style="padding-left:5px;">
+					<input name="type11" type="radio" value="byRole" checked/>按角色</td><td><input name="type11" type="radio" value="byUser"/>按人员
+				</td>
+			</tr>
+			<tr class="tr12">
+			    <td>转审</td>
+				<td colspan="3"> <input id="sp12" name="sp12" class="easyui-combobox" style="width:100%;height:100%;"></td>
+				<td style="padding-left:5px;">
+					<input name="type12" type="radio" value="byRole" checked/>按角色</td><td><input name="type12" type="radio" value="byUser"/>按人员
+			    </td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div id="btns">
+	<a href="#" class="easyui-linkbutton" onclick="addWFLevel()">增加审批层级</a>
+	<input id="domains" name="domains" class="easyui-combobox"/>
+	<a href="#" id="saveBtn" class="easyui-linkbutton" onclick="saveWF()">保存到域</a>
+	<a href="#" id="printCode" style="display: none" class="easyui-linkbutton" onclick="getSaveData(true)">输出代码</a>
+</div>
+
+<div id="dlg_setting" class="easyui-dialog" closed="true" buttons="#dlg_setting_btns" style="width:620px">
+	<form id="fm_setting">
+		<table class="l">
+			<tbody>
+		      <tr>
+		        <td>
+		        	<input id="andor" name="andor" class="easyui-combobox" style="width:50px">
+		            <input id="shuxing" name="shuxing" class="easyui-combobox">
+		            <input id="fuhao" name="fuhao" class="easyui-combobox">
+				    <input id="xiala" name="xiala" class="easyui-combobox">
+				    <input id="shuzi" name="shuzi" class="easyui-numberbox">
+				</td>
+				<td>
+					<a href="#" class="easyui-linkbutton setting-btn small-btn" onclick="addLeftParenthesis()">(</a>
+					<a href="#" class="easyui-linkbutton setting-btn small-btn" onclick="addRightParenthesis()">)</a>
+					<a href="#" class="easyui-linkbutton setting-btn" onclick="addCondition()">新增</a>
+		        </td>
+		        </tr>
+		        <tr>
+		        <td>
+		            <select id="show_content" multiple="" style="width: 100%;height: 80px;">
+		            </select>
+		        </td>
+		        <td>
+		            <a href="#" class="easyui-linkbutton setting-btn" onclick="deleteCondition()">删除</a>
+					<a href="#" class="easyui-linkbutton setting-btn" onclick="clearCondition()">清空</a>
+		        </td>
+		      </tr>
+		    </tbody>
+		</table>
+	</form>
+	<div id="vas_list"></div>
+</div>
+<div id="dlg_setting_btns">
+	<a href="#" class="easyui-linkbutton" onclick="confirmCondition()">确认</a>
+    <a href="#" class="easyui-linkbutton" onclick="$('#dlg_setting').dialog('close')">取消</a>
+</div>
+
+<script type="text/javascript">
+	var developer = tssJS.Cookie.decode("userHas")[11].indexOf('系统管理员') > -1 || tssJS.Cookie.decode("userHas")[11].indexOf('$开发者') > -1;
+	var curr_record_id = tssJS.Query.get("recordId");
+    var sp_list = ['一','二','三','四','五','六','七','八','九','十'];
+    var num = 5;
+    var sp_html = '';
+    for(var i = 0;i < num;i++){
+        sp_html += getSpHtml(i,sp_list[i]);
+    }
+    $('.tr11').before(sp_html)
+    
+    var users = [],roles = [];
+	// $.get("/tss/auth/service/roles", {}, function(data) {
+	// 	roles = data;
+	// 	sp_list.each(function(i,item){
+	//     	initSp(i,false)
+	//     });
+	//     initSp(11,true)
+	//     initSp(12,true)
+	// });
+    var define_arr = [];
+	// var define_arr = [  {col:'role',name:'角色',type:'string',
+	//                            options:{'codes':'总经理|副总经理'}},
+	// 					{col:'type',name:'类型',type:'string',
+	// 						   options:{'codes':'工资|奖金|提成|社保费|职工福利-厨房杂费|职工福利-劳务补贴|职工福利-餐费补贴|职工福利-工伤|培训费|文化活动费|招聘费|其他'}},
+	// 					{col:'fee',name:'金额',type:'number'},
+	// 					{col:'mode',name:'结算模式',type:'string',options:{'codes':'1|2|3|4','names':'现金结算|票据转让|个人账户转账|公司账户转账'}}
+	// 				  ];
+	// define_arr.each(function(i,item){
+	// 	if(item.options){
+	// 		item.options.codes = item.options.codes.split('|');
+	// 		item.options.names = item.options.names ? item.options.names.split('|') : item.options.codes;
+		
+	// 		var data = [];
+	// 		item.options.codes.each(function(j,jtem){
+	// 			data.push({code:jtem,name:item.options.names[j]})
+	// 		})
+	// 		item.options.data = data;
+	// 	}
+	// })
+	var number_fuhao = [{name:'>',value:'>'},{name:'>=',value:'>='},{name:'=',value:'=='},{name:'<=',value:'<='},{name:'<',value:'<'}];
+	var string_fuhao = [{name:'包含',value:'in'},{name:'不包含',value:'notin'}];
+	var left_parenthesis_num = 0,boxtype = '_combo',the_tj_num = '',the_tj = '', the_showtj = '';
+	$(function(){
+		developer && $('#printCode').css('display','inline-block');
+		$.get("/tss/auth/service/roles", {}, function(data) {
+			roles = data;
+			var all_roles = [];
+			roles.each(function(i,item){all_roles.push(item[1])})
+			$.getJSON('/tss/xdata/define/'+curr_record_id,function(data){
+				define_arr.push({col:'role',name:'角色',type:'string',options:{'codes':all_roles.join('|')}})
+				if(data && data[0] && data[0].length){
+					let j = 0;
+					data[0].each(function(i,item){
+						let all_num = data[0].length;
+						if(item.options){
+							define_arr.push({col:item.code,name:item.label,type:'string',options:item.options})
+							j = da(j,all_num,define_arr)
+						}
+						else if(item.type == 'number' || item.type == 'int'){
+							define_arr.push({col:item.code,name:item.label,type:'number'})
+							j = da(j,all_num,define_arr)
+						}else if(item.jsonUrl && item.wf_pulldown){
+							$.getJSON(item.jsonUrl,{},function(res){
+								let codes = [];
+								res.each((i,item)=>{
+									codes.push(item.name)
+								})
+								item.options = {codes:codes.join('|')}
+								define_arr.push({col:item.code,name:item.label,type:'string',options:item.options})
+								j = da(j,all_num,define_arr)
+							})
+						}else{
+							j = da(j,all_num,define_arr)
+						}
+					})
+				}
+				$.get("/tss/auth/service/domains", {}, function(data) {
+				    $('#domains').combobox({
+				    	data:data,
+				    	textField:'name',
+				    	valueField:'domain',
+				    	panelHeight:'100px',
+				    	width: '160px',
+				    	onSelect:function(data){
+				    		changeDomain(data.domain)
+				    	}
+				    });
+				    var login_domain = tssJS.Cookie.decode("userHas")[12];
+				    if(login_domain){
+				    	$('#domains').combobox('setValue',login_domain)
+				    	$('#domains').combobox('readonly',true)
+				    }
+				    else if(data.length){
+				    	$('#domains').combobox('setValue',data[0].domain)
+				    }
+				});
+			})
+			sp_list.each(function(i,item){
+		    	initSp(i,false)
+		    });
+		    initSp(11,true)
+		    initSp(12,true)
+		});
+		
+        $('#fuhao,#andor').combobox({
+			textField:'name',
+			valueField:'value',
+			panelHeight:'auto'
+		})
+		$('#xiala').combobox({
+			textField:'name',
+			valueField:'code',
+			panelHeight:'100px',
+			multiple:true
+		})
+		$('#andor').combobox({
+			data:[{name:'且',value:'&&'},{name:'或',value:'||'}]
+		})
+		$('#andor').combobox('setValue','&&')
+		$('#shuzi').next().hide()
+		
+
+	})
+
+	function da(now_num,all_num,define_arr){
+		now_num++
+		if(now_num == all_num) {
+			define_arr.each(function (i, item) {
+				if (item.options) {
+					item.options.codes = item.options.codes.split('|');
+					item.options.names = item.options.names ? item.options.names.split('|') : item.options.codes;
+
+					var data = [];
+					item.options.codes.each(function (j, jtem) {
+						data.push({code: jtem, name: item.options.names[j]})
+					})
+					item.options.data = data;
+				}
+			})
+			initShuxingBox()
+		}
+		return now_num;
+	}
+
+	function initShuxingBox(){
+		$('#shuxing').combobox({
+			data:define_arr,
+			textField:'name',
+	    	valueField:'col',
+	    	onSelect:function(a){
+	    		var fh = $('#andor').combobox('getValue')
+	    		if(a.type == 'number'){
+	    			boxtype = '_number';
+	    			$('#fuhao').combobox({
+	    				data:number_fuhao
+	    			})
+	    			$('#xiala').next(".combo").hide();
+	    			$('#shuzi').next().show();
+	    		}
+	    		else{
+	    			if(a.col == 'role'){
+	    				$('#xiala').combobox({
+							multiple:false
+						})
+	    			}
+	    			else{
+	    				$('#xiala').combobox({
+							multiple:true
+						})
+	    			}
+	    			boxtype = '_combo';
+	    			$('#fuhao').combobox({
+	    				data:string_fuhao
+	    			})
+	    			$('#xiala').combobox({
+	    				data:a.options.data
+	    			})
+	    			$('#shuzi').next().hide()
+	    			$('#xiala').next(".combo").show();
+	    		}
+	    		$.parser.parse('#dlg_setting')
+	    		$('#andor').combobox('setValue',fh)
+	    	}
+		})
+	}
+
+	function addWFLevel(){
+		if(num < 10){
+			$('.tr11').before(getSpHtml(num,sp_list[num]));
+			initSp(num,false)	
+			num++;
+		}
+		else{
+			$.messager.alert('提示','页面暂时只支持十级')
+		}
+	}
+
+	function getSpHtml(i,item){
+		return '<tr class="tr' + i + '">'
+					    + '<td>' + item + '级审批</td>'
+						+ '<td> <input id="sp' + i + '" name="sp' + i + '" class="easyui-combobox"></td>'
+						+ '<td>'
+							+ '<input name="type' + i + '" type="radio" value="byRole" checked/>按角色'
+						+ '</td>'
+						+ '<td>'
+						    + '<input name="type' + i + '" type="radio" value="byUser"/>按人员'
+					    + '</td>'
+						+ '<td>条件</td>'
+						+ '<td>'
+						    + '<a href="#" id="sp' + i + '_setting" class="easyui-linkbutton" onclick="openSetting(' + i + ')">高级设置</a>'
+						+ '</td>'
+						+ '<td>'
+						    + '<textarea class="ta" id="sp' + i + '_tj" name="sp' + i + '_tj" style="width:260px;height:70px;' + (developer ? '' : 'display:none') + '"></textarea>'
+						    + '<textarea class="ta" id="sp' + i + '_showtj" name="sp' + i + '_showtj" style="width:260px;height:70px" readonly="readonly"></textarea>'
+						+ '</td>'
+					+ '</tr>';
+	}
+
+	function changeDomain(domain){
+		sp_list.each(function(i,item){
+			$('input[name="type' + i + '"][value="byRole"]').click();
+			$('#sp' + i).combobox('setValue','');
+			$('#sp' + i + '_tj').val('')
+			$('#sp' + i + '_showtj').val('')
+		})
+		$('#sp11').combobox('setValue','');
+		$('#sp12').combobox('setValue','');
+		$.get("/tss/auth/service/domainuser", {domain: domain, field: "loginName, u.userName"}, function(data) {
+			users = data;
+			$.get("/tss/auth/rc/wf/domain", {"domain": domain, "recordId": curr_record_id}, function(result) {
+		 		if(result.id && result.define){
+		 			var define = JSON.parse(result.define);
+		 			for(var i = 0;i < define.to.length;i++){
+		 				if(i >= num){
+		 					addWFLevel()
+		 				}
+		 				const item = define.to[i];
+		 				const type = item.roleId ? 'byRole' : 'byUser';
+		 				const key = type == 'byRole' ? 'role' : 'name';
+						const val = type == 'byRole' ? 'roleId' : 'user';
+						$('input[name="type' + i + '"][value="' + type + '"]').click();
+						$('#sp'+i).combobox('setValue',item[val]);
+						$('#sp'+i+'_tj').val(item.when || '');
+						$('#sp'+i+'_showtj').val(tj2showtj(item.when || ''));
+		 			}
+		 			var cc = [];
+		 			for(var i = 0;i<define.cc.length;i++){
+		 				const item = define.cc[i];
+		 				const type = item.roleId ? 'byRole' : 'byUser';
+		 				const key = type == 'byRole' ? 'role' : 'name';
+						const val = type == 'byRole' ? 'roleId' : 'user';
+						!i && $('input[name="type11"][value="' + type + '"]').click();
+		 				cc.push(item[val])
+		 			}
+		 			$('#sp11').combobox('setValues',cc.join(','));
+		 			var trans = [];
+		 			for(var i = 0;i<define.trans.length;i++){
+		 				const item = define.trans[i];
+		 				const type = item.roleId ? 'byRole' : 'byUser';
+		 				const key = type == 'byRole' ? 'role' : 'name';
+						const val = type == 'byRole' ? 'roleId' : 'user';
+						!i && $('input[name="type12"][value="' + type + '"]').click();
+		 				trans.push(item[val])
+		 			}
+		 			$('#sp12').combobox('setValues',trans.join(','));
+		 		}
+			});
+		});
+	}
+
+	function initSp(i,multi){
+		$('#sp'+i).combobox({
+			valueField:'0',
+			textField:'1',
+			panelHeight:'100px',
+			multiple:multi
+    	})
+    	if(!multi){
+    		$('#sp'+i).combobox({
+    			onHidePanel:onHidePanel
+    		})
+    	}
+    	$.parser.parse('.tr'+i)
+    	initSpBox(i,'byRole');
+    	$('input[type=radio][name=type' + i + ']').change(function() {
+			initSpBox(i,this.value)
+		})
+	}
+
+	function initSpBox(i,type){
+		var data = type == 'byRole' ? roles : users;
+		$('#sp'+i).combobox({
+			data:data
+		})
+	}
+
+	function saveWF(){
+		const domain = $('#domains').combobox('getValue');
+		if(domain){
+			var saveData = getSaveData();
+			$.post("/tss/auth/rc/wf/domain", {"domain": domain, "recordId": curr_record_id, "define": JSON.stringify(saveData)}, function(result) {
+		 		if(result.id){
+		 			$.messager.alert('提示','保存成功')
+		 		}
+		 		else{
+		 			$.messager.alert('提示','保存失败。' + (result.errorMsg || ''))
+		 		}
+			});
+		}
+		else{
+			$.messager.alert('提示','请选择一个域')
+		}
+
+	}
+
+	function getSaveData(log){
+		var saveData = {to:[],cc:[],trans:[],by:"byRole"}
+		for(var i=0;i<Math.min(num,sp_list.length);i++){
+			var value = $('#sp' + i).combobox('getValue');
+			var name = $('#sp' + i).combobox('getText');
+			var condition = $('#sp' + i + '_tj').val();
+			if(value){
+				saveData.to.push(getSaveItem(i,value,name,condition))
+			}
+		}
+		var ct = [{id:11,key:'cc'},{id:12,key:'trans'}];
+		ct.each(function(i,item){
+			const id = item.id;
+			var values = $('#sp' + id).combobox('getValues');
+			if(values.length){
+				var names = $('#sp' + id).combobox('getText').replace(/，/g,',').split(',');
+				values.each(function(j,value){
+					saveData[item.key].push(getSaveItem(id,value,names[j]))
+				})
+			}
+		})
+		log && console.log(JSON.stringify(saveData))
+		return saveData
+	}
+
+	function getSaveItem(i,value,name,condition){
+		const type = $('input[name="type' + i + '"]:checked').val()
+		const key = type == 'byRole' ? 'role' : 'name';
+		const val = type == 'byRole' ? 'roleId' : 'user';
+		var con = {};
+		if(condition){
+			con = {when:condition}
+		}
+		return Object.assign({[key]:name,[val]:value},con);
+	}
+	
+	function openSetting(num){
+		$('#dlg_setting').dialog({closed:false,modal:true,title:sp_list[num] + '级审批高级设置'})
+		the_tj_num = num;
+		the_tj = $('#sp' + num + '_tj').val();
+		the_showtj = $('#sp' + num + '_showtj').val();
+		drawShowContent()
+
+	}
+
+	function tj2showtj(tj){
+		var showtj_arr = [];
+		if(tj){
+			var tj_arr = tj.split('\n');
+			tj_arr.each(function(i,item){
+				var item = item.replace(/\&&/g,'且').replace(/\|\|/g,'或').replace(/\==/g,'=');
+				define_arr.each(function(j,jtem){
+					if(jtem.col != 'role' ){
+						var reg = "/\\?index_of\\('\\${"+jtem.col+"}\\'\\)=-1/g";
+						var reg1 = "/\\?index_of\\('\\${"+jtem.col+"}\\'\\)!=-1/g";
+						var reg2 = "/" + jtem.col + "/g";
+						item = item.replace(eval(reg),'(记录中' + jtem.name + '不属于)').replace(eval(reg1),'(记录中' + jtem.name + '属于)').replace(eval(reg2),jtem.name);
+					}
+				})
+				for(var j=roles.length-1;j>=0;j--){
+					var jtem = roles[j];
+					var reg = "/"+jtem[1]+"\\?\\?/g";
+					var reg1 = "/"+jtem[1]+"!0=0/g";
+					item = item.replace(eval(reg),' 角色包含'+jtem[1]).replace(eval(reg1),' 角色不包含'+jtem[1])
+				}
+				showtj_arr.push(item)
+			})
+		}
+		return showtj_arr.join('\n');
+	}
+
+	function addCondition(){
+		var real_content = '',show_content = '';
+		var sx_value = $('#shuxing').combobox('getValue');
+		var sx_text = $('#shuxing').combobox('getText');
+		var fh_value = $('#fuhao').combobox('getValue');
+		var fh_text = $('#fuhao').combobox('getText');
+		var xl_value = $('#xiala').combobox('getValues').join(',');
+		var xl_text = $('#xiala').combobox('getText');
+		var sz_value = $('#shuzi').numberbox('getValue');
+
+		if(!sx_value || !fh_value){
+			$.messager.alert('提示','请将条件补充完整')
+			return
+		}
+		if(boxtype == '_combo'){
+			if(!xl_value){
+				$.messager.alert('提示','请将条件补充完整')
+				return
+			}
+			if(sx_value == 'role'){
+				real_content = xl_value + (fh_value == "notin" ? "!0==0" : "??");
+			}
+			else{
+		    	real_content = "'" + xl_value + "'?index_of('${" + sx_value + "}')" + (fh_value == "notin" ? "=" : "!=")  + "-1" ;
+		    }
+		    show_content = sx_text + fh_text + xl_text;
+		}
+		else{
+			if(!sz_value){
+				$.messager.alert('提示','请将条件补充完整')
+				return
+			}
+			real_content = sx_value+fh_value+sz_value;
+			show_content = sx_text + fh_text + sz_value
+		}
+		changeCondition(real_content,show_content)	
+	}
+
+	function changeCondition(real_content,show_content){
+		if(real_content == ')'){
+			the_tj += real_content;
+			the_showtj += show_content;
+			drawShowContent()
+			return
+		}
+		var ao_value = $('#andor').combobox('getValue')
+		var ao_text = $('#andor').combobox('getText');
+		if(the_tj && !ao_value && the_tj.replace(/\(/g,'')){
+			$.messager.alert('提示','请将条件补充完整')
+			return
+		}
+		if(the_tj){
+			the_tj += (left_parenthesis_num ? '' : '\n') + (the_tj.charAt(the_tj.length - 1) == '(' ? '' : ao_value) + real_content;
+			the_showtj += (left_parenthesis_num ? '' : '\n') + (the_showtj.charAt(the_showtj.length - 1) == '(' ? '' : ao_text) + show_content;
+		}
+		else{
+			the_tj = real_content;
+			the_showtj = show_content;
+		}
+		drawShowContent()
+	}
+
+	function drawShowContent(){
+		var sc_html = '';
+		for(var i=0;i<the_showtj.split('\n').length;i++){
+			sc_html += '<option value="' + the_tj.split('\n')[i] + '">' + the_showtj.split('\n')[i] + '</option>'
+		}
+		$('#show_content').html(sc_html)
+	}
+
+	function addLeftParenthesis(){
+		changeCondition('(','(')
+		left_parenthesis_num++
+	}
+
+	function addRightParenthesis(){
+		if(!left_parenthesis_num){
+			$.messager.alert('提示','请先输入左括号')
+			return
+		}
+		if(the_tj.charAt(the_tj.length - 1) == '('){
+			$.messager.alert('提示','请在左括号中先输入条件')
+			return
+		}
+		changeCondition(')',')')
+		left_parenthesis_num--
+	}
+
+	function clearCondition(){
+		the_tj = '';
+		the_showtj = '';
+		drawShowContent()
+	}
+
+	function deleteCondition(){
+		const select_index = $("#show_content ").get(0).selectedIndex;
+		var the_tj_arr = the_tj.split('\n');
+		var the_showtj_arr = the_showtj.split('\n');
+		if(select_index == -1){
+			$.messager.alert('提示','请先选择需删除的行')
+			return
+		}
+		else{
+			the_tj_arr.splice(select_index,1)
+			the_showtj_arr.splice(select_index,1)
+		}
+		if(select_index == 0 && the_tj_arr.length){
+			the_tj_arr[0] = the_tj_arr[0].slice(2)
+			the_showtj_arr[0] = the_showtj_arr[0].slice(1)
+		}
+		the_tj = the_tj_arr.join('\n')
+		the_showtj = the_showtj_arr.join('\n')
+		drawShowContent()
+	}
+
+	function cancelCondition(){
+		$('#dlg_setting').dialog('close')
+	}
+
+	function confirmCondition(){
+		if(left_parenthesis_num){
+			$.messager.alert('提示','右括号个数不等于左括号个数，请检查条件是否正确')
+			return
+		}
+		$('#sp' + the_tj_num + '_tj').val(the_tj)
+		$('#sp' + the_tj_num + '_showtj').val(the_showtj)
+		$('#dlg_setting').dialog('close')
+	}
+
+</script>
+</body>
+</html>

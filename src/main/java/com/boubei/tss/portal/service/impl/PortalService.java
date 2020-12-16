@@ -24,7 +24,6 @@ import com.boubei.tss.cache.Cacheable;
 import com.boubei.tss.cache.Pool;
 import com.boubei.tss.cache.extension.CacheHelper;
 import com.boubei.tss.framework.exception.BusinessException;
-import com.boubei.tss.framework.sso.context.Context;
 import com.boubei.tss.modules.param.ParamConstants;
 import com.boubei.tss.portal.PortalConstants;
 import com.boubei.tss.portal.PortalDispatcher;
@@ -39,7 +38,6 @@ import com.boubei.tss.portal.entity.Structure;
 import com.boubei.tss.portal.entity.Theme;
 import com.boubei.tss.portal.entity.ThemeInfo;
 import com.boubei.tss.portal.entity.ThemeInfo.ThemeInfoId;
-import com.boubei.tss.portal.entity.ThemePersonal;
 import com.boubei.tss.portal.helper.ComponentHelper;
 import com.boubei.tss.portal.service.IPortalService;
 import com.boubei.tss.util.EasyUtils;
@@ -91,16 +89,7 @@ public class PortalService implements IPortalService {
         	useTheme = new Theme(selectThemeId);
         }
         portal.setTheme(useTheme);
-        
-        // 如果是匿名访问, 则直接访问默认门户
-        if(Context.getIdentityCard().isAnonymous()) {
-            return getNormalPortal(portal);
-        }
-        
-        ThemePersonal personalTheme = portalDao.getPersonalTheme(portalId);
-        useTheme = (Theme) EasyUtils.checkNull(personalTheme, useTheme);
-        portal.setTheme(useTheme);
-        
+                
         return getNormalPortal(portal);
     }
     
@@ -255,7 +244,7 @@ public class PortalService implements IPortalService {
         ps = portalDao.getEntity(ps.getId());
         String code = ps.getCode();
         if(code == null || !code.startsWith("ps-")) {
-            ps.setCode("ps-" + ps.getPortalId() + "-" + ps.getId());
+            ps.setCode("ps-" + EasyUtils.checkNull(ps.getPortalId(), ps.getId()) + "-" + ps.getId());
         }
         portalDao.saveStructure(ps);
         
@@ -460,17 +449,6 @@ public class PortalService implements IPortalService {
     public ReleaseConfig getReleaseConfig(Long id) {
         return (ReleaseConfig) portalDao.getEntity(ReleaseConfig.class, id);
     }
-    
-    //******************************** 以下为门户自定义管理 ***************************************************************
-
-    public void savePersonalTheme(Long portalId, Long userId, Long themeId) {
-         // 一个用户对一个门户只能有一套自定义主题，保存新的自定义主题之前需要删除老的
-         String hql = "from ThemePersonal o where o.portalId = ? and o.userId = ? ";
-         portalDao.deleteAll(portalDao.getEntities(hql, portalId, userId));
-         
-         ThemePersonal pt = new ThemePersonal(portalId, userId, themeId);
-         portalDao.createObject(pt);
-     }
   
     //***********************************  门户流量统计获取 ***************************************************************
     

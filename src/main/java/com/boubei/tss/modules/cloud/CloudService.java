@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.boubei.tss.modules.cloud.entity.CloudOrder;
+import com.boubei.tss.modules.cloud.pay.Result;
 
 public interface CloudService {
 
@@ -38,4 +39,6 @@ public interface CloudService {
 	Set<Long> limitMenus();
 	
 	void fastCreateModuleUser(String user_name, String phone, Long moduleId,Long logistics_id);
+
+	Result refund(String order_no, Double refund_fee, String out_refund_no, String feeType, boolean toBalance);
 }

@@ -210,18 +210,16 @@ window.Supports = supports;
       Sys.opera = userAgent.match(/OPR\/([\d.]+)/)[1];
       if(Supports.letConst){
         supES6 = "yes";
-        }
-       console.log("Opera"+' '+Sys.opera+' '+supES6);
-       } 
-   
+      }
+      console.log("Opera"+' '+Sys.opera+' '+supES6);
+  }  
   else if (isFF) { 
       Sys.firefox = userAgent.match(/Firefox\/([\d.]+)/)[1];
       if(Supports.letConst){
          supES6 = "yes";
       }
       console.log("Firefox"+' '+Sys.firefox+' '+supES6);
-  } 
-                  
+  }              
   else if (isSafari) {  
         Sys.safari = userAgent.match(/Safari\/([\d.]+)/)[1];
         if(Supports.letConst){
@@ -229,7 +227,6 @@ window.Supports = supports;
         }
         console.log("Safari"+' '+Sys.safari+' '+supES6);
   }  
-   
   else if (isChrome) { 
          Sys.chrome = userAgent.match(/Chrome\/([\d.]+)/)[1];
          if(Supports.letConst){
@@ -237,24 +234,21 @@ window.Supports = supports;
          }
          console.log("Chrome"+' '+Sys.chrome+' '+supES6);
   } 
-   
   else if(isIE11){
        Sys.ie = userAgent.match(/rv:([\d.]+)/)[1];
        if(Supports.letConst){
           supES6 = "yes";
        }
        console.log("IE"+' '+Sys.ie+' '+supES6);
-  }
-                  
+  }              
   else if (elseIE) { 
-        Sys.elseIE = userAgent.match(/MSIE\s([\d.]+)/)[1];
-        if(Supports.letConst){
-           supES6 = "yes";
-        }
+        supES6 = "no";
         console.log("IE-low"+' '+Sys.elseIE+' '+supES6);
   }
 
   tssJS.supportES6 = supES6;
+  tssJS.isChrome = isChrome;
+  tssJS.isSafari = isSafari;
   if( supES6 === "no") {
     console.log("您的浏览器过旧，请下载最新版chrome浏览器以获得更好的体验！")
   }

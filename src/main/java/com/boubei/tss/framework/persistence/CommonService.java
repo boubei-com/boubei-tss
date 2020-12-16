@@ -55,4 +55,22 @@ public class CommonService implements ICommonService {
 	public IEntity getEntity(Class<?> entityClass, Long id) {
 		return commonDao.getEntity(entityClass, id);
 	}
+
+	public void createBatch(List<? extends IEntity> entitys) {
+		for(IEntity entity : entitys) {
+			create(entity);
+		}
+	}
+
+	public void updateBatch(List<? extends IEntity> entitys) {
+		for(IEntity entity : entitys) {
+			update(entity);
+		}
+	}
+
+	public void deleteBatch(Class<?> entityClass, List<Long> idList) {
+		for(Long id : idList) {
+			delete(entityClass, id);
+		}
+	}
 }

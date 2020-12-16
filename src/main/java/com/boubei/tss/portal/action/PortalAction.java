@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.boubei.tss.cache.Pool;
 import com.boubei.tss.cache.extension.CacheHelper;
-import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.framework.web.display.grid.DefaultGridNode;
 import com.boubei.tss.framework.web.display.grid.GridDataEncoder;
 import com.boubei.tss.framework.web.display.grid.IGridNode;
@@ -267,16 +266,7 @@ public class PortalAction extends FMSupportAction {
         service.removeTheme(themeId);
         printSuccessMessage();
     }
-    
-    @RequestMapping(value ="/theme/personal/{portalId}/{themeId}", method = RequestMethod.POST)
-    public void savePersonalTheme(HttpServletResponse response, 
-    		@PathVariable("portalId") Long portalId, 
-    		@PathVariable("themeId") Long themeId) {
-    	
-        service.savePersonalTheme(portalId, Environment.getUserId(), themeId);
-        printSuccessMessage("更改主题成功");
-    }
-    
+        
     //******************************** 以下为门户发布管理 ***************************************
     @RequestMapping("/release/list")
     public void getAllReleaseConfigs4Tree(HttpServletResponse response) {        

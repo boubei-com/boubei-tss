@@ -27,6 +27,7 @@ public class AccountFlow implements IEntity {
 	public final static String TYPE2 = "代理费";
 	public final static String TYPE3 = "积分充值";
 	public final static String TYPE4 = "积分支出";
+	public final static String TYPE5 = "积分冻结";
 
 	public static final String PAYMENT0 = "系统赠送";
 	public static final String PAYMENT1 = "系统扣款";

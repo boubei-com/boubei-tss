@@ -12,6 +12,6 @@
 			u.email, u.sex, u.telephone, u.employeeNo, null authMethod, u.disabled
 		from xxx_user u 
 		where u.groupId >= :groupId 
-		order by id
+		order by id desc
 	</userSql>
 </params>

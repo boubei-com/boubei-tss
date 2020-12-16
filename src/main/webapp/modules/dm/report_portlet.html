@@ -102,7 +102,9 @@ body { width:100%; overflow: hidden; }
   <tr>
     <td id="gridTitle">
       <span class="icon"></span><span class="title">查询结果</span>
-<button class="tssbutton small white btDownload" style="margin-left: 15px;"><span class="icon-arrow-down"></span>导出数据</button>
+        <button class="tssbutton small white btDownload" style="margin-left: 15px;">
+            <span class="icon-arrow-down"></span>导出数据
+        </button>
       <span class="buttonBox" id="gridToolBar"></span>
     </td>
   </tr>
@@ -232,16 +234,10 @@ var fixedParams;
 
 /* http://localhost:8088/tss/modules/dm/report_portlet.html?refresh=3&id=501&param1=today-10
    从邮件里打开 或 从文章里打开 */
-   
-var index = 100;  // 最多100个参数
-while(index--) {
-    var key = "param" + index;
-    var value = $.Query.get(key);
-    if(value) {
-        fixedParams = fixedParams || {};
-        fixedParams[key] = decodeURI(value);
-    }
-}
+$.each( $.Query.getItems(), function(key, value) {
+    fixedParams = fixedParams || {};
+    fixedParams[key] = decodeURI(value);
+} );
 
 var globalValiable = {},  // 用来存放传递给iframe页面的信息
     report_info_url; 
@@ -355,7 +351,7 @@ function initPortlet( hideQueryForm ) {
         var _params = $.parseJSON(globalValiable.define);
         $.each(_params, function(i, param) {
 
-            var key = "param" + (i+1);  
+            var key = param.code || ("param" + (i+1));  
             if(param.defaultValue) {
                 var dv = (param.defaultValue+"").trim();
                 if( dv.indexOf("#") == 0 ) {

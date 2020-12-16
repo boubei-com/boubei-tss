@@ -1,0 +1,31 @@
+<assembly  
+	xmlns ="http://maven.apache.org/POM/4.0.0"  
+	xmlns:xsi ="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation ="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.0.0.xsd" > 
+     
+	 <id>all</id> 
+     <formats> 
+         <format>jar</format> 
+     </formats> 
+     <includeBaseDirectory>false</includeBaseDirectory> 
+     <fileSets> 
+         <fileSet> 
+			 <directory>target/classes</directory>
+			 <outputDirectory>/</outputDirectory>
+			 <includes>
+			 	<include>META-INF/*.xml</include> 
+                <include>template/**/*.xml</include>
+                <include>tss/rights.xml</include>  
+                <include>com/boubei/tss/**/*.class</include> 
+			 </includes>
+			 <excludes>
+			 	<!-- 
+			 		JPA会自动读取同一jar包下，标注@Entity的实体类。
+			 		但是如果所使用的实体和persistent.xml不在同一jar包时，会读取不到，所以把它放到项目中而不是打在jar包里 
+			 	-->
+			 	<exclude>META-INF/persistence.xml</exclude> 
+			 </excludes>
+         </fileSet> 
+     </fileSets> 
+ 
+</assembly>

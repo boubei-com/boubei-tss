@@ -54,9 +54,10 @@ public class DateUtil {
     	if(EasyUtils.isNullOrEmpty(str)) return null;
     	
     	str = str.trim();
-    	if(str.indexOf(".") > 0) {
+    	if(str.length() > 12 && str.indexOf(".") > 0) {
     		str = str.substring(0, str.indexOf(".")); // 截掉微秒
     	}
+    	str = str.replaceAll("\\.", "-"); // yyyy.MM.dd --> yyyy-MM-dd
     	
     	List<String> sdfRegArray = Arrays.asList(SDF_1_REG, SDF_2_REG, SDF_3_REG, SDF_4_REG, SDF_5_REG, SDF_6_REG);
     	

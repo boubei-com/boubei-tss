@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<rightConfig url_404="/tss/_404.html">
+<rights url_404="/tss/_404.html">
 
-	<servlet right="-1,Admin" name="/admin.html"/>
+	<right role="-1,Admin" uri="/admin.html"/>
 	
-	<servlet right="-1,Admin" name="/modules/portal/structure.html" />
-	<servlet right="-1,Admin" name="/modules/portal/component.html"/>
-	<servlet right="-1,Admin" name="/modules/portal/navigator.html"/>
-	<servlet right="-1,Admin" name="/modules/portal/release.html"/>
+	<right role="-1,Admin" uri="/modules/portal/structure.html" />
+	<right role="-1,Admin" uri="/modules/portal/component.html"/>
+	<right role="-1,Admin" uri="/modules/portal/navigator.html"/>
+	<right role="-1,Admin" uri="/modules/portal/release.html"/>
 	
-	<servlet right="-1,Admin" name="/modules/_param/param.htm"/>
-	<servlet right="-1,Admin,-9" name="/modules/_cache/cache.htm"/>
+	<right role="-1,Admin" uri="/modules/_param/param.htm"/>
+	<right role="-1,Admin,-9" uri="/modules/_cache/cache.htm"/>
 	
-	<servlet right="-1,Admin" name="/modules/um/resource.html"/>
-	<servlet right="-1,Admin" name="/modules/um/online.html"/>
-	<servlet right="-1,Admin,-9" name="/modules/dm/datasource.html"/>
+	<right role="-1,Admin" uri="/modules/um/resource.html"/>
+	<right role="-1,Admin" uri="/modules/um/online.html"/>
+	<right role="-1,Admin,-9" uri="/modules/dm/datasource.html"/>
 	
-</rightConfig>
+</rights>

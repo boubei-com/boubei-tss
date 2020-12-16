@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ArticleList>
+	<channel>
+		<title>廉政建设</title>
+		<totalPageNum>2</totalPageNum>
+		<item>
+			<title>文章一</title>
+			<author>飞洒</author>
+			<type>2</type>
+			<pubDate>2007-06-08</pubDate>
+			<id>21</id>
+			<summary/>
+			<hitcount>0</hitcount>
+		</item>
+		<item>
+			<title>文章二</title>
+			<author>飞洒</author>
+			<type>2</type>
+			<pubDate>2007-06-09</pubDate>
+			<id>21</id>
+			<summary/>
+			<hitcount>0</hitcount>
+		</item>
+	</channel>
+</ArticleList>

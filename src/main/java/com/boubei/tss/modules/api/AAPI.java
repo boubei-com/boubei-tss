@@ -87,6 +87,8 @@ public class AAPI {
 		Long picId = EasyUtils.obj2Long( v.split("#")[1] );
 		
 		RecordAttach attach = recordService.getAttach(picId);
-		FileHelper.downloadFile(response, attach.getAttachPath(), attach.getName());
+		if(attach != null) {
+			FileHelper.downloadFile(response, attach.getAttachPath(), attach.getName());
+		}
 	}
 }

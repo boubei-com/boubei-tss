@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -75,14 +76,19 @@ public class Servlet4Upload extends HttpServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		
         String servletPath = request.getServletPath() + "";
-        if( servletPath.endsWith("/remote/upload") ) { // 远程上传，先校验令牌，通过则进行自动登录
+        if( servletPath.endsWith("/remote/upload") ) { // 远程（微信小程序、APP等）上传，先校验令牌，通过则进行自动登录
         	Filter8APITokenCheck.checkAPIToken( request );
         }
 		
-        String script;
+        String script = "";
 		try {
-	        Part part = request.getPart("file");
-			script = doUpload(request, part); // 自定义输出到指定目录
+			Collection<Part> partList = request.getParts();
+	        for(Part part : partList) {
+	        	if( part.getContentType() != null ) {
+	        		String result = doUpload(request, part); // 自定义输出到指定目录
+					script += EasyUtils.checkTrue(result != null && script.indexOf(result) < 0, result, "");
+	        	}
+	        }
 			
 		} catch (Exception _e) {
 			ProgressPool.finish( new Progress(100) ); // 进度设置为完成
@@ -103,10 +109,9 @@ public class Servlet4Upload extends HttpServlet {
 	}
 	
 	String doUpload(HttpServletRequest request, Part part) throws Exception {
-		
 		/* 
-		 * gets absolute path of the web application, tomcat7/webapps/tss
-		String defaultUploadPath = request.getServletContext().getRealPath("");
+		 * gets absolute path of the web application, tomcat7/webapps/tss 
+		 * String defaultUploadPath = request.getServletContext().getRealPath("");
 		 */
 		Map<String,String> params = DMUtil.getRequestMap(request, true);
 		String uploadPath = DMUtil.getAttachPath() + File.separator + "upload";

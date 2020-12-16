@@ -1,0 +1,256 @@
+<html> 
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>    
+<meta charset="UTF-8">
+<title>录入表流程设计器</title>
+
+<link rel="stylesheet" href="../../tools/tssJS/css/boubei.css">
+<link rel="stylesheet" href="../../css/easyui.css">
+<link rel="stylesheet" href="../../tools/easyui/themes/default/easyui.css">
+
+<script src="../../tools/tssJS/tssJS.js"></script>
+<script src="../../tools/easyui/jquery.min.js"></script>
+<script src="../../tools/easyui/jquery.easyui.min.js"></script>
+<script src="../../tools/easyui.js"></script>
+
+<style type="text/css">
+	body { font-family: Tahoma;}
+	form{
+		padding:10px 0 10px 20px;
+	}
+	#btns{
+		padding-left:20px;
+	}
+	td { height: 33px; padding:5px;}
+	table tr>td:nth-child(5){
+		padding-left:30px;
+	}
+
+</style>
+
+</head>
+
+<body>
+<div id="designerForm">
+	<form id="fm">
+		<table class="l">
+			<tr class="tr11">
+			    <td>抄送</td>
+				<td colspan="3"> <input id="sp11" name="sp11" class="easyui-combobox" style="width:100%"></td>
+				<td style="padding-left:5px;">
+					<input name="type11" type="radio" value="byRole" checked/>按角色</td><td><input name="type11" type="radio" value="byUser"/>按人员
+				</td>
+			</tr>
+			<tr class="tr12">
+			    <td>转审</td>
+				<td colspan="3"> <input id="sp12" name="sp12" class="easyui-combobox" style="width:100%"></td>
+				<td style="padding-left:5px;">
+					<input name="type12" type="radio" value="byRole" checked/>按角色</td><td><input name="type12" type="radio" value="byUser"/>按人员
+			    </td>
+			</tr>
+		</table>
+	</form>
+</div>
+<div id="btns">
+	<a href="#" class="easyui-linkbutton" onclick="addWFLevel()">增加审批层级</a>
+	<input id="domains" name="domains" class="easyui-combobox"/>
+	<a href="#" id="saveBtn" class="easyui-linkbutton" onclick="saveWF()">保存到域</a>
+	<a href="#" id="saveBtn" class="easyui-linkbutton" onclick="getSaveData(true)">输出代码</a>
+</div>
+
+<script type="text/javascript">
+	var curr_record_id = tssJS.Query.get("recordId");
+    var sp_list = ['一','二','三','四','五','六','七','八','九','十'];
+    var num = 5;
+    var sp_html = '';
+    for(var i = 0;i < num;i++){
+        sp_html += getSpHtml(i,sp_list[i]);
+    }
+    $('.tr11').before(sp_html)
+    $.get("/tss/auth/service/domains", {}, function(data) {
+	    $('#domains').combobox({
+	    	data:data,
+	    	textField:'name',
+	    	valueField:'domain',
+	    	panelHeight:'100px',
+	    	width: '160px',
+	    	onSelect:function(data){
+	    		changeDomain(data.domain)
+	    	}
+	    });
+	    if(data.length){
+	    	$('#domains').combobox('setValue',data[0].domain)
+	    }
+	});
+    var users = [],roles = [];
+	$.get("/tss/auth/service/roles", {}, function(data) {
+		roles = data;
+		sp_list.each(function(i,item){
+	    	initSp(i,false)
+	    });
+	    initSp(11,true)
+	    initSp(12,true)
+	});
+
+	$(function(){
+
+	})
+
+	function addWFLevel(){
+		if(num < 10){
+			$('.tr11').before(getSpHtml(num,sp_list[num]));
+			initSp(num,false)	
+			num++;
+		}
+		else{
+			$.messager.alert('提示','页面暂时只支持十级')
+		}
+	}
+
+	function getSpHtml(i,item){
+		return '<tr class="tr' + i + '">'
+					    + '<td>' + item + '级审批</td>'
+						+ '<td> <input id="sp' + i + '" name="sp' + i + '" class="easyui-combobox"></td>'
+						+ '<td>'
+							+ '<input name="type' + i + '" type="radio" value="byRole" checked/>按角色'
+						+ '</td>'
+						+ '<td>'
+						    + '<input name="type' + i + '" type="radio" value="byUser"/>按人员'
+					    + '</td>'
+						+ '<td>条件</td>'
+						+ '<td>  <input id="sp' + i + '_tj" name="sp' + i + '_tj" class="easyui-textbox" style="width:260px"> </td>'
+					+ '</tr>';
+	}
+
+	function changeDomain(domain){
+		sp_list.each(function(i,item){
+			$('input[name="type' + i + '"][value="byRole"]').click();
+			$('#sp' + i).combobox('setValue','');
+			$('#sp' + i + '_tj').textbox('setValue','')
+		})
+		$('#sp11').combobox('setValue','');
+		$('#sp12').combobox('setValue','');
+		$.get("/tss/auth/service/domainuser", {domain: domain, field: "loginName, u.userName"}, function(data) {
+			users = data;
+			$.get("/tss/auth/rc/wf/domain", {"domain": domain, "recordId": curr_record_id}, function(result) {
+		 		if(result.id && result.define){
+		 			var define = JSON.parse(result.define);
+		 			for(var i = 0;i < define.to.length;i++){
+		 				if(i >= num){
+		 					addWFLevel()
+		 				}
+		 				const item = define.to[i];
+		 				const type = item.roleId ? 'byRole' : 'byUser';
+		 				const key = type == 'byRole' ? 'role' : 'name';
+						const val = type == 'byRole' ? 'roleId' : 'user';
+						$('input[name="type' + i + '"][value="' + type + '"]').click();
+						$('#sp'+i).combobox('setValue',item[val]);
+						$('#sp'+i+'_tj').textbox('setValue',item.when || '');
+		 			}
+		 			var cc = [];
+		 			for(var i = 0;i<define.cc.length;i++){
+		 				const item = define.cc[i];
+		 				const type = item.roleId ? 'byRole' : 'byUser';
+		 				const key = type == 'byRole' ? 'role' : 'name';
+						const val = type == 'byRole' ? 'roleId' : 'user';
+						!i && $('input[name="type11"][value="' + type + '"]').click();
+		 				cc.push(item[val])
+		 			}
+		 			$('#sp11').combobox('setValues',cc.join(','));
+		 			var trans = [];
+		 			for(var i = 0;i<define.trans.length;i++){
+		 				const item = define.trans[i];
+		 				const type = item.roleId ? 'byRole' : 'byUser';
+		 				const key = type == 'byRole' ? 'role' : 'name';
+						const val = type == 'byRole' ? 'roleId' : 'user';
+						!i && $('input[name="type12"][value="' + type + '"]').click();
+		 				trans.push(item[val])
+		 			}
+		 			$('#sp12').combobox('setValues',trans.join(','));
+		 		}
+			});
+		});
+	}
+
+	function initSp(i,multi){
+		const hp = multi ? onHideMutiPanel : onHidePanel;
+		$('#sp'+i).combobox({
+			valueField:'0',
+			textField:'1',
+			panelHeight:'100px',
+			multiple:multi,
+			onHidePanel:hp
+    	})
+    	$('#sp' + i +'_tj').textbox()
+    	initSpBox(i,'byRole');
+    	$('input[type=radio][name=type' + i + ']').change(function() {
+			initSpBox(i,this.value)
+		})
+	}
+
+	function initSpBox(i,type){
+		var data = type == 'byRole' ? roles : users;
+		$('#sp'+i).combobox({
+			data:data
+		})
+	}
+
+	function saveWF(){
+		const domain = $('#domains').combobox('getValue');
+		if(domain){
+			var saveData = getSaveData();
+			$.post("/tss/auth/rc/wf/domain", {"domain": domain, "recordId": curr_record_id, "define": JSON.stringify(saveData)}, function(result) {
+		 		if(result.id){
+		 			$.messager.alert('提示','保存成功')
+		 		}
+		 		else{
+		 			$.messager.alert('提示','保存失败。' + (result.errorMsg || ''))
+		 		}
+			});
+		}
+		else{
+			$.messager.alert('提示','请选择一个域')
+		}
+
+	}
+
+	function getSaveData(log){
+		var saveData = {to:[],cc:[],trans:[],by:"byRole"}
+		for(var i=0;i<Math.min(num,sp_list.length);i++){
+			var value = $('#sp' + i).combobox('getValue');
+			var name = $('#sp' + i).combobox('getText');
+			var condition = $('#sp' + i + '_tj').textbox('getValue');
+			if(value){
+				saveData.to.push(getSaveItem(i,value,name,condition))
+			}
+		}
+		var ct = [{id:11,key:'cc'},{id:12,key:'trans'}];
+		ct.each(function(i,item){
+			const id = item.id;
+			var values = $('#sp' + id).combobox('getValues');
+			if(values.length){
+				var names = $('#sp' + id).combobox('getText').split(',');
+				values.each(function(j,value){
+					value && saveData[item.key].push(getSaveItem(id,value,names[j]))
+				})
+			}
+		})
+		log && console.log(JSON.stringify(saveData))
+		return saveData
+	}
+
+	function getSaveItem(i,value,name,condition){
+		const type = $('input[name="type' + i + '"]:checked').val()
+		const key = type == 'byRole' ? 'role' : 'name';
+		const val = type == 'byRole' ? 'roleId' : 'user';
+		var con = {};
+		if(condition){
+			con = {when:condition}
+		}
+		return Object.assign({[key]:name,[val]:value},con);
+	}
+	
+
+</script>
+</body>
+</html>

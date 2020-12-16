@@ -56,6 +56,8 @@ public class UserToken extends ARecordTable {
 	
 	private Date expireTime;
 	
+	private String appId;  // 应用ID
+	
 	private String remark;
 	private String description;
 
@@ -125,5 +127,13 @@ public class UserToken extends ARecordTable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getAppId() {
+		return appId;
+	}
+
+	public void setAppId(String appId) {
+		this.appId = appId;
 	}
 }

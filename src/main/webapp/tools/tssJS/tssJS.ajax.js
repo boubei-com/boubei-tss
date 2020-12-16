@@ -595,19 +595,7 @@ CONTEXTPATH = "tss";
             $.Cookie.del("token", "/tss");
             $.Cookie.del("token", "/" + CONTEXTPATH);
 
-            if($.relogin) { // 如果不希望弹出登陆小窗口，则再调用ajax之前设置：$.relogin = null;
-                $.relogin( 
-                    function(loginName, password, identifier, randomKey) { 
-                        request.setHeader("loginName", $.encode(loginName, randomKey));
-                        request.setHeader("password",  $.encode(password, randomKey));
-                        request.setHeader("identifier", identifier);
-                        request.setHeader("randomKey", randomKey);
-                        request.send();
-                    }, info.msg );
-            } else {
-                console.log(info.msg);
-                location.href = "/" + CONTEXTPATH + "/login.html";
-            }
+            location.href = "/" + CONTEXTPATH + "/login.html";
         }
     }   
 

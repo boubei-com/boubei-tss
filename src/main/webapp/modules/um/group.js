@@ -112,15 +112,16 @@
         return ("-7"==id );
     }
     
-    function editable(includeRoot) {
+    function editable(includeRoot, excludeCustomer) {
         var isRoot = false, 
-            treeNodeID = getTreeNodeId();
+            treeNodeID = getTreeNodeId()
+            isCustomerGroup = getTreeNodeName() === 'customer';  
 
         if(!includeRoot) {
             var rootList = $.T("tree").rootList;
             isRoot = rootList[0].id == treeNodeID;
         }
-        return !isTreeRoot() && treeNodeID > 0 && getOperation("2") && !isRoot;
+        return !isTreeRoot() && treeNodeID > 0 && getOperation("2") && !isRoot && (excludeCustomer || !isCustomerGroup);
     }
 
     function initTreeMenu(){
@@ -151,13 +152,16 @@
         var item6 = {
             label:"新建用户组",
             callback:addNewGroup,
-            visible:function(){ return !isSelfRegisterGroup() && getTreeNodeId() != -9 && getOperation("2"); }
+            visible:function(){ 
+                var nodeId = getTreeNodeId();
+                return !isSelfRegisterGroup() && (nodeId > 0 || nodeId == -8 || nodeId == -3) && getOperation("2") && getTreeNodeName() != 'customer'; 
+            }
         }
         var item7 = {
             label:"新建用户",
             callback:addNewUser,
             icon:"icon icon-plus",
-            visible:function(){ return !isTreeRoot() && isMainGroup() && editable(true); }
+            visible:function(){ return !isTreeRoot() && isMainGroup() && editable(true, true); }
         }
         var item8 = {
             label:"浏览用户",
@@ -262,6 +266,11 @@
             icon:"icon icon-x", 
             visible:function() { return getUserOperation("2"); }
         }
+        var item5 = {
+            label:"完全删除",
+            callback: function() { deepDelelteUser(); },
+            visible:function() { return userCode === 'Admin'; }
+        }
         /* 登录过的用户不能被删除，只能被停用。
            防止域管理员把域下用户删除，导致删除用户创建的数据表记录无法被查询到，甚至会可能被其它域下后期注册的同名用户吸走了） */
 
@@ -269,8 +278,8 @@
         menu1.addItem(item1);
         menu1.addItem(item2);
         menu1.addItem(item3);
-        menu1.addItem(item5);
         menu1.addItem(item4);
+        menu1.addItem(item5);
  
         $1("grid").contextmenu = menu1;
 
@@ -293,6 +302,27 @@
                     method : "DELETE",
                     waiting: true, 
                     onsuccess : function() { 
+                        grid.deleteSelectedRow();
+                    }
+                }); 
+            }
+        });
+    }
+
+    function deepDelelteUser() {
+        var grid = $.G("grid");
+        var userName  = grid.getColumnValue("userName");
+
+        $.confirm("您确定要完全删除用户【" +userName+ "】吗？", "删除确认", function(){
+            var grid = $.G("grid");
+            var userID  = grid.getColumnValue("id");
+            var groupId = grid.getColumnValue("groupId");
+            if( userID ) {
+                $.ajax({
+                    url : URL_DEL_USER + "deeprm/" + groupId + "/" + userID,
+                    method : "DELETE",
+                    waiting: true, 
+                    ondata : function() { 
                         grid.deleteSelectedRow();
                     }
                 }); 
@@ -400,6 +430,26 @@
             });
         });
     }
+
+    function moveBatch() {
+        var grid = tssJS.G("grid");
+        var ids  = grid.getCheckedRowsValue("id");
+        if(!ids || ids.length == 0) {
+            return alert("您没有选中任何用户记录，请勾选后再进行批量移动。");
+        }
+
+        popupTree(URL_INIT, "GroupTree", {}, function(target) {
+            var count = 0;
+            ids.each(function(i, userId){
+                $.post(URL_MOVE_USER + userId + "/" + target.id, {}, function(result) {
+                    count++;
+                    if (count == ids.length) {
+                        showUserList( target.id );
+                    }
+                });
+            });
+        });
+    }
  
     /* 初始化密码  */
     function resetPassword(){
@@ -427,10 +477,10 @@
         var phases = [];
         phases[0] = {page:"page1",label:"基本信息"};
         if( isMainGroup() ) { 
-            phases[1] = {page:"page3",label:"拥有角色"};
+            phases[1] = {page:"page3",label:"分配角色"};
         } else {
             phases[1] = {page:"page4",label:"用户列表"};
-            phases[2] = {page:"page3",label:"拥有角色"};
+            phases[2] = {page:"page3",label:"分配角色"};
         }       
         
         var callback = {};
@@ -478,8 +528,9 @@
             var page1Form = $.F("page1Form", groupInfoNode);
             attachReminder(page1Form.box.id, page1Form);
             if( treeID != -8) {
-                $($1("syncConfig").parentNode.parentNode).hide();
-                $($1("fromGroupId").parentNode.parentNode).hide()
+                var el1 = $1("syncConfig"), el2 = $1("fromGroupId");
+                el1 && $(el1.parentNode.parentNode).hide();
+                el2 && $(el2.parentNode.parentNode).hide()
             }
  
             var page3Tree  = $.T("page3Tree",  group2RoleTreeNode);
@@ -631,6 +682,7 @@
             $("#gridTitle .tssbutton").show();
         } else {
             $("#gridTitle .tssbutton").hide();
+            $("#btn_account, #btn_mv").show();
         }
         $("#x1").text(groupName);
 
@@ -676,7 +728,7 @@
         var phases = [];
         phases[0] = {page:"page1", label:"基本信息"};
         phases[1] = {page:"page2", label:"所属组织"};
-        phases[2] = {page:"page3", label:"拥有角色"};
+        phases[2] = {page:"page3", label:"分配角色"};
 
         var callback = {};
         callback.onTabChange = function() {
@@ -726,6 +778,9 @@
 
             if( !$("#loginName").value() ) {
                 page1Form.setFieldEditable("loginName", "true"); 
+            }
+            if( userCode != 'Admin' ) {
+                page1Form.setFieldEditable("authToken", "false"); 
             }
             
             var page3Tree  = $.T("page3Tree",  user2RoleTreeNode);
@@ -904,6 +959,10 @@
             }
         });
     }  
+
+    function assignAccount() {
+        $.openIframePanel("aa", "分配账号", 1028, 600, "/tss/more/pay/account.html?assignAccount=true", true);
+    }
  
     function searchUser(){
         var treeNode = $.T("tree").getActiveTreeNode();
@@ -916,6 +975,7 @@
             var params = {"groupId": treeID, "searchStr": value};
             $("#x1").text( treeName + " / " + value ).attr("data-group", null);
             $("#gridTitle .tssbutton").hide();
+            $("#btn_account, #btn_mv").show();
 
             $.showGrid(URL_SEARCH_USER, XML_USER_LIST, editUserInfo, "grid", 1, params);
         });

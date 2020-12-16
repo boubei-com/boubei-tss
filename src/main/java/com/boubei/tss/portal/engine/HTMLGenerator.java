@@ -205,13 +205,17 @@ public class HTMLGenerator {
      */
     private StringBuffer formatStyleLinks() {
         StringBuffer sb = new StringBuffer();
-        // 默认挂载的css
-        String commonCSSPath = Environment.getContextPath() + "/tools/tssJS/css/";
-        sb.append("<link href=\"" + commonCSSPath + "boubei.css\" rel=\"stylesheet\">\n");
-        
-        for ( String filePath : styleFiles ) {
-            sb.append("<link href=\"" + (portalResourseDir + filePath) + "\" rel=\"stylesheet\">\n");
+        if( styleFiles.size() > 0 ) {
+        	for ( String filePath : styleFiles ) {
+                sb.append("<link href=\"" + (portalResourseDir + filePath) + "\" rel=\"stylesheet\">\n");
+            }
         }
+        else {
+        	// 默认挂载的css
+            String commonCSSPath = Environment.getContextPath() + "/tools/tssJS/css/";
+            sb.append("<link href=\"" + commonCSSPath + "boubei.css\" rel=\"stylesheet\">\n");
+        }
+        
         return sb;
     }
 
@@ -220,16 +224,23 @@ public class HTMLGenerator {
      */
     private StringBuffer formatScriptLinks() {
         StringBuffer sb = new StringBuffer();
-        // 默认挂载的js
         String commonJSPath = Environment.getContextPath() + "/tools/";
-        sb.append("<script src=\"" + commonJSPath + "tssJS/tssJS.all.js\"></script>\n");
-        sb.append("<script src=\"" + commonJSPath + "tssJS/tssJS.json2Form.js\"></script>\n");
-        sb.append("<script src=\"" + commonJSPath + "tssJS/tssJS.jsonp.js\"></script>\n");
-        sb.append("<script src=\"" + commonJSPath + "portlet.js\"></script>\n");
         
-        for ( String filePath : scriptFiles ) {
-            sb.append("<script src=\"" + (portalResourseDir + filePath) + "\"></script>\n");
+        if( scriptFiles.size() > 0 ) {
+            sb.append("<script src=\"" + commonJSPath + "tssJS/tssJS.js\"></script>\n");
+            sb.append("<script src=\"" + commonJSPath + "tssJS/tssJS.ajax.js\"></script>\n");
+        	for ( String filePath : scriptFiles ) {
+                sb.append("<script src=\"" + (portalResourseDir + filePath) + "\"></script>\n");
+            }
         }
+        else {
+        	// 默认挂载的js
+            sb.append("<script src=\"" + commonJSPath + "tssJS/tssJS.all.js\"></script>\n");
+            sb.append("<script src=\"" + commonJSPath + "tssJS/tssJS.json2Form.js\"></script>\n");
+            sb.append("<script src=\"" + commonJSPath + "tssJS/tssJS.jsonp.js\"></script>\n");
+            sb.append("<script src=\"" + commonJSPath + "portlet.js\"></script>\n");
+        }
+        
         return sb;
     }
  
@@ -246,17 +257,12 @@ public class HTMLGenerator {
         
         StringBuffer onloadEvent = new StringBuffer("window.onload = function() { \n");
         for( String initCode : initCodes ) {
-            onloadEvent.append(initCode).append("\n"); // 将每个node生成的js code换行分隔开来
+            onloadEvent.append("  " + initCode).append("\n"); // 将每个node生成的js code换行分隔开来
         }
         sb.append("\n");
         
         for( String[] codes : eventCodes ) {
-            if ("onload".equals(codes[0])) {
-                onloadEvent.append("  " + codes[1] + "();").append("\n");
-            } 
-            else {
-                sb.append("window." + codes[0] + "=" + codes[1]).append("\n"); 
-            }
+        	onloadEvent.append( EasyUtils.checkTrue("onload".equals(codes[0]), "  " +codes[1]+ "();\n", "") ).append("\n");
         }
         onloadEvent.append("};").append("\n"); 
         
@@ -491,7 +497,7 @@ public class HTMLGenerator {
             StringBuffer sb = new StringBuffer();
             sb.append("$$('" + parentId + "').subset = [");
             for (int i = 0; i < childIds.size(); i++) {
-                if (i > 0) sb.append(", \n");
+                sb.append( EasyUtils.checkTrue(i > 0, ", \n", "") );
                 
                 List<?> items = childIds.get(i);
                 sb.append("[");

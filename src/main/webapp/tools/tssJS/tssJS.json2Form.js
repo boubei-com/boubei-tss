@@ -19,7 +19,7 @@ var Field = function(info) {
 
 		if(this.defaultValue) {
             var dv = (this.defaultValue+"").trim();
-            if( dv.indexOf("#") == 0 ) {
+            if( dv.indexOf("#_") == 0 ) {
                 var _dvs = (dv+"||").split("||");  // #_day1||today-1  或 #_day1
                 dv = $.Cookie.getValue(_dvs[0].substring(1)) || _dvs[1]; // 通用查询条件写在cookie里
             } 
@@ -29,7 +29,7 @@ var Field = function(info) {
             this.defaultValue = (dv == "undefined" ? "" : dv);
         }
 
-		this.width  = (info.width || "240px").trim();
+		this.width  = (info.width || "220px").trim();
 		if( !this.jsonUrl ) {
 			this.height = info.height;	
 		}
@@ -42,24 +42,26 @@ var Field = function(info) {
 		}
 
 		this.mode = this.type.toLowerCase();
-		if(this.jsonUrl) {
-			this.mode = "combotree";
-		} else if(this.options && this.options.codes && this.options.codes.length) {
-			// this.mode = this.multiple ? "combotree" : "combo";
-			this.mode = "combotree";
+		if(this.mode !== "hidden") {
+			if(this.jsonUrl) {
+				this.mode = "combotree";
+			} else if(this.options && this.options.codes && this.options.codes.length) {
+				this.mode = "combotree";
+			}
+			if(this.type == "file") {
+				this.mode = "combotree";
+				this.multiple = true;
+			}
 		}
-		if(this.type == "file") {
-			this.mode = "combotree";
-			this.multiple = true;
-		}
+		
 		switch(this.mode) {
 			case "number":
 				this.checkReg = this.checkReg || "^(-?\\d+)(\\.\\d+)?$"; // 浮点数
-				this.errorMsg = this.errorMsg || "请输入数字";
+				this._errorMsg = this.errorMsg || "请输入数字";
 				break;
 			case "int":
 				this.checkReg = this.checkReg || "^(-?\\d+)$"; // 整数
-				this.errorMsg = this.errorMsg || "请输入整数";
+				this._errorMsg = this.errorMsg || "请输入整数";
 				break;
 			case "string":
 			case "combo":
@@ -80,8 +82,11 @@ var Field = function(info) {
 			if(this.checkReg) {
 				column += " checkReg='" +this.checkReg+ "' ";
 			}
+			if(this._errorMsg) {
+				column += " errorMsg='" +this._errorMsg+ "' ";
+			}
 			if(this.errorMsg) {
-				column += " errorMsg='" +this.errorMsg+ "' ";
+				column += " placeholder='" +this.errorMsg+ "' ";
 			}
 			if(this.multiple) {
 				column += " multiple='multiple' ";
@@ -179,11 +184,15 @@ var Field = function(info) {
 		var tssForm = $.F(formId, $.XML.toNode(str.join("")));
 
 		fields.each(function(i, field){
-			if( !field.jsonUrl ) return;
+			if( !field.jsonUrl || field.type === 'hidden' ) return;
 
 			field.jsonUrl = decodeURI(field.jsonUrl); // 从浏览器复制过来已经带了encode
 			function loadList() {
 				function setList(result) { 
+					if( result.length == 0 ) {
+						result.push({"text": "没有数据", "value": ""})
+					}
+					
 					var values = [], texts = [];
 					result.each(function(i, item){
 						values.push( $.vt(item).value );
@@ -224,7 +233,11 @@ var Field = function(info) {
  
 		$.getJSON(service, params, 
 			function(result) { 
-				if( result && result.length ) {
+				if( result ) {
+					if( result.length == 0 ) {
+						result.push({"text": "没有数据", "value": ""})
+					}
+
 					var values = [], texts = [];
 					result.each(function(i, item){
 						values.push( $.vt(item).value );

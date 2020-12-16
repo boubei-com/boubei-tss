@@ -46,8 +46,9 @@ public class SubAuthorize extends OperateInfo implements IEntity, ITreeNode, IXF
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "SubAuthorize_sequence")
 	private Long id; // 策略ID：策略主键ID
 
-	private Long ownerId; // 策略所有人
-	private Long buyerId; // 策略购买人
+	private Long buyerId;  // 策略购买人
+	private Long ownerId;  // 策略所有人
+	private Long ownerOrg; // 策略所属组织（经营组织：分公司、仓库站点等）···
 
 	@Column(nullable = false)
 	private String name; // 名称:策略名称，如果是购买模块所获策略，则name=模块ID_模块名称_购买人ID_购买序号
@@ -157,5 +158,13 @@ public class SubAuthorize extends OperateInfo implements IEntity, ITreeNode, IXF
 
 	public Long _buyer() {
 		return (Long) EasyUtils.checkNull(buyerId, creatorId);
+	}
+
+	public Long getOwnerOrg() {
+		return ownerOrg;
+	}
+
+	public void setOwnerOrg(Long ownerOrg) {
+		this.ownerOrg = ownerOrg;
 	}
 }

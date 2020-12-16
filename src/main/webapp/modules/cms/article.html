@@ -12,7 +12,7 @@
 <script src="../../tools/tssJS/tssJS.all.js"></script>
 <script src="../../tools/tssUtils.js"></script>
 
-<script src="../../tools/kindeditor/kindeditor-min.js"></script>
+<script src="../../tools/kindeditor/kindeditor.js"></script>
 <script src="../../tools/kindeditor/lang/zh_CN.js"></script>
 
 <style type="text/css">
@@ -27,6 +27,8 @@
 	.article .bts input { margin-right:20px; }
 	
 	#content { width:99%; height:375px; visibility:hidden; }
+
+	.ke-dialog-body input {  height: 20px; margin: 3px 2px; }
 
 	.ke-icon-imageSelf {
 		background-image: url(../../tools/kindeditor/themes/default/default.png);
@@ -47,6 +49,13 @@
 		width: 16px;
 		height: 16px;
 	}
+
+	.ke-icon-urlLink {
+		background-image: url(../../tools/kindeditor/themes/default/default.png);
+		background-position: 0px -1040px;
+		width: 16px;
+		height: 16px;
+	}
 	
 </style>
 
@@ -57,11 +66,13 @@
     URL_ARTICLE_DETAIL = AUTH_PATH + "article/";       // {articleId}
 	URL_ARTICLE_INIT   = AUTH_PATH + "article/init/";  // {channelId}
     URL_SAVE_ARTICLE   = AUTH_PATH + "article";
+    URL_SET_ATTACH_TOP = AUTH_PATH + "article/attach/top/"; // {id}
 
 	if(window.parent == window.self) {
 		URL_ARTICLE_DETAIL = "data/article.xml?";
 		URL_ARTICLE_INIT   = "data/article.xml?";
 		URL_SAVE_ARTICLE   = "data/_success.xml?";
+		URL_SET_ATTACH_TOP = "data/_success.xml?";
 	}
 
 	// 自定义插件 #1
@@ -170,6 +181,38 @@
 		});
 	});
 
+	KindEditor.lang({
+		urlLink : '插入超链接'
+	});
+	KindEditor.plugin('urlLink', function(K) {
+		var self = this, name = 'urlLink';
+		self.clickToolbar(name, function() {
+			var html = [];
+			html.push('<div style="margin:20px;line-height:22px;">');
+			html.push('链接地址：<input id="urlValue" style="width:300px;">');
+			html.push('<br/>链接说明：<input id="urlTitle" style="width:120px;">');
+			html.push('</div>');
+
+			self.createDialog({
+				name : 'urlLink',
+				width : 450,
+				title : '插入超链接',
+				body : html.join('\n'),
+				yesBtn : {
+					name : "插入",
+					click : function(e) {
+						var url = $("#urlValue").value();
+						var title = $("#urlTitle").value() || '点击链接查看';
+						var html = '<a href="' + url + '" target="self">' +title+ '</a>';
+
+						self.insertHtml(html);
+						self.select().hideDialog().focus();
+					}
+				}
+			});
+		});
+	});
+
 
 	var editor;
 	KindEditor.ready( function(K) {
@@ -178,9 +221,11 @@
 				allowPreviewEmoticons : false,
 				allowImageUpload : false,
 				items : [
-					'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline', 'lineheight',
-					'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
-					'insertunorderedlist', '|', /*'image',*/ 'imageSelf', 'reportportlet', 'table', 'baidumap', '|', 'source', 'fullscreen', 'quickformat', 'preview']
+					'fontname', 'fontsize', 
+					'|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline', 'lineheight', 'removeformat', 
+					'|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist', 'insertunorderedlist', 
+					'|', 'media', 'imageSelf', 'urlLink', 'reportportlet', 'table', 'baidumap', 
+					'|', 'source', 'fullscreen', 'quickformat', 'preview']
 			});				
 	} );
 
@@ -218,7 +263,7 @@
 				grid.element.contextmenu.show(event.clientX, event.clientY);
 			} 
 			grid.element.onDblClickRow = function(eventObj) {
-				deleteAttachment();
+				delAttach();
 			}
 
             $("#btSave").click( function() { saveArticle(false); } );
@@ -253,7 +298,11 @@
 		request.setFormContent(dataNode);
 
 		// 文章正文
-		request.addParam("ArticleContent", editor.html());
+		var _articleContent = editor.html();
+		if( _articleContent.indexOf("data:image/png;base64") > 0 ) {
+			return alert("请先将正文中复制进来的图片保存到本地目录，再通过编辑器下方的【上传附件】上传后插入到正文里。");
+		}
+		request.addParam("ArticleContent", _articleContent);
 
 		// 文章图片附件
 		var attachsSeqNos = $.G("attachGrid").getColumnValues("seqNo");
@@ -305,21 +354,32 @@
 			"downloadUrl": downloadUrl, 
 			"relationUrl": relationUrl,
 			"fileName": fileName, 
-			"fileExt": fileExt
+			"fileExt": fileExt,
+			"_url": "<a href='/tss/" + relationUrl + "' target='_blank'>查看</a>", 
+	        "delOpt": "<a href='javascript:void(0)' onclick='delAttach()'>删除</a>", 
+	        "uploadDate": tssJS.now(true)
 		};
 		$.G("attachGrid").insertRow(map);
 	}
 
-	function deleteAttachment() {
+	function delAttach() {
 		$.confirm("您确定要删除该附件吗？", "删除确认", function(){
 			$.G("attachGrid").deleteSelectedRow();
 		});
 	}
 
+	function setTop(attachId) {
+	    tssJS.post(URL_SET_ATTACH_TOP + attachId, {}, function(attach) {
+	    		tssJS.tssTip("置顶成功，重新打开文章生效。")
+	            tssJS.hideWaitingLayer();
+	        }
+	    );
+	}
+
 	function initGridMenu() { 
         var item1 = {
             label:"删除",
-            callback:deleteAttachment,
+            callback:delAttach,
             icon:"icon icon-x",
         }
 
@@ -352,7 +412,7 @@
 					<option value="1" selected>图片</option>
 					<option value="2">文档</option>
 				</select>
-				<input type="file" name="file" id="sourceFile"/>
+				<input type="file" name="file" id="sourceFile" multiple="multiple"/>
 				<input type="button" class="tssbutton small blue" onclick="uploadAttachment()" value="上传附件" />
 				<b>&nbsp;单个附件大小不宜超过3M</b>
 			</form>
@@ -365,6 +425,7 @@
 			<input type="button" value="保 存" class="tssbutton small blue" id="btSave"/> 
 			<input type="button" value="保存并提交" class="tssbutton small blue" id="btSaveAndPublish"/>
 			<input type="button" value="关 闭" class="tssbutton small blue" onclick="window.parent.showArticleList(channelId);"/>
+			<input type="button" value="查看帮助" class="tssbutton small green" onclick="window.open('https://www.boudata.com/tss/article.portal?articleId=168');"/>
 		</div>
 	</div>
 

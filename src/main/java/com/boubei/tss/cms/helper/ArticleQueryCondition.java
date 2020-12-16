@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.boubei.tss.PX;
 import com.boubei.tss.framework.persistence.pagequery.MacrocodeQueryCondition;
 import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.modules.param.ParamConfig;
@@ -57,7 +58,7 @@ public class ArticleQueryCondition extends MacrocodeQueryCondition {
         
         map.put("${channelId}",  " and o.channel.id = :channelId");
         
-        String publicDomains = ParamConfig.getAttribute("PUBLIC_DOMAINS", "'无域','BD'");
+        String publicDomains = ParamConfig.getAttribute(PX.PUBLIC_DOMAINS, "'无域','BD'");
         map.put("#{domainOrNoDomain}", " and o.domain in (" +publicDomains+ ",'" +Environment.getDomain()+ "')");
 
         return map;

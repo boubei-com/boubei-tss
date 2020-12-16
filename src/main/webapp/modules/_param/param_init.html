@@ -38,9 +38,9 @@ $.each(FIELDS, function(i, field) {
     field.align = field.align || "left";
 }); 
 function codeStyle(value,row,index){
-	if(param_list[index].require){
-		return 'background-color:#eee'
-	}
+    if(param_list[index].require){
+        return 'background-color:#eee'
+    }
 }
 
 var dg;
@@ -82,117 +82,117 @@ var param_list = [
 
 var codes = [], require_codes = [], result = [], exist_params = {};
 $(document).ready(function () {
-	$.each(param_list,function(i,item){
-		codes.push(item.code);
-		if(item.require) {
-			require_codes.push(item.code);
-		}
-	})
-		
-	init(true); 
+    $.each(param_list,function(i,item){
+        codes.push(item.code);
+        if(item.require) {
+            require_codes.push(item.code);
+        }
+    })
+        
+    init(true); 
 });
 
 function init(enableCellEditing){
-	result = [], exist_params = {};
-	tssJS.getJSON('/tss/param/init/query', { codes: codes.join(',') }, function(data){	
-		$.each(data,function(i,item){
-			exist_params[item.code] = item;
-		});
+    result = [], exist_params = {};
+    tssJS.getJSON('/tss/param/init/query', { codes: codes.join(',') }, function(data){  
+        $.each(data,function(i,item){
+            exist_params[item.code] = item;
+        });
 
-		var parentid;
-		$.each(param_list, function(i, item) {
-			item['name'] = item['name'] || item['code'];
-			var param_old = exist_params[item.code];
+        var parentid;
+        $.each(param_list, function(i, item) {
+            item['name'] = item['name'] || item['code'];
+            var param_old = exist_params[item.code];
 
-			if(param_old) {
-				parentid = parentid || param_old.parentid;
-				result.push(param_old);
-				result[i]['content'] = item.content;
-				result[i]['group'] = item.group;
-				result[i]['parentId'] = param_old.parentid;
-				delete result[i]['parentid']
-			}
-			else{
-				result.push(item);
-			}
-		})
-		$.each(result,function(i,item){
-			item.parentId = item.parentId || parentid;
-		})
-		dg = $('#table').datagrid({
-	        fit: true,
-	        fitColumns: true,
-	        rownumbers: true,
-	        singleSelect: true,
-	        checkOnSelect: true,
-	        selectOnCheck: true,
-	        nowrap: false, 
-	        view: groupview,
+            if(param_old) {
+                parentid = parentid || param_old.parentid;
+                result.push(param_old);
+                result[i]['content'] = item.content;
+                result[i]['group'] = item.group;
+                result[i]['parentId'] = param_old.parentid;
+                delete result[i]['parentid']
+            }
+            else{
+                result.push(item);
+            }
+        })
+        $.each(result,function(i,item){
+            item.parentId = item.parentId || parentid;
+        })
+        dg = $('#table').datagrid({
+            fit: true,
+            fitColumns: true,
+            rownumbers: true,
+            singleSelect: true,
+            checkOnSelect: true,
+            selectOnCheck: true,
+            nowrap: false, 
+            view: groupview,
             groupField: 'group',
             groupFormatter: function(value, rows) {
-            	return value;
+                return value;
             },
-	        toolbar: [ 
-	            { text: '保存参数', iconCls: 'icon-save', handler: saveData},
-	            { text: '更多参数设置', iconCls: 'icon-redo', handler: function() { $("#tabs").tabs("select", 1); }}
-	        ],
-	        columns: [FIELDS],
-	        data: result
-	    });  
-	    enableCellEditing && dg.datagrid('enableCellEditing');
-	})
+            toolbar: [ 
+                { text: '保存参数', iconCls: 'icon-save', handler: saveData},
+                { text: '更多参数设置', iconCls: 'icon-redo', handler: function() { $("#tabs").tabs("select", 1); }}
+            ],
+            columns: [FIELDS],
+            data: result
+        });  
+        enableCellEditing && dg.datagrid('enableCellEditing');
+    })
 }
 
 function saveData(){
-	var save_params = {};
-	$.each(param_list, function(i, item) {
-		save_params[item.code] = exist_params[item.code] || item;
-	});
+    var save_params = {};
+    $.each(param_list, function(i, item) {
+        save_params[item.code] = exist_params[item.code] || item;
+    });
 
-	for(var i = 0; i < param_list.length; i++) {
+    for(var i = 0; i < param_list.length; i++) {
         $('#table').datagrid("endEdit", i);
     }
     var rows = $('#table').datagrid('getChanges');
     for(var i = rows.length-1; i >= 0; i--) {
-    	if(!rows[i].value && !exist_params[rows[i].code]) { // 没有填写值且原先也没有设置的，忽略
-    		rows.splice(i, 1);
-    		continue;
-    	}
-    	if( !rows[i].id ) { // 新增Param
-    		rows[i].lockversion = 0;
-    		rows[i].disabled = 0;
-    		rows[i].hidden = 0;
-    		rows[i].modality = 0;
-    		rows[i].type = 1;
-    	}
+        if(!rows[i].value && !exist_params[rows[i].code]) { // 没有填写值且原先也没有设置的，忽略
+            rows.splice(i, 1);
+            continue;
+        }
+        if( !rows[i].id ) { // 新增Param
+            rows[i].lockversion = 0;
+            rows[i].disabled = 0;
+            rows[i].hidden = 0;
+            rows[i].modality = 0;
+            rows[i].type = 1;
+        }
     }
 
     var rows_obj = {};
     $.each(rows, function(i, item) {
-    	rows_obj[item.code] = item;
+        rows_obj[item.code] = item;
     });
 
     var checked = true;
     $.each(require_codes, function(i,item){
-    	if( rows_obj[item] ){
-    		if(!rows_obj[item].value){
-	    		$.messager.alert('提示','请将必填项（参数code列背景颜色为灰色）填写完整后保存！');
-	    		checked = false;
-	    		return false;
-	    	}
-    	}
-    	else if(save_params[item] && !save_params[item].value){
-    		$.messager.alert('提示','请将必填项（背景颜色为灰色）填写完整后保存！');
-    		checked = false;
-	    	return false;
-    	}
+        if( rows_obj[item] ){
+            if(!rows_obj[item].value){
+                $.messager.alert('提示','请将必填项（参数code列背景颜色为灰色）填写完整后保存！');
+                checked = false;
+                return false;
+            }
+        }
+        else if(save_params[item] && !save_params[item].value){
+            $.messager.alert('提示','请将必填项（背景颜色为灰色）填写完整后保存！');
+            checked = false;
+            return false;
+        }
     })
     if(checked) {
-	    $.post('/tss/param/init/save', {json: JSON.stringify(rows)}, function(data){
-	    	$.messager.alert('提示',data ? '保存失败：' +data.errorMsg : '保存成功！');
-	    	init();
-	    })
-	}
+        $.post('/tss/param/init/save', {json: JSON.stringify(rows)}, function(data){
+            $.messager.alert('提示',data ? '保存失败：' +data.errorMsg : '保存成功！');
+            init();
+        })
+    }
 }
 
 
@@ -237,10 +237,10 @@ function saveData(){
         null, 
         'param.htm',
         '../portal/navigator.html',
-        encodeURI('../dm/recorder.html?rcname=系统定时器'), 
-        encodeURI('../dm/recorder.html?rcname=ETL任务'),
-        encodeURI('../dm/recorder.html?rcname=功能模块发布'),
-        encodeURI('../dm/recorder.html?rcname=对外用户令牌发放')
+        encodeURI('../dm/recorder.html?rcname=component_job_def'), 
+        encodeURI('../dm/recorder.html?rcname=dm_etl_task'),
+        encodeURI('../dm/recorder.html?rcname=cloud_module_def'),
+        encodeURI('../dm/recorder.html?rcname=um_user_token')
     ];
 
     for(var i=6; i >= 1; i--) {

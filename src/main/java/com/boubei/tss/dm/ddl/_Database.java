@@ -202,8 +202,35 @@ public abstract class _Database {
 			this.fieldRole2s.add(role2);
 			crole.put(code, role2);
 			
-			this.fieldAligns.add( (String)EasyUtils.checkNull(fDefs.get("calign"), "") ); // 列对齐方式
-			this.fieldWidths.add( (String)EasyUtils.checkNull(fDefs.get("cwidth"), "") ); // 列宽度
+			this.fieldAligns.add( EasyUtils.obj2String(fDefs.get("calign")) ); // 列对齐方式
+			this.fieldWidths.add( EasyUtils.obj2String(fDefs.get("cwidth")) ); // 列宽度
+		}
+	}
+	
+	/**
+	 * 获取自定义字段，多层级自定义查询过滤，优先级 user > org > domain > domain is null
+	 * 	1、tb不为空，ignoreTblisNull = true， 只取指定表的自定义字段
+	 * 	2、tb不为空，ignoreTblisNull = false， 取指定表 及 公共 的自定义字段
+	 * 	3、tbl为空 且 ignoreTblisNull = false， 前台调用，取共同部分（tbl is null）的字段自定义，eg：批次属性
+	 */
+	public static Map<?, Map<?, Object>> queryRecordFields(String tbl, Long userOrg, boolean ignoreTblisNull) {
+		String domain = Environment.getDomain();
+		String userCode = Environment.getUserCode();
+		String sql = "select code,label, IFNULL(type, 'string') type, nullable,unique_,readonly,role1,role2,cwidth,align,options,defaultValue,checkReg from dm_record_field ";
+		
+		List<Map<String, Object>> _fields4 = SQLExcutor.queryL(sql + " where ? in (tbl,udf1) and domain = ? and user is null and user_org is null", tbl, domain);
+		List<Map<String, Object>> _fields5 = SQLExcutor.queryL(sql + " where ? in (tbl,udf1) and domain = ? and user is null and user_org = ?", tbl, domain, userOrg);
+		List<Map<String, Object>> _fields6 = SQLExcutor.queryL(sql + " where ? in (tbl,udf1) and domain = ? and user = ?", tbl, domain, userCode);
+		
+		if( ignoreTblisNull ) { // 只取指定表的自定义字段
+			return EasyUtils.list2Map("code", _fields4, _fields5, _fields6);
+		}
+		else { // tbl is null，字段作用于多个表（eg：批次属性）
+			List<Map<String, Object>> _fields1 = SQLExcutor.queryL(sql + " where tbl is null and domain = ? and user is null and user_org is null", domain);
+			List<Map<String, Object>> _fields2 = SQLExcutor.queryL(sql + " where tbl is null and domain = ? and user is null and user_org = ?", domain, userOrg);
+			List<Map<String, Object>> _fields3 = SQLExcutor.queryL(sql + " where tbl is null and domain = ? and user = ?", domain, userCode);
+			
+			return EasyUtils.list2Map("code", _fields1, _fields2, _fields3, _fields4, _fields5, _fields6);
 		}
 	}
 	
@@ -213,13 +240,7 @@ public abstract class _Database {
 		}
 		
 		// 获取自定义字段
-		String domain = Environment.getDomain();
-		String userCode = Environment.getUserCode();
-		String sql = "select code,label, IFNULL(type, 'string') type, nullable,unique_,readonly,role1,role2,cwidth,align,options,defaultValue,checkReg from dm_record_field ";
-		List<Map<String, Object>> _fields1 = SQLExcutor.queryL(sql + " where tbl is null and domain = ?", domain);
-		List<Map<String, Object>> _fields2 = SQLExcutor.queryL(sql + " where ? in (tbl,udf1) and domain = ? and user is null", this.table, domain);
-		List<Map<String, Object>> _fields3 = SQLExcutor.queryL(sql + " where ? in (tbl,udf1) and domain = ? and user = ?", this.table, domain, userCode);
-		Map<?, Map<?, Object>> map = EasyUtils.list2Map("code", _fields1, _fields2, _fields3);
+		Map<?, Map<?, Object>> map = queryRecordFields(this.table, Environment.getUserOrg(), false);
 		
 		define = define.replaceAll("'", "\"");
 		List<String> remainCodes = Arrays.asList("creator", "createTime", "updator", "updateTime", "version", "id");  // domain
@@ -274,7 +295,7 @@ public abstract class _Database {
 			throw new BusinessException( EX.parse(EX.DM_15, recordName, e.getMessage()), true );
    	    } 
 	}
-	
+
 	protected Map<String, String> getDBFiledTypes(int length) {
 		Map<String, String> m = new HashMap<String, String>();
 		m.put(_Field.TYPE_NUMBER, "float");
@@ -643,8 +664,9 @@ public abstract class _Database {
 		rcEvent.afterUpdate(id, old, this);
 	}
 	
-	public void updateBatch(String ids, String field, String value) {
-		String updateSQL = "update " + this.table + " set " + field + "=?, updatetime=?, updator=?, version=version+1 where id in (" + ids + ")";
+	public void updateBatch(String ids, String field, String value, boolean addVersion) {
+		String version = addVersion ? ", version=version+1" : "";
+		String updateSQL = "update " + this.table + " set " + field + "=?, updatetime=?, updator=? " +version+ " where id in (" + ids + ")";
 		
 		Map<Integer, Object> paramsMap = new HashMap<Integer, Object>();
 		int index = 0, fieldIndex = this.fieldCodes.indexOf(field);
@@ -837,7 +859,7 @@ public abstract class _Database {
 			condition = " creator = ? ";
 		}
 		
-		boolean pointedDomain = false;
+		boolean pointedDomain = false, pointedID = false;
 		for(String _key : params.keySet()) {
 			String _valueStr = params.get(_key);
 			String key = _key.toLowerCase();  // code默认都是小写
@@ -879,7 +901,7 @@ public abstract class _Database {
 			
 			// Admin或匿名可浏览的表 可以查询指定域下的数据, 用户也可以查看本域下已逻辑删除的数据（BB@--）
 			String _deletedTag = Environment.getDomainOrign() + deletedTag;
-			if( "domain".equals(key) && (Environment.isAdmin() || anonymousVisiable || valueStr.startsWith(_deletedTag)) ) { 
+			if( "domain".equals(key) && (Environment.isAdmin() || anonymousVisiable || valueStr.equals(_deletedTag)) ) { 
 				condition += " and domain = ? ";
 				paramsMap.put(paramsMap.size() + 1, valueStr);
 				pointedDomain = true;
@@ -891,10 +913,10 @@ public abstract class _Database {
 					condition += " and id in (" + EasyUtils.filterEmptyItem(valueStr) + ") ";
 				} else {
 					condition += " and id = ? ";
-					valueStr = valueStr.replace("_copy", "");
+					valueStr = valueStr.replace("_copy", ""); // 复制记录
 					paramsMap.put(paramsMap.size() + 1, EasyUtils.obj2Long(valueStr));
 				}
-				pointedDomain = true;
+				pointedID = true;
 				continue;
 			}
 
@@ -1003,7 +1025,7 @@ public abstract class _Database {
 		 * 注：部分全局基础表需要忽略域限制：比如行政区划等，customizeTJ: <#if 1=0>ignoreDomain</#if>
 		 */
 		boolean _ignoreDomain = this.ignoreDomain || _customizeTJ.indexOf("ignoreDomain") > 0;
-		if( _ignoreDomain || pointedDomain || (anonymousVisiable && Environment.isAnonymous()) ) {  
+		if( _ignoreDomain || pointedDomain || (anonymousVisiable && (Environment.isAnonymous() || pointedID)) ) {  
 			// 匿名用户可浏览，则无需过滤域
 		}
 		else {

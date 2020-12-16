@@ -301,7 +301,7 @@ function createImportDiv(remark, checkFileWrong, importUrl, callback) {
 
 		var str = [];
 		str[str.length] = "<form id='importForm' method='post' target='fileUpload' enctype='multipart/form-data'>";
-		str[str.length] = "	 <div class='fileUpload'> <input type='file' name='file' id='sourceFile' onchange=\"$('#importDiv h2').html(this.value)\" /> </div> ";
+		str[str.length] = "	 <div class='fileUpload'> <input type='file' name='file' id='sourceFile' multiple='multiple' onchange=\"$('#importDiv h2').html(this.value)\" /> </div> ";
 		str[str.length] = "	 <input type='button' id='importBt' value='确定导入' class='tssbutton blue'/> ";
 		str[str.length] = "</form>";
 		str[str.length] = "<iframe style='width:0; height:0;' name='fileUpload'></iframe>";
@@ -335,6 +335,7 @@ function createImportDiv(remark, checkFileWrong, importUrl, callback) {
 		$(importDiv).hide();
 	} );
 
+	$1("sourceFile").click();
 	return importDiv;
 }
 
@@ -820,7 +821,7 @@ function popupTree(url, nodeName, params, callback, method) {
 	});
 }
 
-function popupForm(url, nodeName, params, callback, title) {
+function popupForm(url, nodeName, params, callback, title, init) {
 	removeDialog();
 
 	var boxName = "popupForm";
@@ -855,7 +856,8 @@ function popupForm(url, nodeName, params, callback, title) {
 			});
 
 			$.cache.XmlDatas[nodeName] = formXML;
-			$.F(boxName, formXML);
+			var xform = $.F(boxName, formXML);
+			init &&  init(xform);
 
 			$(".bts .b1", el).click(function(){
 				var condition = {};       
@@ -865,8 +867,9 @@ function popupForm(url, nodeName, params, callback, title) {
 	                condition[node.nodeName] = $.XML.getText(node);
 	            });
 
-		        removeDialog();
-		        callback(condition);
+	            if( callback(condition) !== false ) {
+	            	removeDialog();
+	            }
 			});
 		}
 	});
@@ -930,8 +933,9 @@ function email(receivers, title, content) {
 	$.post(AUTH_PATH + "message/email2", {"receivers": receivers, "title": title, "content": content});
 }
 
-function sendMessage(receivers, title, content) {
-	$.post(AUTH_PATH + "message", {"receivers": receivers, "title": title, "content": content});
+function sendMessage(receivers, title, content, category, level, callback) {
+	var params = {"receivers": receivers, "title": title, "content": content, "category": category, "level": level};
+	$.post(AUTH_PATH + "message", params, callback);
 }
 
 function listMessages(callback) {

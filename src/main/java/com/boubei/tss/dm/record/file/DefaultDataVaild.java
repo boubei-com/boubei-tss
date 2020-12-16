@@ -53,6 +53,10 @@ public class DefaultDataVaild implements IDataVaild {
 			
 			for(int j = 0; j < labels.size(); j++) {
     			String filedLabel = labels.get(j);
+    			if(EasyUtils.isNullOrEmpty(filedLabel)) {
+    				continue;
+    			}
+    			
     			String fieldCode = _db.ncm.get(filedLabel);
     			if(fieldCode == null) {
     				errors.add("列【" + filedLabel + "】在【" +_db.recordName+ "】定义里不存在;");

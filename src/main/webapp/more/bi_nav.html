@@ -15,9 +15,11 @@
 <script src="../tools/tssJS/tssJS.js"></script>
 <script src="../tools/tssJS/tssJS.ajax.js"></script>
 <script src="../tools/tssJS/tssJS.jsonp.js"></script>
+<script src="../tools/portlet.js"></script>
 
 <script src="../tools/easyui/jquery.min.js"></script>
 <script src="../tools/easyui/jquery.easyui.min.js"></script>
+<script src="page_code.js"></script>
 
 <STYLE type="text/css">
 
@@ -25,6 +27,21 @@
 html, body { height: 100%; }
 a { color:black; text-decoration:none; }
 a:hover { text-decoration:underline; }
+
+/* 启用自定义滚动条，并设置容器属性 */
+*::-webkit-scrollbar {
+  /* 这里的宽是指竖向滚动条的宽，高是指横向滚动条的高*/      
+  width: 8px; height: 8px; background: #ccc; 
+}
+/* 滚动条凹槽，还可以设置边框属性。此处属性也可以直接在容器中设置 */
+*::-webkit-scrollbar-track-piece {
+  background-color: #fff;
+}
+/* 滚动条 */
+*::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: linear-gradient(#ccc, #bbb); 
+}
 
 #north {
   overflow:hidden; height:30px; line-height:20px; color:#fff; 
@@ -35,9 +52,9 @@ a:hover { text-decoration:underline; }
   border: 0px;
 }
 #south { height: 24px; background: #D2E0F2; }
-#west { width:200px; }
+#west { width:175px; }
 #tabs .panel-body { overflow: hidden; }
-
+#nav { overflow: auto; }
 
 .head { float:right; padding-right:20px; }
 .head a { color:white; text-decoration:underline; }
@@ -60,11 +77,15 @@ a:hover { text-decoration:underline; }
 
 .tssicon { display: inline-block; font-size: 16px; width: 13px; padding-right: 8px; }
 .tssicon:before { vertical-align: middle; }
-
 .navlist li .tssicon { padding-left: 2px; padding-right: 0; }
-
+.icon-question { font-size: 16px; }
 .wfCount { color: red; }
+#tab-tools a { width: 30px; height:26px;}
+
+#configBtn{display: none;}
 		 
+.mapPage { width: 75%; position: absolute; left: 173px; top: 33px; z-index: 999; background: white; }
+
 </STYLE>
 
 <script type="text/javascript">
@@ -72,11 +93,15 @@ a:hover { text-decoration:underline; }
 var report_portlet_url = "../modules/dm/report_portlet.html?leftBar=true&id=",
 	record_portlet_url = "../modules/dm/recorder.html?id=",
 	onlyOpenTitle = "默认首页",
-	_menus;
+	_menus, global_env = {},
+	iframes = {},
+	pageHelps = {},
+	pageCodes = {};
 
 var group = tssJS.Query.get("group"),
     _default = tssJS.Query.get("_default"),
-    _defaultItem = tssJS.Query.get("_defaultItem");
+	_defaultItem = tssJS.Query.get("_defaultItem"),
+	isAdmin = parent.userHas[1].contains(-8) || parent.userHas[1].contains(-1);
 
 if( _default ) {
 	_default = resourceUrl(_default) + (_defaultItem ? "&itemId=" + _defaultItem : "");
@@ -97,7 +122,7 @@ $(function(){
 	_menus = globalV.list;
 
 	initMenu();
-	_default && $("#if1").attr("src", _default);
+	_default && $("#ifr1").attr("src", _default);
 });
 
 function fixICON(icon) {
@@ -126,7 +151,7 @@ function initMenu() {
 		count += (menu1.children && menu1.children.length ? menu1.children.length + 1 : 0);
 
 	})
-	var collapsed = count > 16; // 菜单个数 > 16 个，默认收缩手风琴
+	var collapsed = count > 32; // 菜单个数（加目录） > 32 个，默认收缩手风琴
 
 	$.each(_menus, function(i, menu1) {
 		var menu1Name =  fixICON(menu1[5] ||'icon icon-triangle-right' ) +  menu1[1];
@@ -139,10 +164,13 @@ function initMenu() {
 		menuHTML.push('<ul class="navlist">');
 	    menu1.children && $.each(menu1.children, function(j, menu2) {
 	    	var icon = fixICON(menu2[5] || 'icon icon-file-text');  // 自定义图标
-	    	var wfCount = menu2[6] ? '(' +menu2[6]+ ')' : '';
+	    	var wfCount  = menu2[6] ? '(' +menu2[6]+ ')' : '';
+	    	var pageHelp = menu2[7]||'';
+	    	var pageCode = menu2[8]||'';
+	    	var pageUrl  = menu2[9]||'';
 
 	    	menuHTML.push('<li>');
-	    	menuHTML.push('<div>' +icon+ '<a ref="' + menu2[0] + '" wfCount="' +menu2[6]+ '" href="#">');
+	    	menuHTML.push('<div>' +icon+ '<a ref="' + menu2[0] + '" wfCount="' +menu2[6]+ '" pageHelp="' +pageHelp+ '" pageCode="' +pageCode+ '" pageUrl="' +pageUrl+ '" href="#">');
 	    	menuHTML.push('  <span class="nav">' + menu2[1] + '</span>');
 	    	menuHTML.push('  <span class="wfCount">' + wfCount + '</span>');
 	    	menuHTML.push('</a></div>');
@@ -164,35 +192,116 @@ function initMenu() {
 	$('#nav').accordion('select', selectedPanelname);
 
 	$('.navlist li a').click(function(){
-		$('#main').layout('collapse', 'west');	
-
 		var tabTitle = $(this).children('.nav').text();
-		var reportId = $(this).attr("ref"),
-			wfCount  = $(this).attr("wfCount");
-		var url = resourceUrl(reportId);
-		if(wfCount) {
+		var recourceId = $(this).attr("ref"),
+			wfCount  = $(this).attr("wfCount"),
+			pageUrl  = $(this).attr("pageUrl");
+
+		var url = pageUrl || resourceUrl(recourceId);
+		if( wfCount && wfCount != '0' && !pageUrl) {
 			url += '&wfCount=' + wfCount;
 			$(this).find("span.wfCount").text("");
 		}
+
+		if ( url.indexOf("isMapPage") > 0 ) {
+			showMapPage( url )
+			return;
+		}
 		
+		$('#main').layout('collapse', 'west');
 		setTimeout( function() {
 			addTab(tabTitle, url);
 		}, 500 );
 
 		$('.navlist li div').removeClass("selected");
-		$(this).parent().addClass("selected");	
+		$(this).parent().addClass("selected");
+
+		var pageHelp = $(this).attr("pageHelp");
+		if( pageHelp && pageHelp !== 'null' ) {
+			pageHelps[tabTitle] = pageHelp;
+			setTimeout(function(){
+				$('#helpBtn').tooltip({ position: 'left', content: '<b class="icon icon-alert" style="font-size:14px; color:blue;"><b>点此查看帮助' }).tooltip("show");
+			},550);
+		}
+
+		var pageCode = $(this).attr("pageCode");
+		if( pageCode && pageCode !== 'null' ) {
+			pageCodes[tabTitle] = pageCode;
+		}
+	});
+
+	$('#tabs').tabs({
+		onSelect: function(title, index) {
+			var pageCode = pageCodes[title];
+			if( pageCode && pageCode !== 'null' && isAdmin) {
+				$('#configBtn').show();
+			} else {
+				$('#configBtn').hide();
+			}
+
+			// 调用 内嵌页的 onshow() 方法
+			try {
+				var iframeId = "ifr" + (title == onlyOpenTitle ? 1 : tssJS.hashCode(title) );
+				tssJS("#" + iframeId)[0].contentWindow.onshow();
+			}
+			catch(e) { }
+		}
 	});
 }
 
+function showMapPage(src) {
+	var id = "ifm" + tssJS.hashCode(src);
+    var $mp = $('#' + id);
+    if( !$mp.length ) {
+    	var el = tssJS.createElement("iframe", "mapPage", id);
+    	tssJS("body").appendChild(el);
+
+        $mp = $('#' + id);
+        $mp.attr("frameborder", 0);
+        $mp.css('height', Math.max(tssJS.getInner().height * 0.75, 650));
+
+        IframeOnClick.track($mp[0], function(el) { tssJS.hideWaitingLayer(); $(el).hide(); $('#main').layout('collapse', 'west'); }); 
+    }
+    
+    tssJS.showWaitingLayer();
+    $("#_waiting").click( function() {
+    	tssJS.hideWaitingLayer();
+    	$mp.hide();
+    });
+
+    $mp.show(true);
+    if( src != $mp.attr('src') ) {
+    	$mp.attr('src', src)
+    }
+
+    window.frames[id].contentWindow.onshow && window.frames[id].contentWindow.onshow()
+}
+
 function addTab(subtitle, url, refresh){
-	if( !$('#tabs').tabs('exists',subtitle) ){
+	var iframeId = "ifr" + tssJS.hashCode(subtitle);
+
+	if( !$('#tabs').tabs('exists', subtitle) ){
+		iframes[subtitle] = iframeId;
 		$('#tabs').tabs('add', {
 			title:subtitle,
-			content: createFrame(url),
-			closable: true
+			content: createFrame(url, iframeId),
+			closable: true,
+			/*
+			 iconCls: 'icon-reload',
+			tools:[{
+		        iconCls:'icon-reload',
+		        handler:function() {
+		            refreshTab();
+		        }
+		    }]
+		    */
 		});
 	} 
 	else {
+		var $ifr = $("#" + iframeId);
+		if( url != $ifr.attr("src") ) {
+			$ifr.attr("src", url);
+		}
 		$('#tabs').tabs('select', subtitle);
 	}
 }
@@ -210,6 +319,9 @@ function refreshTab(tab){
 		src = iframe.attr('src');
     }	
 
+    var iframeId = "ifr" + tssJS.hashCode(currtab_title);
+	iframes[currtab_title] = iframeId;
+
     src && $('#tabs').tabs('update', {
 	    tab: currentTab,
 	    options: {
@@ -218,8 +330,8 @@ function refreshTab(tab){
 	});
 }
 
-function createFrame(url) {
-	return '<iframe scrolling="auto" frameborder="0" src="' + url + '" style="width:100%;height:100%;"></iframe>';
+function createFrame(url, iframeId) {
+	return '<iframe scrolling="auto" frameborder="0" id="' + iframeId + '" src="' + url + '" style="width:100%;height:100%;"></iframe>';
 }
 
 var FIELDS_1 = [
@@ -250,10 +362,12 @@ function _search() {
         	result.each(function(i, item){
         		var row = {"id": item[0], "name": item[1], "path": item[2]};    		
         		if(resource == 'Report') {
-        			row.opt = "<a href='" +report_portlet_url + item[0] + "' target='_blank'>打开</a>";
+        			var url = report_portlet_url + item[0];
+        			row.opt = "<a href='#' onclick='addTab(\"" +row.name+ "\", \"" +url+ "\")'>打开</a>";
         		}
         		if(resource == 'Record') {
-        			row.opt = "<a href='" +record_portlet_url + item[0] + "' target='_blank'>打开</a>";
+        			var url = record_portlet_url + item[0];
+        			row.opt = "<a href='#' onclick='addTab(\"" +row.name+ "\", \"" +url+ "\")'>打开</a>";
         		}
         		data.push(row);
         	});
@@ -276,10 +390,49 @@ function showSearchDialog() {
 	$('#dlg').dialog( {"modal": true} ).dialog('open').dialog('setTitle', "内容|功能|目录检索");
 }
 
-var global_userlist;
+function help() {
+	var currentTab = $('#tabs').tabs('getSelected');
+    var currtab_title = currentTab.panel('options').title;
+    var curr_html = pageHelps[currtab_title];
+    var title = "【" + currtab_title + "】操作指南 | <a href='#' style='color:blue' onclick='feedback(\"" +currtab_title+ "\");'>【反馈文档异常】</a>"
+
+    if( curr_html ) {
+    	$('#dlg2>iframe').attr('src', curr_html);
+		$('#dlg2').dialog( {"modal": true} ).dialog('open').dialog('setTitle', "内容|功能|目录检索").dialog('setTitle', title);
+    }
+}
+/* 
+ * 要求Title和Tab页的title一致	
+ * parent.addHelpUrl && parent.addHelpUrl("计费单位定义", "https://www.boudata.com/tss/article.portal?articleId=106"); 
+ */
+function addHelpUrl(title, url) {
+	pageHelps[title] = url;
+	$('#helpBtn').tooltip({ position: 'left', content: '<b class="icon icon-alert" style="font-size:14px;color:blue;"><b>点此查看帮助' }).tooltip("show");
+}
+
+function feedback(title) {
+    openUrl( encodeURI('modules/dm/recorder.html?rctable=x_feedback&udf=' + title), true, "建议反馈" );
+}
+
+var global_userlist, global_usercodes = [], global_usernames = [];
 $.getJSON("/tss/wx/api/users", {}, function(result) {
     global_userlist = result;
+    $.each(result, function(k, v) {
+    	global_usercodes.push(k);
+    	global_usernames.push(v);
+    });
 });
+
+function pageDefineDirectorGo(){
+	var currentTab = $('#tabs').tabs('getSelected');
+    var currtab_title = currentTab.panel('options').title;
+    var pageCode = pageCodes[currtab_title];
+
+	var iframeId = iframes[currtab_title];
+	var pageId = tssJS("#" + iframeId)[0].getAttribute('src').split(/\?id=(\d+)/)[1];
+
+	pageDefineDirector.go(pageCode, pageId);
+}
     </script>
 
 </head>
@@ -293,31 +446,89 @@ $.getJSON("/tss/wx/api/users", {}, function(result) {
 	<div region="center" id="mainPanle">
 	  <div id="tabs" class="easyui-tabs" fit="true" border="false" data-options="tools:'#tab-tools'">
 			<div title="默认首页" style="text-align: center; ">		
-				<iframe frameborder="0" id="if1" style="width:100%;height:100%;"></iframe>
+				<iframe frameborder="0" id="ifr1" style="width:100%;height:100%;"></iframe>
 			</div>
 		</div>
 	</div>
 
 	<div id="tab-tools">       
-		<a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-search'" onclick="showSearchDialog()" style="background-color:#FEF7A9; margin-right:5px; width: 40px;" title="检索"></a>
-        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-reload'" onclick="refreshTab()" style="background-color:#FEF7A9; width:40px;" title="刷新当前页"></a>
+		<a href="void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-search'" onclick="showSearchDialog()" title="检索"></a>
+		<a href="void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-tss-define'" onclick="pageDefineDirectorGo()" title="配置" id='configBtn'></a>
+		<a href="void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-question'" onclick="help()" style="font-size:16px;" title="帮助文档" id='helpBtn'></a>
+        <a href="void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-reload'" onclick="refreshTab()" style="background-color:#FEF7A9; width:36px;" title="刷新当前页"></a>
+        <a href="void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-fullScreen'" onclick="fullScreen()"  title="全屏"></a>
     </div>
 
     <div id="dlg" class="easyui-dialog" style="width:600px; min-height: 200px; max-height: 400px;" closed="true">
 	    <div class="navbar-form" style="margin: 20px 0 10px 30px;">  
 	        <select class="easyui-combobox" style="width:80px;" id="resource">
 	            <option value="Article">文章</option>
-	            <option value="Report" selected>数据报表</option>
-	            <option value="Record">数据表</option>
-	            <option value="Group">用户组织</option>
-	            <option value="Channel">栏目</option>
+	            <option value="Record" selected>业务功能</option>
+	            <option value="Report">数据报表</option>
+	            <!--  
 	            <option value="Navigator">导航菜单</option>
+	            <option value="Group">用户组织</option>
+	            <option value="Channel">栏目</option> 
+	            -->
 	        </select> - 
 	        <input class="easyui-textbox" style="width:250px;" prompt="请输入查询关键字" id="keyword">
 	        <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="_search()" style="margin-left:10px; width: 100px;">开始检索</a>
 	    </div>
 	    <table id="t1" border="false" style="display:none"></table>
-	</div>										
+	</div>				
+
+	 <div id="dlg2" class="easyui-dialog" style="width:1200px; height: 700px;" closed="true" title="帮助文档">
+	    <iframe src="" style="width: 100%; height: 99%;" scrolling="auto" frameborder="0"></iframe>
+	</div>		
+
+<script type="text/javascript">
+	
+var FIELD_CUSTOMIZE;
+
+function loadCustomize(callback) {
+	tssJS.get("/tss/xdata/json/dm_record_field", {}, function(data) {
+		if(data.length) {
+			FIELD_CUSTOMIZE = data;
+			callback && callback();
+		}
+	});
+}
+loadCustomize();
+
+//全屏
+var isFullScreen = false;
+function fullScreen(){
+	if(isFullScreen) {
+		return exitScreen();
+	}
+    var el = document.documentElement;
+    var rfs = el.requestFullScreen || el.webkitRequestFullScreen || el.mozRequestFullScreen || el.msRequestFullscreen;      
+    if(typeof rfs != "undefined" && rfs) {
+        rfs.call(el);
+    };
+    isFullScreen = true;
+}
+//退出全屏
+function exitScreen(){
+    if (document.exitFullscreen) {  
+        document.exitFullscreen();  
+    }  
+    else if (document.mozCancelFullScreen) {  
+        document.mozCancelFullScreen();  
+    }  
+    else if (document.webkitCancelFullScreen) {  
+        document.webkitCancelFullScreen();  
+    }  
+    else if (document.msExitFullscreen) {  
+        document.msExitFullscreen();  
+    } 
+    if(typeof cfs != "undefined" && cfs) {
+        cfs.call(el);
+    }
+    isFullScreen = false;
+}
+
+</script>								
 
 </body>
 </html>

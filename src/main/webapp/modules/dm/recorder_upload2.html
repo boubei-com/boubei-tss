@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta charset="UTF-8">
+	<title>文件上传</title>
+
+    <link rel="stylesheet" href="../../tools/tssJS/css/boubei.css">
+	<link rel="stylesheet" href="../../tools/ionicons.css">
+
+	<script src="../../tools/tssJS/tssJS.all.js"></script>
+	<script src="../../tools/tssJS/tssJS.data.js"></script>
+
+    <script src="../../tools/easyui/jquery.min.js"></script>
+	<script src="../../tools/jquery/jquery-ui.min.js"></script>
+
+	<style type="text/css">
+		.main { width: 90vw; margin: 0 auto; }
+		.upload-content { width: 100%; padding-top: 20px; }
+		.upload-content .content-file { display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-start; align-content: flex-start; }
+		.upload-content .file {
+			border: 1px dashed #dedede;
+			border-radius: 4px;
+			width: 16vw;
+			height: 16vw;
+			background-color: #fff;
+			margin: 1vw;
+			position: relative;
+		}
+		.upload-content .file input { opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+		.upload-content .file:hover { border: 1px dashed #3a75dc; }
+		.upload-content .content-file .icon { position: absolute; top: 50%; left: 50%; font-size: 5vw; color: #aaa;
+			transform: translateX(-50%) translateY(-50%);
+		}
+		.upload-content .file-item {
+			border: 1px dashed #dedede;
+			border-radius: 4px;
+			width: 16vw;
+			height: 16vw;
+			background-color: #fff;
+			margin: 1vw;
+			position: relative;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		.img { max-width: 100%; max-height: 100%; }
+		.upload-content .file-item h1 {
+			color: grey;
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 90%;
+			font-size: 1.2vw;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			margin-left: 5%;
+			margin-right: 5%;
+		}
+		.upload-content .hide { display:none; }
+		.upload-content .show { 
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+		}
+		.upload-content .file-item div {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,.4);
+			text-align: center;
+		}
+		.upload-content .file-item .btn { font-size: 5vw; color: #aaa; }
+		.upload-content .file-item .btn:hover { color: #fff; }
+		.upload-content .file-item .op-btn { color: #fff; cursor: pointer; margin: 0 1vw; }
+		.file-type-icon { font-size: 5vw; }
+	</style>
+
+<!-- 
+	使用此上传页示例一：
+    var globalValiable = {"tableId": 12, itemId: 1}; 
+    tssJS.openIframePanel("if1", "上传附件", 810, 257, "/tss/modules/dm/recorder_upload2.html", true);
+-->
+	<script type="text/javascript">
+		var URL_FILE_UPLOAD = "/tss/auth/file/upload";
+		var URL_RECORD_ATTACH_QUERY  = "/tss/auth/xdata/attach/json/";
+		var URL_RECORD_ATTACH_DELETE = "/tss/xdata/attach/";
+		var URL_RECORD_ATTACH_SORT   = "/tss/xdata/attach/sort";
+
+		var FILE = [];
+		var MAX_FILE_SIZE = 5000;  // 单个文件大小限制 KB
+		var MAX_NUM_TOTAL = 100;   // 页面总文件个数限制
+		var MAX_NUM_ONCE  = 20;    // 单次文件最大上传个数
+		var IMG_TYPE = ["jpg", "jpeg", "png", "bmp", "gif"];
+
+		var recordId = -1, itemId = 0, callback, MULTI_RECORDS = false;
+
+		var globalValiable = window.parent.globalValiable;
+	    if(globalValiable) {
+		    MAX_FILE_SIZE = globalValiable.MAX_FILE_SIZE || MAX_FILE_SIZE;
+		    MAX_NUM_TOTAL = globalValiable.MAX_NUM_TOTAL || MAX_NUM_TOTAL;
+		    MAX_NUM_ONCE  = globalValiable.MAX_NUM_ONCE  || MAX_NUM_ONCE;
+
+		    recordId = globalValiable.recordId || globalValiable.tableId;
+		    itemId   = globalValiable.itemId;
+		    callback = globalValiable.callback;
+
+		    var itemList = (itemId.toString()).split(",");
+		    if(itemList.length > 1){
+		    	MULTI_RECORDS = true;
+		    }
+
+		    globalValiable.recordId = recordId;
+		    globalValiable.afterUploadClass = globalValiable.afterUploadClass || "com.boubei.tss.dm.record.file.CreateAttach";
+	    }
+
+		$(function(){
+			addUploadInput(".content-file");
+			init();
+			getAttachs();
+		});
+
+		function init(){
+			$(".content-file").on("mouseover", ".file-item", function() {
+		        $(this).children('div').removeClass('hide');
+		        $(this).children('div').addClass('show');
+		    });
+
+		    $(".content-file").on("mouseleave", ".file-item", function() {
+		    	$(this).children('div').removeClass('show');
+		        $(this).children('div').addClass('hide');
+		    });
+
+            // 删除文件
+		    $(".content-file").on("click", ".file-item a .ion-md-trash", function() {
+		        var index = $(this).parent().parent().parent().index();
+		        var file = FILE[index - 1];
+		        deleteAttach(file.attachId, index - 1);
+		    });
+
+            // 下载文件
+		    $(".content-file").on("click", ".file-item a .ion-md-download", function() {
+		        var index = $(this).parent().parent().parent().index();
+		        var file = FILE[index - 1];
+		        saveFile(file.src, file.name);
+		    });
+
+            // 放大图片
+		    $(".content-file").on("click", ".file-item a .ion-md-search", function() {
+		        var img = $(this).parent().parent().parent().children("img")[0];
+		        fullScreenImg(img);
+		    });
+            
+            // 禁止其他区域拖入文件
+		    document.addEventListener('dragover', function (e) {
+			    if(e.target.id != "upload"){
+		    		e.preventDefault();
+		    	}
+			}, false);
+		    document.addEventListener('drop', function (e) {
+		    	if(e.target.id != "upload"){
+		    		e.preventDefault();
+		    	}
+			}, false);
+            
+            if(!MULTI_RECORDS){
+            	$(".content-file").sortable({
+			        revert: true,
+			        items: ".file-item",
+			        stop: function(){
+	            		var items = $(".file-item");
+	            		var newSort = [];
+	            		items.each(function(i, item){
+	            			var findex = item.getAttribute("findex");
+	            			if(findex){
+	            				newSort.push(FILE[findex].attachId);
+	            			}
+	            		});
+	            		$.post(URL_RECORD_ATTACH_SORT, {"ids": newSort.join(",")}, function(result){
+	            			getAttachs();
+	            		});
+			        }
+			    });
+            }
+		}
+
+		function getAttachs(){
+			// 多条记录同时上传，不显示已存在附件
+			if(MULTI_RECORDS) return;
+
+			$.get(URL_RECORD_ATTACH_QUERY + recordId + "/" + itemId, {}, function(data){
+				FILE = [];
+				if(data.length > 0){
+					$.each(data, function(i, attach) {
+				        var file = {};
+				        file.file = attach;
+				    	file.name = attach.name;
+				    	file.src = attach.downloadUrl;
+				    	file.attachId = attach.id;
+				    	file.uploadDate = attach.uploadDate || "";
+				    	file.uploadUser = attach.uploadUser || "";
+
+				        FILE.push(file);
+				    });
+				    addNewFile();
+				}
+			});
+		}
+
+		function deleteAttach(id, fileIndex){
+			tssJS.confirm("您确定要删除该文件吗？", "删除确认", function(){
+		        $.ajax({
+		            url: URL_RECORD_ATTACH_DELETE + id + "?recordId=" + recordId,
+		            method: 'DELETE',
+		            waiting: true,
+		            success: function(res){
+		                if(res.errorMsg){
+		                	tssJS.alert(res.errorMsg);
+		                }
+		                else{
+		                	FILE.splice(fileIndex, 1);
+				            addNewFile();
+		                }
+		            }
+		        });
+		    });
+		}
+
+		function addUploadInput(obj){
+			var html = "";
+			html += '<div class="file">';
+			html +=     '<i class="icon ion-md-add"></i>';
+			html += 	'<input type="file" name="file" id="upload" multiple>';
+			html += '</div>';
+			$(obj).append(html);
+
+			bindUpload();
+		}
+
+		function bindUpload(){
+			$("#upload").on("change", function(e) {
+			    var filesList = this.files;
+			    if(filesList.length > MAX_NUM_ONCE){
+			    	this.value = null;
+			    	return tssJS.alert("单次上传文件个数不得大于" + MAX_NUM_ONCE);
+			    }
+
+			    var checkedFiles = [];
+			    for (var i = 0; i < filesList.length; i++) {
+			    	if(FILE.length + i + 1 > MAX_NUM_TOTAL){
+			    		this.value = null;
+			    		return tssJS.alert("本页面最多可上传" + MAX_NUM_TOTAL + "个文件");
+			    	}
+
+			    	var f = filesList[i];
+
+			    	var fileSize = f.size;
+			    	if (fileSize > 1024 * MAX_FILE_SIZE) {
+			    		var msg = f.name + "大小超过" + MAX_FILE_SIZE + "KB，无法上传";
+			    		this.value = null;
+				        return tssJS.alert(msg);
+				    }
+
+			    	var file = {};
+			    	file.file = f;
+			    	file.name = f.name;
+			    	file.src = getObjectUrl(f);
+			    	file.type = f.type; // 文件类型
+			    	checkedFiles.push(file);
+			    }
+
+			    var that = this;
+			    uploadFiles(checkedFiles, that);
+			});
+		}
+
+		function uploadFiles(checkedFiles, obj){
+			var formFile = new FormData();
+		    $.each(checkedFiles, function(i, file) {
+		        formFile.append("file", file.file);
+		    });
+
+            // 参数设置
+		    for(var key in globalValiable){
+		    	formFile.append(key, globalValiable[key]);
+		    }
+
+            tssJS.showWaitingLayer();
+	        $.ajax({
+	            url: URL_FILE_UPLOAD,
+	            data: formFile,
+	            type: "POST",
+	            cache: false,
+	            processData: false,
+	            contentType: false,
+	            success: function (res) {
+	            	tssJS.hideWaitingLayer();
+	            	obj.value = null;
+
+	            	if(res.errorMsg){
+	            		tssJS.alert(res.errorMsg);
+	            	}
+	            	else{
+	            		if(MULTI_RECORDS){
+	            			$.each(checkedFiles, function(i, file) {
+						        FILE.push(file);
+						    });
+
+	            			addNewFile();
+	            		}
+	            		else{
+	            		    getAttachs();
+	            		}
+	            	}
+	            }
+	        });
+		}
+
+		function addNewFile() {
+			var obj = ".content-file";
+		    $(obj).html("");
+		    addUploadInput(obj);
+		    for (var i = 0; i < FILE.length; i++) {
+		    	var file = FILE[i];
+		    	var suffix = getSuffix(file.name);
+		    	var title = file.name;
+		    	if(file.uploadUser){
+		    		title += " 上传人：" + file.uploadUser + " 上传时间：" + file.uploadDate;
+		    	}
+
+		    	var html = "";
+		        if(IMG_TYPE.indexOf(suffix) > -1){
+		        	html += '<div class="file-item" findex="' + i + '">';
+		        	html +=     '<img src="' + file.src + '" class="img">';
+		        	html +=     '<div class="hide" title="' + title + '">';
+		            if(!MULTI_RECORDS){
+		            	html += '<a class="op-btn"><i class="btn ion-md-trash"></i></a>';
+		            }
+		        	html +=         '<a class="op-btn"><i class="btn ion-md-search"></i></a>';
+		        	html +=         '<a class="op-btn"><i class="btn ion-md-download"></i></a>';
+		        	html +=     '</div>';
+		        	html += '</div>';
+		        }
+		        else{
+		        	html += '<div class="file-item" findex="' + i + '">';
+		        	html +=     '<h1>' + file.name + '</h1>';
+		        	html +=     '<i class="file-type-icon ion-md-attach"></i>';
+		        	html +=     '<div class="hide" title="' + title + '">';
+		        	if(!MULTI_RECORDS){
+		        		html += '<a class="op-btn"><i class="btn ion-md-trash"></i></a>';
+		        	}
+		        	html +=         '<a class="op-btn"><i class="btn ion-md-download"></i></a>';
+		        	html +=     '</div>';
+		        	html += '</div>';
+		        }
+		        $(obj).append(html);
+
+		        if(!MULTI_RECORDS){
+		        	$(".file-item").draggable({
+		            	cursor: "move",
+		            	connectToSortable: ".content-file",
+		            	containment: ".content-file"
+		            });
+		        }
+			}
+		}
+
+		function getSuffix(str){
+			var index = str.lastIndexOf(".");
+			if(index > -1){
+				return str.substr(index + 1);
+			}
+			return "Undefined";
+		}
+		
+		function getObjectUrl(file) {
+		    var url = null;
+		    if (window.createObjectURL != undefined) {
+		        url = window.createObjectURL(file);
+		    } 
+		    else if (window.URL != undefined) {
+		        url = window.URL.createObjectURL(file);
+		    } 
+		    else if (window.webkitURL != undefined) {
+		        url = window.webkitURL.createObjectURL(file);
+		    }
+		    return url;
+		}
+
+		function fullScreenImg(img){
+			if(window.parent){
+				if(!window.parent.showBigImg){
+					loadScriptString(window.parent.document, showBigImg.toLocaleString());
+				}
+				window.parent.showBigImg(img);
+			}
+			else{
+				showBigImg(img);
+			}
+		}
+
+		function loadScriptString(doc, code){
+		    var script = doc.createElement("script");
+		    script.type = "text/javascript";
+		    try {
+		        script.appendChild(doc.createTextNode(code));
+		    } catch (ex) {
+		        script.text = code;
+		    }
+		    doc.body.appendChild(script);
+		}
+
+		function showBigImg(img){
+			var $outdiv = $("#outerdiv");
+			if($outdiv.length == 0){
+				var html =  '<div id="outerdiv" style="position:fixed;top:0;left:0;background:rgba(0,0,0,0.7);z-index:999999999;width:100%;height:100%;display:none;overflow:auto;">' + 
+				                '<div id="innerdiv" style="width:100%;height:100%;display:flex;justify-content:center;align-items:center;">' +
+							        '<img id="bigimg" src=""/>' +
+						        '</div>' +
+						        '<button id="transBtn" style="position:absolute;top:10px;right:10px;width:60px;height:30px;color:white;background-color:orange;">旋转</button>' +
+						    '</div>';
+			    $("body").append(html);
+			}
+			else{
+				$("#bigimg")[0].style = "";
+			}
+
+			var src = img.src;
+            $("#bigimg").attr("src", src);
+
+            var windowW = $(window).width();
+            var windowH = $(window).height();
+            var realWidth = img.width;
+            var realHeight = img.height;
+            var imgWidth, imgHeight; 
+            var scale = 0.9;
+
+            imgHeight = windowH * scale;
+            imgWidth = imgHeight / realHeight * realWidth;
+            if(imgWidth > windowW * scale) {
+                imgWidth = windowW * scale;
+                imgHeight = imgWidth / realWidth * realHeight;
+            }
+
+            $("#bigimg").css("width", imgWidth);
+            $("#outerdiv").fadeIn("fast");
+
+			$("#outerdiv").click(function(){
+	            $(this).fadeOut("fast"); 
+	        }); 
+
+	        const outerDiv = $("#outerdiv")[0];
+		    const bigImg = $("#bigimg")[0];
+		    var defaultValue = Math.round(imgWidth / windowW * 100);
+		    outerDiv.onmouseover = () => {
+		        outerDiv.onmousewheel = (b) => {
+		            b.wheelDelta < 0 ? defaultValue-- : defaultValue++;
+		            bigImg.style.width = `${defaultValue}%`;
+		        }
+		    }
+
+		    var current = 0;
+		    $("#transBtn").off("click").click(function(e){
+		    	current = (current + 90) % 360;
+		    	bigImg.style.transform = "rotate(" + current + "deg)";
+		    	e.stopPropagation();
+		    });
+		}
+
+		function saveFile(url, name){
+		    var saveLink = document.createElement("a");
+		    saveLink.href = url;
+		    saveLink.download = name;
+		    saveLink.click();
+		}
+	</script>
+</head>
+
+<body>
+	<div class="main">
+		<div class="upload-content">
+			<div class="content-file"></div>
+		</div>
+	</div>
+</body>
+</html>

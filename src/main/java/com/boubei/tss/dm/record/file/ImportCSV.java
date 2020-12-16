@@ -264,7 +264,7 @@ public class ImportCSV implements AfterUpload {
 
 		List<String> valSQLFields = new ArrayList<String>();
 		for(String code : _db.csql.keySet()) {
-			if( _db.csql.get(code) != null) {
+			if( _db.csql.get(code) != null && !_Field.TYPE_HIDDEN.equals(_db.ctype.get(code)) ) {
 				String name = _db.cnm.get(code);
 				valSQLFields.add(name);
 			}

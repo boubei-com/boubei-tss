@@ -94,7 +94,7 @@ public class Account implements IEntity {
 	}
 
 	public Double getBalance_safe() {
-		return balance_safe;
+	    return (Double) EasyUtils.checkNull(balance_safe, 0D);
 	}
 
 	public void setBalance_safe(Double balance_safe) {

@@ -114,7 +114,7 @@ public class AccessLogRecorder extends OutputRecordsManager {
 		
 		Report report = reportService.getReport(reportId);
 		boolean ignoreLog = ParamConstants.FALSE.equals(report.getNeedLog());
-		if( !ignoreLog ) {
+		if( !ignoreLog || System.currentTimeMillis() - start > 1000 ) {
 			String reportName = report.getName();
 			String tempName = (String) EasyUtils.checkNull(report.getCode(), "Report-"+reportId);
 			AccessLogRecorder.outputAccessLog(tempName, reportName, methodName, requestMap, start);

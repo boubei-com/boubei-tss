@@ -57,11 +57,17 @@
     #lcontainer {  }
     #lcontainer>header { margin-bottom: 10px }
     #lcontainer li { line-height: 22px; }
-    #lcontainer li>header { text-indent: 2em; display: inline-block; }
+    #lcontainer li>header { text-indent: 2em; display: inline-block; cursor: pointer; }
     #lcontainer li>p { text-indent: 92px; }
-    #lcontainer li>time {  margin-left: 30px; color: #666; }
+    #lcontainer li>time {  margin-left: 30px; color: #999; }
     #lcontainer li.done { color: green; }
     #lcontainer li.todo { color: blue; }
+    #lcontainer .tssbutton { padding: 1px 3px; margin-left: 6px; }
+
+    #mcontainer>header { margin-bottom: 10px }
+    #mcontainer li { line-height: 22px; }
+    #mcontainer li>span { text-indent: .6em; display: inline-block; color: blue; }
+    #mcontainer li>time { margin-left: 2em; color: #999; }
 
     #opinionLabel { width: 92px; display: inline-block; margin-top: 20px; }
     #opinion { height: 50px; width: 320px; margin-top: 15px; }
@@ -122,7 +128,12 @@ if( IS_TEST ) {
 
 // 录入表定义信息
 var recordId=1, recordName="录入表", openItemId,
-    recordDefine, customizeJS, customizeGrid, needFile, batchImp, visiableFields, 
+    recordDefine, 
+    customizeJS, 
+    customizeGrid,  // 默认在Grid加载完成后执行，如需提前，加注释隔离：/* --- before load --- */
+    needFile, 
+    batchImp, 
+    visiableFields, 
     wfFields = []; // 流程审批可编辑字段
 
 // 用户权限信息、流程信息等
@@ -134,7 +145,7 @@ var _operation = ['1','2','3','4','5'],
     userGroups = [], 
     userRoles  = [], 
     userRoleNames = [], 
-    hasWorkflow, wfCount = 0,
+    hasWorkflow, wfCount = 0, wfing = false,
     isLogicDelete,
     default_sort = "";
 
@@ -148,7 +159,7 @@ var preListener, // 在表单保存前触发，如不通过，则终止保存
 /* -------- 示例参考 spirit/常用tip.sql & 操作手册 ----------------- */
 
 // 缓存查询条件，增加删除修改后刷新Grid可以继续使用
-var params = {};   
+var params = clone(init_params), init_params = clone(init_params);   
 
 tssJS(function() {
     
@@ -167,6 +178,7 @@ tssJS(function() {
     recordName = tssJS.Query.get("rctable") || decodeURI(tssJS.Query.get("rcname")||"");
     openItemId = tssJS.Query.get("itemId");  // 通常为审批
     wfCount    = tssJS.Query.get("wfCount");
+    wfing      = tssJS.Query.get("wfing");
     if(wfCount == 'null' || wfCount == '0') { wfCount = 0; } else { wfCount = parseInt(wfCount) || 0; }
 
     if(!recordId && recordName) {
@@ -215,6 +227,8 @@ function init() {
             hasWorkflow   = result[8];
             isLogicDelete = result[9];
 
+            result[11] && parent.addHelpUrl && parent.addHelpUrl(recordName, result[11]);
+
             // if has customize page
             if( (customizePage||"").indexOf("html") > 0 ) {
                 location.href = customizePage;
@@ -237,6 +251,7 @@ function init() {
                 var fval = tssJS.Query.get(fcode);
                 if(fval) {
                     params[fcode] = decodeURI( fval );
+                    init_params[fcode] = params[fcode];
                 }
 
                 if( fcode.indexOf('wf_') == 0 || field.wfeditable ) {
@@ -251,11 +266,18 @@ function init() {
                 }
             });
 
+            var ids = tssJS.Query.get("ids");
+            if(ids) {
+                params["ids"] = decodeURI( ids );
+                init_params["ids"] = params["ids"];
+            }
+
             initMenus();
             initWorkSpace();
 
             if( hasWorkflow ) {
-                wfCount || openItemId ? listWorkflow() : listApply();
+                var wfingTag = wfing ? 'wfing' : '';
+                wfCount || openItemId || wfing? listWorkflow(wfingTag) : listApply();
                 wfCount && showWfCount();
             } else {
                 refreshTable();
@@ -276,6 +298,8 @@ function init() {
     });
 }
 
+function onGridLoad() { }
+
 var billMode       = false; // 流水账模式：只能新增，不能修改、删除；适合流水类数据记录
 var recycleBinMode = false; // 回收站模式
 var commitMode     = false; // 提交模式
@@ -283,7 +307,7 @@ var approveMode    = false; // 审批模式
 
 function refreshTable() {
     recycleBinMode = false;
-    params = {};
+    params = clone(init_params);
     delete tssJS.cache.XmlDatas["searchFormXML"];
     loadGridData(1);
 
@@ -301,7 +325,8 @@ function listWorkflow(type) {
     approveMode    = true;
     tssJS(".listBT").removeClass("bt_selected").addClass("bt_unselected");
     tssJS("#listBT2").removeClass("bt_unselected").addClass("bt_selected");
-    params = {"my_wf_list": true};
+    params = clone(init_params);
+    params.my_wf_list = true;
     if( type) {
         params[type] = true;
     }
@@ -319,7 +344,8 @@ function listApply() {
     commitMode = true;
     tssJS(".listBT").removeClass("bt_selected").addClass("bt_unselected");
     tssJS("#listBT3").removeClass("bt_unselected").addClass("bt_selected");
-    params = {"creator": userCode};
+    params = clone(init_params);
+    params.creator = userCode;
     loadGridData(1);
     ws.closeAllTabs();
 
@@ -345,7 +371,7 @@ function recycleBin() {
 
 function filterTopMenu() {
     if( !_operation.contains("1") ) {
-        tssJS("#btn_create").hide();
+        tssJS("#btn_create, #btn_update").hide();
     } 
     if( !_operation.contains("1") || !batchImp ) {
         tssJS("#btn_imp, #btn_tl").hide();
@@ -356,6 +382,14 @@ function filterTopMenu() {
     if( !_operation.contains("5") && !billMode ) { // 只有维护数据权限的角色才能使用批量删除
         tssJS("#btn_batch_del").hide();
     }
+
+    // 自定义按钮 有编辑权限才显示
+    if( _operation.contains("4") && !_operation.contains("1") && !_operation.contains("5")) {
+        setTimeout(function() {
+            tssJS("#customizeBox .tssbutton").hide();
+            tssJS("#customizeBox .readonly").show(true);
+        }, 300);
+    }
 }
 
 function initMenus() {
@@ -364,6 +398,7 @@ function initMenus() {
         rcTitle = recordName + ":【<a onclick='listWorkflow()' id='listBT2' class='listBT'> 我审批的列表<span></span></a>";
         rcTitle += "  <a onclick='listApply()' id='listBT3' class='listBT'> 我提交的列表</a>";
         rcTitle += "  <a onclick='recycleBin()' id='listBT4' class='listBT'>回收站</a>";
+        rcTitle += "  <a onclick='customizeWF()' id='listBT5' class='listBT'>流程自定义</a>";
         rcTitle += "】";
     } else {
         rcTitle = "【<a onclick='refreshTable()' id='listBT1' class='listBT'> " +recordName+ "（刷新）</a>";
@@ -371,6 +406,10 @@ function initMenus() {
     }
     tssJS("#rcTitle").html(rcTitle);
     tssJS("#rcTitle>a").attr("href", "javascript:void(0)");
+
+    if( !userRoleNames.contains('$域管理员') ) {
+        $("#listBT5").hide();
+    }
 
     filterTopMenu();
 
@@ -436,19 +475,32 @@ function canEditRow(rowID, _wfStatus) {
     else { // 编辑（本人及有维护数据权限的人能编辑）
         if(billMode) return false;
 
-        var creator = tssJS.G("grid").getColumnValue("creator");   
-        var id = tssJS.G("grid").getColumnValue("id");
+        var grid = tssJS.G("grid");
+
+        // 非右键或双击编辑，而是勾选后点击顶部【修改】按钮，此时getColumnValue取不到值
+        var ck_creator  = grid.getCheckedRowsValue("creator")[0],
+            ck_id       = grid.getCheckedRowsValue("id")[0],
+            ck_wfstatus = grid.getCheckedRowsValue("wfstatus")[0]; 
+
+          
+        var id = grid.getColumnValue("id") || ck_id;
         if( !id && !openItemId )  {
-            return false; // 透析模式
+            return false; // 透析统计模式
         }
 
-        var wfstatus = _wfStatus || tssJS.G("grid").getColumnValue("wfstatus");  
+        var wfstatus = _wfStatus || grid.getColumnValue("wfstatus") || ck_wfstatus;  
         if( wfstatus && !wfEditable(wfstatus) ) { 
             return false;
         }
 
+        var creator = grid.getColumnValue("creator") || ck_creator; 
         return (_operation.contains("1") && userCode == creator) || ( !wfstatus && _operation.contains("5") );
     }
+}
+
+function customizeWF() {
+    var url = "wf_designer_manager.html?recordId=" + recordId;
+    $.openIframePanel("if1", " - 流程自定义设置", document.body.clientWidth - 200, document.body.clientHeight - 100, url, true)
 }
 
 // 流程数据只有【待审批】和【自动通过】状态能修改
@@ -516,7 +568,7 @@ function isCreate(rowID) {
     return rowID == '_new' || (rowID+"").indexOf('_copy') > 0;
 }
 
-var uniqueFlag = false, uniqueMsg, _tempID;
+var uniqueFlag = false, uniqueMsg, _tempID, currUploadField;
 function loadDetailData(rowID) {
     var form, dataNode = tssJS.cache.XmlDatas[rowID],
         isCreateRow = isCreate(rowID),
@@ -556,6 +608,7 @@ function loadDetailData(rowID) {
                 $(uploadBtn).text("上传附件");
                 tssJS(uploadBtn).css("margin-left", "4px").css("cursor", "pointer").click( function() {      
                     manageAttach( _tempID, "form", isCreateRow);
+                    currUploadField = f.code;
                 } );  
                 tdNode.appendChild(uploadBtn);
 
@@ -979,10 +1032,22 @@ function showQueryForm(isTJ) {
     });
     
     if( userRoles.contains(-1) ) {
-        paramsConfig.push({"label": "用户域", "name": "p_domain", "width": "150px"});
+        paramsConfig.push({"label": "用户域", "name": "p_domain", "width": "120px"});
     }
-    paramsConfig.push({"label": "创建人", "name": "p_creator", "width": "150px"});
-    paramsConfig.push({"label": "修改人", "name": "p_updator", "width": "150px"});
+    var userOptions = {};
+    if(parent.global_usercodes) {
+        userOptions = {"codes":parent.global_usercodes.join("|"), "names": parent.global_usernames.join("|")};
+    }
+    if( hasWorkflow ) {
+        paramsConfig.push({"label": "流程状态", "name": "p_wf_status", "width": "120px", "options": {"codes":"草稿|待审批|审批中|已通过|已驳回|已撤销|自动通过"}});
+        paramsConfig.push({"label": "当前审批人", "name": "p_wf_next_processor", "width": "120px", "options": userOptions});
+        paramsConfig.push({"label": "审批时间从", "name": "p_wf_process_time__1", "type": "datetime"});
+        paramsConfig.push({"label": "审批时间到", "name": "p_wf_process_time__2", "type": "datetime"});
+    }
+    paramsConfig.push({"label": "创建人", "name": "p_creator", "width": "120px", "options": userOptions});
+    paramsConfig.push({"label": "修改人", "name": "p_updator", "width": "120px", "options": userOptions});
+    paramsConfig.push({"label": "创建时间从", "name": "p_createtime__1", "type": "datetime"});
+    paramsConfig.push({"label": "创建时间到", "name": "p_createtime__2", "type": "datetime"});
 
     paramsConfig.push({"label":"查询匹配方式", "name":"strictQuery", "width": "120px", "options": {"codes":"false|true", "names": "模糊查询|精确查询"}});
 
@@ -1015,7 +1080,7 @@ function showQueryForm(isTJ) {
         
             // 清空查询条件，除了my_wf_list
             var my_wf_list = params.my_wf_list;
-            params = {};
+            params = clone(init_params);
             if(my_wf_list) params.my_wf_list = my_wf_list;
 
             var nodes = dataNode.querySelectorAll("row *");
@@ -1071,7 +1136,7 @@ function backup( _params ) {
         _params.page = 1; // $1("GridPageList").value
         _params.pagesize = EXP_PAGE_SIZE;
         var totalpages = tssJS("#GridPageList>option").length;
-        if( totalpages*50 > _params.pagesize ) {
+        if( 1000 < _params.pagesize && _params.pagesize < totalpages*50 ) {
             return tssJS.alert("当前导出数据" +totalpages+ "页，单次导出不能超过" +Math.round(_params.pagesize/50)+ "页，请缩短查询条件后再导出");
         }
     } else {
@@ -1094,7 +1159,7 @@ function getImportTL() {
 }
 
 // 允许再数据表的【页面控制脚本】里定制以下个性化导入的参数信息
-var uniqueCodes, 
+var uniqueCodes,   // 如果一张表有两个字段都要求唯一性（sku: code、barcode），则需要都加进来
     ignoreExist,
     together,
     headerTL,
@@ -1117,7 +1182,7 @@ function batchImport() {
         url += "&uniqueCodes=" + uniqueCodes; // 定义在页面全局变量里：uniqueCodes="oto,sjphone";
     }
     if(ignoreExist === false || ignoreExist) {
-        url += "&ignoreExist=" + ignoreExist; // 是否覆盖式导入：true:false
+        url += "&ignoreExist=" + ignoreExist; // 是否覆盖式导入：true:false，忽略or覆盖已存在的记录；
     }
     if(together === false || together) {
         url += "&together=" + together; // 是否完整性导入（即不允许部分导入）：true:false
@@ -1181,6 +1246,7 @@ var selectedLineId;
 
 // tag: "form": form里【管理附件】按钮; "row": 右键记录行，右键菜单【管理附件】; "ot" : 顶部自定义按钮【上传附件】
 function manageAttach(lineId, tag, isCreateRow) {   
+    currUploadField = null;
     selectedLineId = lineId || tssJS.G("grid").getColumnValue("id"); 
     
     selectedLineId && 
@@ -1193,10 +1259,15 @@ function manageAttach(lineId, tag, isCreateRow) {
             tssJS.showWaitingLayer();
             tssJS("#attachDialog").show(true).center();
 
-            // 回收站模式、审批模式下 附件都不可编辑
-            if( !recycleBinMode && !approveMode && (isCreateRow || (canEditRow(lineId) && (!checkFileOpt||checkFileOpt(tag)) )) ) {
-                tssJS("#uploadForm span").show();               
+            // 回收站模式下 附件不可编辑
+            if( !recycleBinMode && (isCreateRow || (canEditRow(lineId) && (!checkFileOpt||checkFileOpt(tag)) )) ) {
+                tssJS("#uploadForm span").show();  
             }
+            else if (approveMode) {
+                // 审批模式下：附件可以上传，但不能删除
+                tssJS("#uploadForm span").show();
+                tssJS("column[name='delOpt']", attachNode).attr("display", "none");  // 隐藏删除附件操作
+            }   
             else {
                 tssJS("#uploadForm span").hide();  // 隐藏上传附件操作
                 tssJS("column[name='delOpt']", attachNode).attr("display", "none");  // 隐藏删除附件操作
@@ -1208,8 +1279,9 @@ function manageAttach(lineId, tag, isCreateRow) {
 }
 
 function clostUpload() {
-    tssJS("#attachDialog").hide();
     tssJS.hideWaitingLayer();
+    tssJS("#attachDialog").hide();
+    tssJS.hideWaitingLayer(true);
 }
 
 function uploadAttach() {       
@@ -1227,6 +1299,10 @@ function uploadAttach() {
     url += "&itemId=" + selectedLineId;
     url += "&refreshGrid=true";
     url += "&type=" + (tssJS.radioValue("fileType") || 2);
+
+    if( currUploadField ) {
+        url += "&uploadField=" + currUploadField;
+    }
     
     var form = $1("uploadForm");
     form.action = url;
@@ -1258,6 +1334,7 @@ function delAttach() {
             url: URL_ATTACH_DELETE + attachId + "?recordId=" + recordId,
             method: 'DELETE',
             waiting: true,
+            headers : { "noAlert": true },
             onsuccess: function() {
                 tssJS.G("attachGrid").deleteSelectedRow();
                 tssJS.showWaitingLayer(); // 继续遮罩
@@ -1269,7 +1346,7 @@ function delAttach() {
 function setTop(attachId) {
     tssJS.post(URL_ATTACH_SETTOP + attachId, {}, function(attach) {
             manageAttach(attach.itemId, "row");
-            tssJS.showWaitingLayer(); // 继续遮罩
+            tssJS.hideWaitingLayer();
         }
     );
 }
@@ -1305,7 +1382,7 @@ function setTop(attachId) {
           </td>
         </tr>
         <tr>
-          <td class="gridContainer"><Grid id="grid"></Grid></td>
+          <td class="gridContainer"><Grid id="grid" onFinish="onGridLoad" onLoad="onGridLoad"></Grid></td>
         </tr>
     </table>
 
@@ -1334,7 +1411,7 @@ function setTop(attachId) {
         <Grid id="attachGrid" height="200"></Grid>
         <form id="uploadForm" method="post" target='fileUpload' enctype="multipart/form-data">
             <span>
-                <input type="file" name="file" id="attachFile"/>
+                <input type="file" name="file" id="attachFile" multiple="multiple"/>
                 附件类型: 
                 <label><input name="fileType" type="radio" value="1" checked="checked"/> 图片 </label> 
                 <label><input name="fileType" type="radio" value="2"/> 文档 </label> 
@@ -1374,7 +1451,7 @@ function cancel(rowID) {
     executeWF(URL_WF_CANCEL, rowID, {}, "撤销");
 } 
 function approve(rowID) {
-    var params = {}
+    var params = clone(init_params);
     var xform = tssJS.F("page1Form");  
     wfFields.each(function(i, code) {
         params[code] = xform.getData(code);
@@ -1385,7 +1462,6 @@ function transApprove(rowID) {
     // 转审人员选择 
     var params = {_title: "请选择转审人员"};
     popupTree(URL_WF_TRANS_LIST + recordId +"/"+ rowID, "UserTree", params, function(target) {
-        console.log(target.id);
         target && executeWF(URL_WF_TRANS, rowID, {"target": target.id}, "转审");
     }, "GET");
 } 
@@ -1466,7 +1542,8 @@ function showWfCount() {
 
 function showExtension(_item) {
     var attachList = _item.attachList, 
-        wf_logs = _item.wf_logs;
+        wf_logs = _item.wf_logs,
+        wf_msgs = _item.wf_msgs;
 
     if(attachList.length || needFile) {
         var pcontainer = $.createElement("ul", "ext", "pcontainer");
@@ -1477,7 +1554,7 @@ function showExtension(_item) {
         attachList.each(function(i, t){
             var li = $.createElement("li");
             var filename = t.name.length <= 32 ? t.name : t.fileName;
-            var html = "<a href='" +t.downloadUrl+ "' target='_blank'>" +filename+ "</a>";
+            var html = "<a href='" +t.downloadUrl+ "' target='_self'>" +filename+ "</a>";
             $(li).html( html );
             $(pcontainer).appendChild(li);
         });
@@ -1487,12 +1564,12 @@ function showExtension(_item) {
     if(wf_logs) {
         var lcontainer = $.createElement("ul", "ext", "lcontainer");
         var header = $.createElement("header");
-        $(header).html( "流程状态：【" + (_item.wfstatus||"") + "】" );
+        $(header).html( "流程状态：【" + (_item.wfstatus||"") + "】<button class='tssbutton small white' onclick='sendWFMsg(" +_item.id+ ")'>发送提醒</button>" );
         $(lcontainer).appendChild(header);
 
         wf_logs.each(function(i, t){
             var li = $.createElement("li", t.id ? "done": "todo");
-            var html = "<header>" +t.processor + " . " + t.processResult+ "</header>";
+            var html = "<header onclick='sendWFMsg(" +_item.id+ ")' title='发送提醒'>" +t.processor + " . " + t.processResult+ "</header>";
             html += "<time>" +(t.processTime||"").replace(".0", "")+ "</time>";
             html += "<p>" +(t.processOpinion||"")+ "</p>";
 
@@ -1508,6 +1585,31 @@ function showExtension(_item) {
         var opinionEL = $.createElement("textarea", "", "opinion");
         tssJS("#page1Form").appendChild(opinionEL);
     }
+    if(wf_msgs && wf_msgs.length) {
+        var mcontainer = $.createElement("ul", "ext", "mcontainer");
+        var header = $.createElement("header");
+        $(header).html( "流程提醒：");
+        $(mcontainer).appendChild(header);
+
+        wf_msgs.each(function(i, t){
+            var li = $.createElement("li");
+            var html = "<time>" +(t.sendTime||"").replace(".0", "")+ "</time>";
+            html += "<span>" +t.sender+ "：" +t.content+ "</span>";
+
+            $(li).html( html );
+            $(mcontainer).appendChild(li);
+        });
+        tssJS("#page1Form").appendChild(mcontainer);
+    }
+}
+
+function sendWFMsg(itemId) {
+     tssJS.prompt("请输入提醒内容", "发送提醒", function(content) {
+        content = content.trim();
+        content && $.post("/tss/xdata/wfmsg", {wfId: recordId, itemId: itemId, wfMsg: content}, function(result) { 
+            $.tssTip( (result||"").errorMsg || '发送成功');
+        });
+    }, "");
 }
 
 </script>

@@ -195,6 +195,14 @@
                 return (value == null || (typeof(value) == 'string' && value.trim() == ""));
             },
 
+            /**
+             * 替换各种分隔符（tab、空格、回车、英文逗号、中文逗号）为统一分隔符
+             */
+            fixSplit: function(value, split) {
+                split = split || ',';
+                return (value||'').trim().replace(/(\t+|\r|\n|,|，|\s+|、)+/ig, split);
+            },
+
             // 抛出一个异常
             error: function(msg) {
                 throw msg;
@@ -234,6 +242,12 @@
 
                 if (!tmp || !tmp.nodeName || tmp.nodeName === "parsererror") {
                     console.log("Invalid XML: " + data);
+                } else {
+                    var errorNode = tmp.querySelector("parsererror");
+                    if( errorNode ) {
+                        console.log("Invalid XML: " + $.XML.getText(errorNode) );
+                        console.log(data);
+                    }
                 }
 
                 return xml;
@@ -875,7 +889,11 @@
                 waitingDiv.id = "_waiting";
                 document.body.appendChild(waitingDiv);
 
-                $(waitingDiv).css("width", "100%").css("height", "100%")
+                var height = "100%";
+                if( document.body.scrollHeight > document.body.clientHeight ) {
+                    height = document.body.scrollHeight + "px";
+                }
+                $(waitingDiv).css("width", "100%").css("height", height)
                              .css("position", "absolute").css("left", "0px").css("top", "0px")
                              .css("cursor", "wait").css("zIndex", "998").css("background", "black");
                 $.setOpacity(waitingDiv, 33);
@@ -933,6 +951,10 @@
     $.extend({        
         Query: {
             items: {},
+
+            getItems: function() {
+                return items;
+            },
 
             get: function(name, decode) {
                 var str = items[name];
@@ -1146,7 +1168,7 @@
 
             /* 将字符串转化成xml节点对象 */
             toNode: function(xml) {
-                xml = xml.revertEntry();
+                xml = xml.revertEntry().replace(/\x02|\x01/g, '');
                 return $.parseXML(xml).documentElement;
             },
 
@@ -1164,6 +1186,7 @@
             },
 
             setText: function(node, textValue) {
+                textValue = (typeof(textValue) == 'string') ? String(textValue).replace(/\x02|\x01/g, '') : textValue;
                 node.text = textValue;
                 if (node.textContent || node.textContent == "") {
                     node.textContent = textValue; // chrome
@@ -1183,6 +1206,8 @@
             },
 
             createCDATA: function(data) {
+                // 替换掉0x01/0x02等一些导致XML失败的特殊字符
+                data = (typeof(data) == 'string') ? String(data).replace(/\x02|\x01/g, '') : data;
                 data = String(data).convertCDATA();
                 if(window.DOMParser) {
                     return $.parseXML("<root><![CDATA[" + data + "]]></root>").documentElement.firstChild;

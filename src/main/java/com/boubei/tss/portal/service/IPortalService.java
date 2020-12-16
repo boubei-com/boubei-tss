@@ -268,17 +268,6 @@ public interface IPortalService {
     ReleaseConfig getReleaseConfig(Long id);
     
     
-    //******************************** 以下为门户自定义管理 ***************************************************************
-    /**
-     * 保存用户自定义主题信息。
-     * 
-     * @param portalId
-     * @param userId
-     * @param themeId
-     */
-    @Logable(operateObject="门户主题", operateInfo="重新设置了 ID为 ${args[0]} 的门户的自定义主题 ")
-    void savePersonalTheme(Long portalId, Long userId, Long themeId);
-    
     //***********************************  门户流量统计获取 ***************************************************************
     /**
      * 获取门户下页面的访问流量

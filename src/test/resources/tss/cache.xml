@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<strategies> 
+
+  <strategy code="connectionpool" name="数据库连接池"> 
+    <poolClass>com.boubei.tss.cache.ReusablePool</poolClass>  
+    <poolSize>100</poolSize>  
+    <cyclelife>0</cyclelife>  
+    <interruptTime>3000</interruptTime>  
+    <initNum>5</initNum>  
+    <disabled>0</disabled> <!-- 数据库连接池配置为启用 -->
+	<visible>1</visible>  
+    <customizerClass>com.boubei.tss.framework.persistence.connpool.ConnPoolCustomizer</customizerClass>  
+	<paramFile>H2.properties</paramFile>
+  </strategy> 
+  
+  <strategy code="connectionpool2" name="数据库连接池2"> 
+    <poolClass>com.boubei.tss.cache.ReusablePool</poolClass>  
+    <poolSize>10</poolSize>  
+    <cyclelife>0</cyclelife>  
+    <interruptTime>1000</interruptTime>  
+    <initNum>5</initNum>  
+    <disabled>0</disabled>
+	<visible>1</visible>  
+    <customizerClass>com.boubei.tss.framework.persistence.connpool.ConnPoolCustomizer</customizerClass>  
+	<paramFile>H2.properties</paramFile>
+  </strategy> 
+  
+  <strategy code="connectionpool3" name="数据库连接池3"> 
+    <poolClass>com.boubei.tss.cache.ReusablePool</poolClass>  
+    <poolSize>10</poolSize>  
+    <cyclelife>0</cyclelife>  
+    <interruptTime>1000</interruptTime>  
+    <initNum>5</initNum>  
+    <disabled>0</disabled>
+	<visible>1</visible>  
+    <customizerClass>com.boubei.tss.framework.persistence.connpool.ConnPoolCustomizer</customizerClass>  
+	<paramFile>H2.properties</paramFile>
+  </strategy> 
+  
+  <strategy code="taskpool" name="端口扫描任务池"> 
+    <poolClass>com.boubei.tss.cache.ReusablePool</poolClass>  
+    <poolContainerClass>com.boubei.tss.cache.MapContainer</poolContainerClass>  
+    <cyclelife>5000</cyclelife>  
+    <interruptTime>1000</interruptTime>  
+	<poolSize>100</poolSize>  
+    <initNum>10</initNum>  
+    <disabled>0</disabled>  
+    <customizerClass>com.boubei.tss.cache.ScannerTaskPoolCustomizer</customizerClass>  
+    <accessMethod>1</accessMethod>  
+  </strategy>  
+  
+  <strategy code="threadpool" name="线程池"> 
+    <poolClass>com.boubei.tss.cache.extension.threadpool.ThreadPool</poolClass>  
+	<poolContainerClass>com.boubei.tss.cache.MapContainer</poolContainerClass>  
+    <cyclelife>0</cyclelife>  
+    <interruptTime>1000</interruptTime>  
+	<poolSize>10</poolSize>  
+    <initNum>5</initNum>  
+    <disabled>0</disabled>  
+    <customizerClass>com.boubei.tss.cache.extension.threadpool.ThreadPoolCustomizer</customizerClass>  
+  </strategy>  
+  
+  <strategy code="SHORTER" name="服务数据缓存（1分钟）"> 
+    <poolClass>com.boubei.tss.cache.ObjectPool</poolClass>  
+    <poolSize>1000</poolSize>  
+    <cyclelife>60000</cyclelife>  
+    <accessMethod>5</accessMethod>  
+  </strategy>
+  <strategy code="SHORT" name="服务数据缓存（短期）"> 
+    <poolClass>com.boubei.tss.cache.ObjectPool</poolClass>  
+    <poolSize>10</poolSize>  
+    <cyclelife>5000</cyclelife>  
+    <accessMethod>5</accessMethod>  
+  </strategy>
+  <strategy code="SHORT-2" name="服务数据缓存（短期）2"> 
+    <poolClass>com.boubei.tss.cache.ObjectPool</poolClass>  
+    <poolSize>10</poolSize>  
+    <cyclelife>5000</cyclelife>  
+    <accessMethod>5</accessMethod>  
+  </strategy>
+  <strategy code="SHORT-3" name="服务数据缓存（短期）3"> 
+    <poolClass>com.boubei.tss.cache.ObjectPool</poolClass>  
+    <poolSize>10</poolSize>  
+    <cyclelife>5000</cyclelife>  
+    <accessMethod>5</accessMethod>  
+  </strategy>
+  
+  <strategy code="LONG" name="服务数据缓存（长期）"> 
+    <poolClass>com.boubei.tss.cache.ObjectPool</poolClass>  
+    <interruptTime>1000</interruptTime>  
+	<poolSize>50</poolSize>  
+    <cyclelife>1000000</cyclelife>  
+    <accessMethod>5</accessMethod>  
+  </strategy>
+  
+  <strategy code="LONGER" name="服务数据缓存（长期）2"> 
+    <poolClass>com.boubei.tss.cache.ObjectPool</poolClass>  
+    <interruptTime>1000</interruptTime>  
+	<poolSize>10</poolSize>  
+    <cyclelife>2000000</cyclelife>  
+    <accessMethod>5</accessMethod>  
+  </strategy>
+ 
+  <strategy code="NODEAD" name="服务数据缓存（不死）"> 
+    <poolClass>com.boubei.tss.cache.ObjectPool</poolClass>  
+    <poolSize>30</poolSize>  
+    <cyclelife>0</cyclelife>  
+    <accessMethod>5</accessMethod>  
+  </strategy>
+  
+  <strategy code="SimplePool" name="SimplePool"/>
+  
+</strategies>

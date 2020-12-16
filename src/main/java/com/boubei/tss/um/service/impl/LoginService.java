@@ -91,8 +91,8 @@ public class LoginService implements ILoginService {
 		User user = getUserByLoginName(loginName);
 
 		currCount ++;
-	    if(currCount >= 10) {
-	    	log.info("【" + loginName + "】已连续【" +currCount+ "】次输错密码。");
+	    if(currCount >= 5) {
+	    	log.info("【" + loginName + "】已连续【" +currCount+ "】次输错密码。IP=" + Environment.getClientIp());
 	    }
 	    
 	    user.setLastPwdErrorTime(new Date());
@@ -102,6 +102,8 @@ public class LoginService implements ILoginService {
 	
 	public Object resetPassword(Long userId, String passwd) {
 		User user = userDao.getEntity(userId);
+		if( UMConstants.ADMIN_USER_ID.equals(userId) && !Environment.isAdmin() ) return user;
+		
 		String token = InfoEncoder.simpleEncode(userId.toString(), MathUtil.randomInt(12));
     	user.setOrignPassword( passwd );
     	
@@ -194,7 +196,12 @@ public class LoginService implements ILoginService {
     			userDao.createObject(entity);  // 新增，多线程不安全
         	}
 		}
-        userDao.deleteAll( history.values() ); // 删除之前有，现在没了的角色
+        
+        // 删除之前有，现在没了的角色（可能存在重复的ru，用 userDao.deleteAll( history.values() ) 会删不干净）
+        for( RoleUserMapping ru : history.values() ) {
+        	RoleUserMappingId ruId = ru.getId();
+			userDao.executeHQL("delete from RoleUserMapping where userId = ? and roleId = ?", ruId.getUserId(), ruId.getRoleId());
+        }
         
         return roleIds;
 	}

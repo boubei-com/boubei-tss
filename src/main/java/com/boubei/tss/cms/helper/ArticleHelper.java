@@ -135,14 +135,11 @@ public class ArticleHelper {
         for ( Attachment attachment : attchments ) {
         	 // 在指定节点下为每个附件增加一个Attachment节点
             Element attachmenetElement = itemElement.addElement("Attachment");
-            if (attachment.isImage()) {
-                attachmenetElement.addAttribute("type", "image");
-            } else {
-                attachmenetElement.addAttribute("type", "file");
-            }
             
+            attachmenetElement.addAttribute("type", attachment.isImage() ? "image" : "file");
             attachmenetElement.addElement("name").addCDATA(attachment.getName());
             attachmenetElement.addElement("url").addCDATA(attachment.getDownloadUrl());
+            attachmenetElement.addElement("rurl").addCDATA(attachment.getRelationUrl());
         }
     }
     
@@ -168,6 +165,7 @@ public class ArticleHelper {
         article.setIsTop((Integer) articleInfos[index++]);
         article.setOverdueDate((Date)articleInfos[index++]);
         article.setSeqNo((Integer) articleInfos[index++]);
+        article.setCommentNum((Integer) articleInfos[index++]);
         
         return article;
     }

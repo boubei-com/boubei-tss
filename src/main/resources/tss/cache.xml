@@ -38,19 +38,25 @@
   </strategy>
   <strategy code="SHORT" name="数据缓存（30分钟）"> 
     <poolClass>com.boubei.tss.cache.ObjectPool</poolClass>  
-    <poolSize>500</poolSize>  
+    <poolSize>1500</poolSize>  
     <cyclelife>1800000</cyclelife>  
     <accessMethod>5</accessMethod>  
   </strategy>
   <strategy code="LONG" name="数据缓存（12小时）"> 
     <poolClass>com.boubei.tss.cache.ObjectPool</poolClass>  
-    <poolSize>300</poolSize>  
+    <poolSize>2000</poolSize>  
     <cyclelife>43200000</cyclelife>  
+    <accessMethod>5</accessMethod>  
+  </strategy>
+  <strategy code="LONGER" name="数据缓存（24小时）"> 
+    <poolClass>com.boubei.tss.cache.ObjectPool</poolClass>  
+    <poolSize>3000</poolSize>  
+    <cyclelife>86400000</cyclelife>  
     <accessMethod>5</accessMethod>  
   </strategy>  
   <strategy code="NODEAD" name="数据缓存（不死）"> 
     <poolClass>com.boubei.tss.cache.ObjectPool</poolClass>  
-    <poolSize>1000</poolSize>  
+    <poolSize>5000</poolSize>  
     <cyclelife>0</cyclelife>  
     <accessMethod>5</accessMethod>  
   </strategy>

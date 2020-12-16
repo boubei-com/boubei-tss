@@ -7,13 +7,14 @@
 <link rel="shortcut icon" href="images/tss.ico">
 <link rel="Bookmark" href="images/tss.ico">
 
-<link  href="tools/tssJS/css/reset.css" rel="stylesheet">
-<script src="tools/tssJS/tssJS.js"></script>
-<script src="tools/tssJS/tssJS.ajax.js"></script>
+<link rel="stylesheet" href="tools/tssJS/fonts/icons.css">
+<link rel="stylesheet" href="tools/tssJS/css/boubei.css">
+
+<script src="tools/tssJS/tssJS.all.js"></script>
 
 <style type="text/css">
 html { height: 100%; }
-body { background: url(images/login_bg.jpg) no-repeat center; background-size : contain; }
+body { background: url(images/login_bg.jpg) no-repeat center; background-size : cover; }
   
 .modal-wrapper {
   box-sizing: border-box;
@@ -31,7 +32,7 @@ body { background: url(images/login_bg.jpg) no-repeat center; background-size : 
   justify-content: center;
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: rgba(0,0,0,.65);
+  background-color: rgba(0,0,0,.25);
 }
 
 .modal {
@@ -40,9 +41,10 @@ body { background: url(images/login_bg.jpg) no-repeat center; background-size : 
   width: 400px; height: 0px;
   margin-right: auto;
   margin-left: auto;
+  margin-top: 5%;
   outline: 0;
-  border-radius: 2px;
-  box-shadow: 0 5px 20px 0 rgba(0,34,77,.5);   
+  border-radius: 4px;
+  /*box-shadow: 0 5px 20px 0 rgba(0,34,77,.95);   */
   background: #fff;
   transition: height .8s ease;  
 }
@@ -51,10 +53,10 @@ body { background: url(images/login_bg.jpg) no-repeat center; background-size : 
   display: none; text-align: center;
 }
 h1, h2, h3 { margin: 0; font: inherit; }
-.input-wrapper input { border: 0;  width: 100%; line-height: 24px; height: 48px;  font-size: 14px; }
+.input-wrapper input { border: 0; border-bottom: 1px solid #e7eaf1; width: 100%; line-height: 24px; height: 48px;  font-size: 14px; }
 .input-wrapper {  width: 352px; margin: 12px 0 0 24px; height: 48px; border: none;border-bottom: 1px solid #e7eaf1; }
 
-div.header { padding: 24px 0 28px; background: #049cdb; }
+div.header { padding: 18px 0 20px; background: #049cdb; margin-bottom: 25px }
 .sysTitle { height: 40px; font-size: 24px; color: #fff; text-align: center; }
 .subTitle { margin-top:4px; font-size: 14px; color: #fff; text-align: center; }
 
@@ -107,6 +109,9 @@ var href = location.hostname;
 var reg = $.Query.get("reg"), 
   _user = $.Query.get("user");
 
+/*
+ * 支持给不同的域名 对应 不同的登录页, eg: {'cx.boubei.com': 'login-cx.html', 'bd.boubei.com': 'login-bd.html'}
+ *
 !reg && getParam("customize_login", function(result) {
     if(result) { 
         if(result.indexOf('{') >= 0) {
@@ -118,6 +123,7 @@ var reg = $.Query.get("reg"),
         }
     }
 });
+*/
 
 </script>
 
@@ -129,7 +135,7 @@ var reg = $.Query.get("reg"),
     <div id="login_box">
         <div class="header">
           <h1 class="sysTitle">它山石</h1>
-          <h2 class="subTitle">一个用来快速开发业务及BI系统的平台</h2>
+          <h2 class="subTitle">一个用来快速开发系统的PAAS平台</h2>
         </div>
         <div class="input-wrapper">
           <input type="text" id="loginName" placeholder="请输入账号"> 
@@ -152,8 +158,8 @@ http://boubei-file.oss-cn-hangzhou.aliyuncs.com/chrome71_win64.exe" target="_bla
 
     <div id="reg_box">
         <div class="header">
-          <h1 class="sysTitle">它山石-BI</h1>
-          <h2 class="subTitle">一个用来快速开发业务及BI系统的平台</h2>
+          <h1 class="sysTitle">它山石</h1>
+          <h2 class="subTitle">一个用来快速开发系统的PAAS平台</h2>
         </div>
         <div class="input-wrapper">
           <input type="text" id="rloginName" placeholder="账号：请输入手机号、邮箱等"> 
@@ -190,6 +196,11 @@ http://boubei-file.oss-cn-hangzhou.aliyuncs.com/chrome71_win64.exe" target="_bla
     location.href = "mobile/login.html";
   }
 */
+  var isMac = /macintosh|mac os x/i.test( navigator.userAgent.toLowerCase() );
+  if( isMac ) {
+      $(".bz>a").attr("href", "http://boubei-file.oss-cn-hangzhou.aliyuncs.com/googlechrome.dmg");
+  }
+
   setTimeout(reg ? preRegister : goLogin, 300);
 
   function goLogin() {
@@ -436,7 +447,9 @@ var doLogin = function(accountEl, passwdEl) {
         },
         onsuccess: function() {
             $.Cookie.setValue("iUser", loginName);
-            gotoIndex(loginName);   
+
+            /* 如需登录要求短信验证，将 /login_need_ck.in 加入Filter11 */
+            $.get('/tss/login_need_ck.in', {}, function(data) { gotoIndex(loginName); } ); 
         }
     });
 }

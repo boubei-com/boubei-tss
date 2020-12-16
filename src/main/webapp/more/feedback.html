@@ -35,7 +35,7 @@ html, body { height: 100%; }
 
 .fb-summay, .fb-result { font-size: 15px; }
 .fb-summay { height: 120px; }
-.fb-result { padding: 10px 0 0 0; color: #999; }
+.fb-result { padding: 10px 0 0 0; color: steelblue; }
 .fb-summay textarea { border: 0; width: 100%; min-height: 50px; padding: 0; }
 .fb-summay p, .fb-result p { text-indent: 0px; }
 .fb-author, .fb-processor { 
@@ -67,17 +67,28 @@ function query(page, status) {
         data.rows.each(function(i, item) {
           var li = $("body>li.template")[0].cloneNode(true);
           li.id = "l" + item.id;
-          $(".fb-summay>textarea", li).value( "【" +item.id+ "，" + item.module + "】：" + item.content);
+          $(".fb-summay>textarea", li).value( "【" + (item.pname||'')+ "，" + (item.module||'') + "】：" + item.content);
           $(".fb-summay .fb-author .author", li).html( (item.commiter||"") + "【" + item.creatorName + "】");
           $(".fb-summay .fb-author time", li).html( item.createtime.split(" ")[0] );
 
-          $(".fb-result>p", li).html( "状态:【" + item.state  + "】" + (item.processing || "") );
+          $(".fb-result>p", li).html( "【" + item.state  + "】：" + (item.processing || "") );
           $(".fb-result .author", li).html( item.processor || item.updator || "未处理" );
           $(".fb-processor time", li).html( item.updatetime || "" );
 
           $("ul.data-list-ul").appendChild(li);
-          $(".tssbutton", li).click(function(){
+          $(".fixing", li).click(function(){
             window.open(encodeURI('/tss/modules/dm/recorder.html?rcname=系统使用反馈&itemId=' + item.id));
+          });
+          $(".close", li).click(function(){
+            tssJS.ajax({
+                url : "/tss/xdata/x_feedback/" + item.id,
+                params : {"state": "关闭"},
+                headers : { "noAlert": true },
+                waiting : true, 
+                ondata : function() { 
+                    query(1, '新建,未解决,又出现了');
+                }
+            });
           });
 
           tssJS.getJSON("/tss/xdata/x_feedback/" + item.id, {}, function(item) {
@@ -91,7 +102,7 @@ function query(page, status) {
                   attachList.each(function(i, t){
                       var li = $.createElement("li");
                       var filename = t.name.length <= 32 ? t.name : t.fileName;
-                      var html = "<a href='" +t.downloadUrl+ "' target='_blank'>" +filename+ "</a>";
+                      var html = "<a href='" +t.downloadUrl+ "' target='_self'>" +filename+ "</a>";
                       $(li).html( html ).click( function() {
                           ImageBrowser.showOnClick(this.parentNode.parentNode);
                       } );
@@ -116,7 +127,7 @@ $(function(){
 <body>
 
 <div style="padding: 6px 12px;">
-  <button class="tssbutton white medium" onclick="query(1, '新建,未解决,又出现了')">待处理</button>
+  <button class="tssbutton orange medium" onclick="query(1, '新建,未解决,又出现了')">待处理</button>
   <button class="tssbutton white medium" onclick="query(1, '正在解决')">正在解决</button>
   <button class="tssbutton white medium" onclick="query(1, '已解决')">已解决</button>
   <button class="tssbutton white medium" onclick="query(1, '关闭')">已关闭</button>
@@ -143,7 +154,8 @@ $(function(){
         <span data-icon="E" class="icon"></span>
         <span class="author"></span>
         <time></time>
-        <button class="tssbutton white small">处 理</button>
+        <button class="tssbutton white small fixing">开始处理</button>
+        <button class="tssbutton white small close">关 闭</button>
       </div>
   </div>
 </li>

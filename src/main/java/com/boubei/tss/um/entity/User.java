@@ -214,6 +214,7 @@ public class User extends OperateInfo implements ITreeNode, IGridNode, IXForm {
     	// 计算用户的密码强度，必要的时候强制用户重新设置密码（注：不能用加密后的password来计算密码强度）
         int strengthLevel = PasswordRule.getStrengthLevel(passwd, this.getLoginName());
     	this.setPasswordStrength(strengthLevel);
+    	this.setPwdErrorCount(0);
     }
  
     public String getPasswordAnswer() {

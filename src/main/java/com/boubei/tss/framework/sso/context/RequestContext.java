@@ -257,6 +257,7 @@ public class RequestContext {
 		return isApiCall(request);
 	}
 	
+	// 要求uName和uSign在 request.paramters里传递，不能在body里
 	public static boolean isApiCall(HttpServletRequest request) {
 		boolean apiCall = "true".equals( request.getAttribute(API_CALL) );
 		if( apiCall ) {

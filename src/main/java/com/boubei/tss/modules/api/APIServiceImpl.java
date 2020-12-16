@@ -174,6 +174,11 @@ public class APIServiceImpl implements APIService {
 		String datasource = (String) EasyUtils.checkNull(script.ds, DMConstants.LOCAL_CONN_POOL);
 		String bIDataProcessImpl = (String) EasyUtils.checkNull(script.dataProcess, BIDataProcess.class.getName());
 		
+		String entityFilter = (String) EasyUtils.checkNull(params.get("entityFilter"), script.defaultFilter);
+		if (!EasyUtils.isNullOrEmpty(entityFilter)) {
+			params.put("entityFilter", entityFilter);
+		}
+		
 		BIDataProcess biDataProcess = (BIDataProcess) BeanUtil.newInstanceByName(bIDataProcessImpl);
 		// 处理查询前的事情
 		sql = biDataProcess.beforeHandleSql(sql, params);
@@ -202,7 +207,7 @@ public class APIServiceImpl implements APIService {
 		// 处理查询出来的数据
 		biDataProcess.handle(ex, params, tag);
 		
-		if( !script.noLog ) {
+		if( script.recordLog || System.currentTimeMillis() - start > 1000 ) {
 			AccessLogRecorder.outputAccessLog("/bi/sql", sqlCode, tag, params, start);
 		}
 		

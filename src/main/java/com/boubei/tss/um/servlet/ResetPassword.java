@@ -17,6 +17,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.boubei.tss.EX;
 import com.boubei.tss.framework.Global;
@@ -62,18 +63,20 @@ public class ResetPassword extends HttpServlet {
 		String userId    = request.getParameter("userId");
 		String password  = request.getParameter("password");
 		String ckcode    = request.getParameter("ckcode");
-		String loginName = request.getParameter("loginName");
+		HttpSession session = request.getSession();
 		
 		User user;
     	if( userId == null ) { 
-            Object ckcodeInSession = request.getSession().getAttribute(SSOConstants.RANDOM_KEY);
+			Object ckcodeInSession = session.getAttribute(SSOConstants.RANDOM_KEY);
 			if( ckcode == null || !EasyUtils.obj2Int(ckcode).equals(ckcodeInSession) ) {
             	throw new BusinessException(EX.U_45);
             }
+			
+			String loginName = (String) session.getAttribute(SSOConstants.USER_ACCOUNT);
 			user = userService.getUserByLoginName(loginName);
     	} 
     	else {
-    		Long id = Long.valueOf(userId);
+    		Long id = (Long) session.getAttribute(SSOConstants.USER_ID);
     		user = userService.getUserById(id);
             if(user == null) {
                 return; // 账号已被删除，或伪造的userId

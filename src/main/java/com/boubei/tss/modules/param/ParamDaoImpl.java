@@ -32,7 +32,7 @@ public class ParamDaoImpl extends TreeSupportDao<Param> implements ParamDao {
 	}
 	
 	public Param getParamByCode(String code) {
-		String hql = "from Param p where p.code = ? and p.disabled <> 1 order by p.decode";
+		String hql = "from Param p where p.code = ?1 and p.disabled <> 1 order by p.decode";
         List<?> list = getEntities(hql, EasyUtils.checkNull(code, "code is null"));
         return list.size() > 0 ? (Param) list.get(0) : null;
 	}

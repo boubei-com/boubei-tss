@@ -15,10 +15,8 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.boubei.tss.framework.persistence.TreeSupportDao;
-import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.portal.dao.IPortalDao;
 import com.boubei.tss.portal.entity.Structure;
-import com.boubei.tss.portal.entity.ThemePersonal;
  
 @Repository("PortalDao")
 public class PortalDao extends TreeSupportDao<Structure> implements IPortalDao {
@@ -58,20 +56,11 @@ public class PortalDao extends TreeSupportDao<Structure> implements IPortalDao {
         Object[] returnVal = new Object[3];   
         returnVal[0] = getEntities(hqls[0], portalId, currentThemeId); 
         returnVal[1] = getEntities(hqls[1], portalId, currentThemeId); 
-        returnVal[2] = getEntities(hqls[2], currentThemeId); 
+        returnVal[2] = getEntities(hqls[2], portalId); 
         return returnVal;
     }
     
     public List<?> getThemesByPortal(Long portalId) {
         return getEntities("from Theme o where o.portalId = ? order by o.id", portalId);
-    }
-    
-    public ThemePersonal getPersonalTheme(Long portalId) {
-        String hql = "from ThemePersonal o where o.userId = ? and o.portalId = ?";
-        List<?> list = getEntities(hql, Environment.getUserId(), portalId);
-        if( !list.isEmpty() ) {
-            return (ThemePersonal) list.get(0);
-        }
-        return null;
     }
 }

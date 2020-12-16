@@ -94,11 +94,16 @@ public class SerialNOer {
 	synchronized static SNCreator getSNCreator(String domain, String snTemplate, int length) {
 		domain = (String) EasyUtils.checkNull(domain, Environment.getDomain());
 		
-		Pool cache = CacheHelper.getNoDeadCache();
+		Pool cache = CacheHelper.getLongCache();
 		String key = domain + "-" + snTemplate + "_" + length;
 		Cacheable item = cache.getObject(key);
 		if( item == null ) {
 			item = cache.putObject( key, new SNCreator(domain, snTemplate, length) );
+			
+			// 顺带清理掉：15分钟内只用过一次的取号器
+			try {
+				CacheHelper.flushCache(cache, "xxxx", 2, System.currentTimeMillis(), 15);
+			} catch(Exception e) { }
 		}
 		
 		return (SNCreator) item.getValue();

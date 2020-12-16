@@ -9,7 +9,8 @@
 		<column name="category" caption="消息分类" width="60px"/>
 		<column name="level"    caption="重要等级" width="60px"/>
 		<column name="status"   caption="是否已阅" values="1|0" texts="已阅|未读" width="60px"/>
-		<column name="sender"   caption="发送人" width="60px"/>
+		<column name="receiver" caption="收件人" width="60px"/>
+		<column name="sender"   caption="发件人" width="60px"/>
 		<column name="sendTime" caption="发送时间" mode="date" pattern="yyyy-MM-dd HH:mm:ss" width="100px"/>
 		<column name="opts" caption="操作" width="100px" showTitle="false"/>
 	</declare>			

@@ -15,7 +15,6 @@ import java.util.List;
 import com.boubei.tss.framework.persistence.ITreeSupportDao;
 import com.boubei.tss.portal.PortalConstants;
 import com.boubei.tss.portal.entity.Structure;
-import com.boubei.tss.portal.entity.ThemePersonal;
 import com.boubei.tss.um.permission.filter.PermissionFilter4Branch;
 import com.boubei.tss.um.permission.filter.PermissionTag;
 
@@ -81,12 +80,5 @@ public interface IPortalDao extends ITreeSupportDao<Structure>{
      * @return
      */
     List<?> getThemesByPortal(Long portalId);
-
-    /**
-     * 获取用户的自定义主题
-     * @param portalId
-     * @return
-     */
-    ThemePersonal getPersonalTheme(Long portalId);
 }
 

@@ -34,6 +34,10 @@ public class ModuleOrderHandler extends AbstractProduct {
 		this.md = (ModuleDef) dao.getEntity(ModuleDef.class, co.getModule_id());
 	}
 
+	public String getName() {
+		return md.getModule();
+	}
+
 	/*
 	 * 检验 购买账号 月份 限制
 	 */
@@ -55,7 +59,7 @@ public class ModuleOrderHandler extends AbstractProduct {
 
 		if ((checkMin && value < min) || value > max || value <= 0) {
 			Object op = EasyUtils.checkTrue(isRenewalfee, "续费", "购买");
-			throw new BusinessException(md.getModule() + "一次只支持" + op + " " + min + " ~ " + max + " 个" + unit);
+			throw new BusinessException("【" + md.getModule() + "】不支持" + op + ", 请重新购买");
 		}
 	}
 
@@ -67,6 +71,12 @@ public class ModuleOrderHandler extends AbstractProduct {
 	}
 
 	protected void handle() {
+		// 购买成功，正式启用用户（if新用户）;
+		if (ParamConstants.TRUE.equals(buyer.getDisabled())) {
+			buyer.setDisabled(ParamConstants.FALSE);
+			dao.update(buyer);
+		}
+
 		/*
 		 * 注册企业域，并将用户移动到新建的域下作为域管理员。 判断user是否已经是域管理员（非自注册域），是的话无需再注册域;
 		 * 回调时user非登录状态

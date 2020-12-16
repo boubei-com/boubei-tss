@@ -14,6 +14,7 @@ import java.util.Set;
 
 import com.boubei.tss.EX;
 import com.boubei.tss.PX;
+import com.boubei.tss.cache.Cacheable;
 import com.boubei.tss.cache.JCache;
 import com.boubei.tss.cache.Pool;
 import com.boubei.tss.modules.param.Param;
@@ -55,6 +56,18 @@ public class CacheHelper {
 		for(Object _key : keys) {
 			if( _key.toString().indexOf(likeKey) >= 0) {
 				pool.destroyByKey(_key);
+			}
+		}
+	}
+	
+	/**
+	 * 清理掉最近 howLong 分钟内，点击此处小于 lessHits 的缓存
+	 */
+	public static void flushCache(Pool pool, String likeKey, int lessHits, long now, long howLong) {
+		for(Cacheable obj : pool.listItems()) {
+			Object key = obj.getKey();
+			if( key.toString().indexOf(likeKey) > 0 && obj.getHit() < lessHits &&  now - obj.getAccessed() > 1000*60*howLong ) {
+				pool.destroyByKey(key);
 			}
 		}
 	}

@@ -1,5 +1,5 @@
 <params>
-	<dsType>ldap</dsType>
+	<dsType>com.boubei.tssx.sync.LDAPDataDao</dsType>
 	<url>ldap://localhost:10389</url>
 	<user>cn=admin2,ou=RD2,o=jinhe</user>
 	<password>123456</password>

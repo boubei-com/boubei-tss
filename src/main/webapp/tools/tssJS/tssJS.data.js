@@ -11,6 +11,10 @@
             return Object.prototype.toString.call(v) === '[object Array]';
         },
 
+        isInt(x) {
+            return /^-?[1-9]+[0-9]*]*$/.test(x)
+        },
+
         // 按字段排序数组（desc）
         sortArray: function(arr, field) {
             arr.sort(function(row1, row2) {
@@ -89,8 +93,18 @@
             
         },
 
+        round : function(num, precision) {
+            precision = precision || 0;
+            var k = 1;
+            for( var n = 0; n < precision; n++ ) {
+                k = k * 10;
+            }
+
+            return Math.round(num * k) / k;
+        },
+
         /*
-        * 格式化金额数字
+        * 格式化金额数字, eg: number_format(123456.447, 2) --> 123,456.45
         * number：要格式化的数字
         * decimals：保留几位小数
         * */
@@ -102,7 +116,7 @@
                 s = '',
                 toFixedFix = function (n, prec) {
                     var k = Math.pow(10, prec);
-                    return '' + Math.ceil(n * k) / k;
+                    return '' + Math.round(n * k) / k;
                 };
          
             s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
@@ -271,22 +285,24 @@
         },
 
         // 导出报表
-        export: function(reportId, queryParams) {
+        export: function(report, queryParams) {
             var frameId = "exportFrame";
-            if( $(frameId).length == 0 ) {
+            if( $("#" + frameId).length == 0 ) {
                 var exportEl = tssJS.createElement("div"); 
                 exportEl.innerHTML = "<div><iframe id='" + frameId + "' src='about:blank' style='display:none'></iframe></div>";
                 document.body.appendChild(exportEl);
             }
 
             var queryString = "?";
-            $.each(params, function(key, value) {
+            $.each(queryParams, function(key, value) {
                 if( queryString.length > 1 ) {
                     queryString += "&";
                 }
                 queryString += (key + "=" + value);
             });
-            $("#exportFrame").attr( "src", encodeURI("/tss/data/export/" + reportId + "/1/100000" + queryString) );
+
+            var url = report.indexOf("/") >= 0 ? report : ("/tss/data/export/" + report + "/1/100000");
+            $("#" + frameId).attr( "src", encodeURI( url + queryString) );
         }
         /* ---------------------------------- 数据导出 END ----------------------------------------------- */
     }

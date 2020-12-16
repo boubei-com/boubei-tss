@@ -193,6 +193,7 @@ public class Filter0Security implements Filter {
 		else if( servletPath.indexOf(".") < 0 ) { // 无后缀，一般restful地址 或 /download
 			/* 
 			 * 地址带/api/的apicall 在Filter8里检测,其它自定义的接口远程调用时需自己控制访问许可检测（eg: Servlet4Upload /remote/upload 和 xdata及data） 
+			 * 要求uName和uSign在 request.paramters里传递，不能在body里
 			 */
     		boolean apiCall = RequestContext.isApiCall(req); 
 			boolean expCall = req.getHeader("referer")  != null && servletPath.indexOf("/data/export/") >= 0; // 跨机器数据导出请求 & 【接口】调用，放行

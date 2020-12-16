@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -79,6 +80,7 @@ import com.boubei.tss.framework.web.filter.Filter8APITokenCheck;
 import com.boubei.tss.framework.web.mvc.ProgressActionSupport;
 import com.boubei.tss.modules.HitRateManager;
 import com.boubei.tss.modules.log.BusinessLogger;
+import com.boubei.tss.um.UMConstants;
 import com.boubei.tss.um.entity.Message;
 import com.boubei.tss.um.permission.PermissionHelper;
 import com.boubei.tss.um.service.ILoginService;
@@ -109,7 +111,14 @@ public class _Recorder extends ProgressActionSupport {
 			flag = flag || checkPermission(recordId, permitOption);
 		}
 		if (!flag) {
-			throw new BusinessException(EX.parse(EX.DM_09, recordId, Arrays.asList(permitOptions).toString()));
+			String opts = Arrays.asList(permitOptions).toString();
+			opts = opts.replaceFirst("1", "录入");
+			opts = opts.replaceFirst("4", "查看");
+			opts = opts.replaceFirst("5", "维护");
+			List<String> hasRoles = new ArrayList<>( Environment.getOwnRoleNames() );
+			hasRoles.remove( UMConstants.ANONYMOUS_ROLE );
+			String errorMsg = EX.parse(EX.DM_09, recordService.getRecord(recordId).getName(), opts, hasRoles);
+			throw new BusinessException(errorMsg);
 		}
 
 		return recordService._getDB(recordId);
@@ -152,8 +161,21 @@ public class _Recorder extends ProgressActionSupport {
 				_db.getVisiableFields(false), 
 				WFUtil.checkWorkFlow(_record.getWorkflow()),
 				_db.isLogicDelete(),
-				_record.getTable()
+				_record.getTable(),
+				DMUtil.getExtendAttr(_record.getRemark(), "page_help")
 			};
+	}
+	
+	@RequestMapping("/cfields")
+	@ResponseBody
+	public Collection<?> getCustomizeFields(HttpServletRequest request, String tbl, Long userOrg) {
+		
+		Filter8APITokenCheck.checkAPIToken(request, "dm_record_field", "D2");
+		
+		userOrg = (Long) EasyUtils.checkNull(userOrg, Environment.getUserOrg());
+		
+		boolean pointedTbl = !EasyUtils.isNullOrEmpty(tbl);
+		return _Database.queryRecordFields(tbl, userOrg, pointedTbl).values();
 	}
 
 	public Map<String, String> prepareParams(HttpServletRequest request, Long recordId) {
@@ -253,11 +275,12 @@ public class _Recorder extends ProgressActionSupport {
 			for (String field : _db.fieldCodes) {
 				boolean isFileField = _Field.TYPE_FILE.equals(_db.fieldTypes.get(index++));
 				if (isFileField) {
+					// eg: logo.png#12,logo2.png#13
 					String[] values = EasyUtils.obj2String(item.get(field)).split(",");
 					String urls = "";
 					List<String> ids = new ArrayList<>();
 					for (String value : values) {
-						int splitIndex = value.indexOf("#");
+						int splitIndex = value.indexOf("#"); 
 						if (splitIndex < 0)
 							continue;
 
@@ -619,7 +642,8 @@ public class _Recorder extends ProgressActionSupport {
 			throw new BusinessException(EX.DM_12);
 		}
 
-		getDB(recordId).updateBatch(ids, field, value);
+		boolean addVersion = !"false".equals(requestMap.get("addVersion"));
+		getDB(recordId).updateBatch(ids, field, value, addVersion);
 		printSuccessMessage();
 	}
 
@@ -1240,7 +1264,10 @@ public class _Recorder extends ProgressActionSupport {
 	 * @param itemId
 	 */
 	private void checkRowEditable(Long recordId, Long itemId, Map<String, ?> params) {
-
+		if ( EasyUtils.isTimestamp(itemId) ) { // 临时ID（即新增尚未保存时上传的附件）无需校验
+			return;
+		}
+		
 		// 非标准录入表，默认允许编辑（附件）; 控制权限需单独定制 安全校验类
 		_DataItemChecker.getInstance().editable(recordId, itemId, params); 
 		
@@ -1265,8 +1292,7 @@ public class _Recorder extends ProgressActionSupport {
 			flag = checkRowVisible(recordId, itemId, params); // 如果有【维护数据】权限，则只要可见就能编辑
 		}
 		if (!flag && checkPermission(recordId, Record.OPERATION_CDATA)) {
-			// 临时ID（即新增尚未保存时上传的附件）无需校验
-			flag = EasyUtils.isTimestamp(itemId) || checkRowAuthor(recordId, itemId); // 如果没有【维护数据】只有【新建】权限，则只能编辑自己创建的记录
+			flag = checkRowAuthor(recordId, itemId); // 如果没有【维护数据】只有【新建】权限，则只能编辑自己创建的记录
 		}
 
 		if (!flag) {

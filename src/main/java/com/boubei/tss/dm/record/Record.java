@@ -71,9 +71,9 @@ public class Record extends OperateInfo implements IXForm, IDecodable, IResource
     public static final String RESOURCE_TYPE = "D2"; 
     
     // 数据表资源操作ID
+    public static final String OPERATION_EDIT    = "2"; // 维护录入表
+    public static final String OPERATION_DELETE  = "3"; // 删除录入表
     public static final String OPERATION_CDATA   = "1"; // 录入数据, create data/delete data
-    public static final String OPERATION_EDIT    = "2"; // 维护录入
-    public static final String OPERATION_DELETE  = "3"; // 删除录入
     public static final String OPERATION_VDATA   = "4"; // 查看数据，授此操作权限的用户能看到所有录入数据, view data
     public static final String OPERATION_EDATA   = "5"; // 维护数据，授此操作权限的用户能看到所有录入数据，且能编辑 edit data
     

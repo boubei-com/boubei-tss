@@ -26,7 +26,7 @@ body { background: url(images/loading_f.gif) no-repeat center; }
     width: 346px; height: 32px; 
     background: url(images/logo-bg.png) no-repeat center;
 }
-.top .logo img { height: 22px; margin-top: 5px; margin-left: 20px; }
+.top .logo img { height: 27px; margin-top: 2px; margin-left: 8px; }
 
 .menu { position: absolute; top:1px; right: 0; font-size: 1.1em;  z-index: 10001; } 
 .menu a { background-color: rgb(38,112,141); color: #b7bac1; }
@@ -78,15 +78,16 @@ var domain_page = tssJS.Query.get("domain_page");
 var refreshUserHas = tssJS.Query.get("refreshUserHas");
 
 /* 用户信息初始化  */
-var roles = [], userHas, isSelfDomain = false;
+var roles = [], userHas, isSelfDomain = false, userGroup;
 $(function(){
 
     resizeIFrame();
 
     userHas = $.Cookie.decode("userHas");
     if( userHas && userHas[1] ) {
+        userGroup = userHas[15];
         roles = userHas[1], isSelfDomain = (userHas[0].length && userHas[0][0][0] == -7);                   
-        roles.contains(-9) && $("li.r9").show(true) && $("li.r8").hide();  // 开发者
+        roles.contains(-9) && $("li.r9").show(true);  // 开发者
         roles.contains(-8) && !isSelfDomain && $("li.r8").show(true);  // 域管理员(非自注册域)
         roles.contains(-1) && $("li.r9,li.r8,li.ra,li.ru").show(true);  // Admin
 
@@ -105,23 +106,51 @@ $(function(){
         getBIMenu();
     }
 
-    getParam("index_logo", function(result) {
-        result && $(".top .logo img").attr("src", result);
-    });
     getParam("sysTitle", function(result) {
-        document.title = result;
+        if(result) document.title = result + ( location.href.indexOf('localhost') >= 0 ? '-本地测试' : '' );
+    });
+    getParam("my_host", function(result) {
+        result && $("#my_host").attr("href", result);
+    });
+
+    // 域级自定义logo
+    var DOMAIN = userHas[12] || '无域';
+    tssJS.get("/tss/aapi/domain/pics", {domain: DOMAIN}, function(r) { 
+        if( r["logo"] ) {
+            $(".top .logo img").attr("src", '/tss/aapi/domain/pic?domain=' +DOMAIN+ '&field=logo');
+        } 
+        else {
+            // 应用级系统Logo（私有部署）
+            getParam("index_logo", function(result) {
+                result && $(".top .logo img").attr("src", result);
+            });
+            $(".top .logo img").css("height", "23px").css("margin-top", "4px").css("margin-left", "12px"); 
+        }
     });
 
     var interval = setInterval(function() {  
-        $.get("/tss/si/version", {sessionId: $.Cookie.getValue("JSESSIONID")}, function(result) {
-            if(result[2] === false) {
+
+        queryNotice(); // 栏目公告
+
+        $.get("/tss/si/version", {}, function(result) {
+            if(result && result[2] === false) {
                 clearInterval(interval);
                 $.confirm("登录已失效，请重新登录", "重新登录", function() {
                     location.href = "login.html";
                 });
             }
+
+            // 紧急站内信自动弹出
+            if( result[4].length ) {
+                var msg = result[4][0];
+                var content = msg.content + "<p style='text-align:right;margin-top:10px;'>  ------ " +(msg.sender||'')+ "  " +msg.sendTime+ "</p>"
+                $.tip(content, msg.title, function() {
+                    $.get("/tss/auth/message/" + msg.id, {});
+                });
+            }
+
         }, false);  
-    }, 60*1000);
+    }, 100*1000);
 });
 
 window.onresize = resizeIFrame;
@@ -158,7 +187,7 @@ var rootId = 0,   // 取”全部“节点
     globalValiable = {},
     level_2_menus = {}, 
     menusMap = {}, 
-    fisrtGroup,
+    fisrtGroup, topGroups = [],
     fisrtResource;
 
 // 合并录入表和报表，同时要防止彼此ID重复
@@ -167,7 +196,7 @@ function buildMenu(reports, records, p) {
         return openMsgPage();
     }
 
-    var data = [], level1Num = 0, hasPermission = p.length == 2 && (p[0].length+p[1].length);
+    var data = [], level1Num = 0, hasPermission = p.length == 3 && (p[0].length+p[1].length);
     records.each( function(i, item) {
         if( item[2] == rootId && item[1].indexOf("系统功能") >=0 ) return true;
         if( hasPermission && !p[1].contains(item[0]) && item[0] > 8 ) return true;
@@ -198,11 +227,13 @@ function buildMenu(reports, records, p) {
         }
 
         if( Math.abs(pid) == rootId ) { // 一级目录
-            var li = tssJS.createElement("li");
+            var li = tssJS.createElement("li", null, "top" + id);
             $(li).html("<a onclick='openLevelOne(" +id+ ")'>" +name+ "</a>");
             // $(li).find("a").css("color", "orange");
 
-            if( level1Num <= 2 ) {  // 直接放顶级目录里
+            if( userGroup === 'customer' && name === '业务中心' && !userHas[11].contains("体验者") ) return true; // 业务中心不对客户开放
+
+            if( level1Num <= 4 ) {  // 直接放顶级目录里
                 // $(".menu>ul").appendChild(li); 
                 $(".menu>ul")[0].insertBefore(li, $1("_bi"));
                 $("#_bi").hide();
@@ -212,6 +243,7 @@ function buildMenu(reports, records, p) {
 
             level_2_menus[id] = [];
             fisrtGroup = fisrtGroup || id;
+            topGroups.push(id);
         }
         else if( !isResource ) { 
             var brothers = level_2_menus[pid];
@@ -239,12 +271,19 @@ function buildMenu(reports, records, p) {
 
     getParam("domain_page", function(result) {
         domain_page = domain_page || result;
-        openLevelOne(fisrtGroup); // 默认打开第一个报表
+        openLevelOne(fisrtGroup, 0); // 默认打开第一个报表
     });
 }
 
-function openLevelOne(group) {
-    globalValiable.list = level_2_menus[group];
+function openLevelOne(group, index) {
+    globalValiable.list = level_2_menus[group]||[];
+
+    if( globalValiable.list.length == 0 ) {
+        $("#top" + group).hide();
+        if ( index > 9 )  return;
+        
+        openLevelOne( topGroups[++index], index );
+    }
 
     !fisrtResource && globalValiable.list.each( function(i, _item) {
         (_item.children||[]).each(function(i, item){
@@ -276,11 +315,10 @@ function openLevelOne(group) {
     <div class="menu"> 
         <ul> 
             <li id="_bi">
-                <a onclick="location.reload()">数据管理</a>
+                <a onclick="location.reload()">业务中心</a>
                 <ul></ul>
             </li>           
             <li class="ru"><a onclick="openUrl('modules/um/group.html')">用户组织</a></li>
-            <li class="r8"><a onclick="openUrl('modules/cms/channel.html')">栏目公告</a></li>
             <li><a onclick="openMsgPage()">待办提醒</a></li> 
             <li class="r9">
                 <a>开发管理</a> 
@@ -297,12 +335,15 @@ function openLevelOne(group) {
                 <a onclick='fixUserInfo()' id="userInfo">个人信息</a>
                 <ul>
                     <li><a onclick="logout()">注销登陆</a></li>
-                    <li class="ra"><a onclick="su()">切换账号</a></li>
+                    <li class="r8 r9"><a onclick="su()">切换账号</a></li>
                     <li><a onclick='changePasswd()'>修改密码</a></li>   
-                    <li class="r8"><a onclick="openUrl('more/pay/account.html')">我的账户</a> </li>  
+                    <li class="r8"><a onclick="openUrl('more/pay/account.html')">我的账户</a> </li> 
+                    <li class="r8 r9"><a onclick="openUrl('modules/cms/channel.html')">栏目文章</a></li> 
+                    <li class="ra"><a onclick="openUrl('modules/portal/structure.html')">门户结构</a></li> 
+                    <li class="ra"><a onclick="openUrl('modules/portal/component.html')">门户组件</a></li> 
                     <li><a onclick="feedback()">问题建议</a></li>
-                    <li><a href='http://www.boubei.com' target="_blank">卜贝官网</a></li>
-                    <!-- <li><a href='http://bbs.boubei.com' target="_blank">卜贝社区</a></li> -->
+                    <li><a href='https://www.boudata.com' target="_blank" id='my_host'>访问官网</a></li>
+                    <!-- <li><a href='http://bbs.boubei.com' target="_blank">社区支持</a></li> -->
                 </ul>
             </li>            
         </ul>  
@@ -319,6 +360,14 @@ function openLevelOne(group) {
 
 <script type="text/javascript">
     $(".top li>a[onclick]").attr("href", "javascript:void(0)");
+
+    tssJS.post("/tss/auth/account/subauthorize/check", {}, function(result) { 
+        var size = result[0];
+        ( size > 0) && tssJS.confirm("您有" + size + "个账号将于【" +result[1]+ "】后到期，现在就去续期吗？", "账号到期提醒", function() {
+            openUrl('more/pay/account.html');
+        });
+    });
+    
 </script>
  
 </body>

@@ -83,7 +83,7 @@ public class EX {
 	public static String DM_06 = "该附件不存在，可能已被删除!";
 	public static String DM_07 = "您对此附件没有查看权限";
 	public static String DM_08 = "您对此记录没有浏览权限";
-	public static String DM_09 = "对数据表【${x1}】的权限不足，${x2}.";
+	public static String DM_09 = "权限不足，您对数据表【${x1}】没有${x2}权限，您当前角色为:${x3}";
 	public static String DM_10 = "该数据表已被停用，无法再录入数据！";
 	public static String DM_11 = "令牌验证未获通过，调用接口失败.";
 	public static String DM_11A= "时间戳【${x1}】无效";
@@ -209,4 +209,11 @@ public class EX {
 	public static String WF_4 = "您无权处理本流程，当前流程审批人员不是您";
 	public static String WF_5 = "转审人员【${x1}】不存在";
 	public static String WF_6 = "【${x1}】已在审批人名单中，无需再转审";
+
+	public static String CO_1 = "订单不是【${x1}】,不能发起退款";
+	public static String CO_2 = "您还没有系统账户";
+	public static String CO_3 = "订单已被删除";
+	public static String CO_4 = "订单已${x1}";
+	public static String CO_5 = "账户余额不足，请用其它支付方式";
+
 }

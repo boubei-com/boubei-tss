@@ -50,7 +50,18 @@ $(document).ready(function(){
         value: 2
     });
 
-    beginQuery();
+    tssJS.get("/tss/auth/service/domains", {}, function(data) {
+        data.each(function(i, g) {
+            g.value = '@' + g.domain;
+            g.text = g.name.substring(0, 9) + (g.name.length > 9 ? '...' : '');
+        });
+
+        $("#vistor").combobox( {
+            data: data
+        });
+
+        beginQuery();
+    });
 
     setInterval(query, 1000*60*10);
 });
@@ -63,6 +74,7 @@ var FIELDS_1 = [
     { field: 'f5', width: 60, align: "right"}
 ];
 
+var interval;
 function query() {
     var params = {"param1": _params.time1, "param2": _params.time2};
     params.param4 = _params.theme || '1';
@@ -73,7 +85,7 @@ function query() {
         /* 判断是否按域查询，格式：@XXX */
         if( params.param3.indexOf('@') == 0 ) {
             var domain = params.param3.substring(1);
-            $.getJSON("/tss/auth/service/domainuser", {'domain': domain, 'field': 'loginName'}, function(data) {
+            $.getJSON("/tss/auth/service/domainuser", {'domain': domain, 'field': 'userName'}, function(data) {
                 data.push("God");
                 // $('#vistor').textbox("setValue", data.join(","));
                 _params.vistor = data.join(",");
@@ -86,6 +98,8 @@ function query() {
 
     FIELDS_1[3].hidden = FIELDS_1[4].hidden = false;
     FIELDS_1[2].sortable = false;
+
+    interval && clearInterval(interval);
     switch( params.param4 ) {
     case '1' :
         FIELDS_1[0].title = '服务名称';
@@ -93,6 +107,7 @@ function query() {
         FIELDS_1[2].title = '最长时长';
         FIELDS_1[3].title = '访问次数';
         FIELDS_1[4].title = '超时次数';
+        interval = setInterval(showRunning, 6*1000);
         break;
     case '2' :
         FIELDS_1[0].title = '操作对象';
@@ -141,18 +156,18 @@ var FIELDS_2 = [[],
     [
         { field: '服务名称', title: '服务名称', width: 100 , sortable: true},
         { field: '参数', title: '参数', width: 300 },
-        { field: '访问时间', title: '访问时间', width: 100, sortable: true},
+        { field: '访问时间', title: '访问时间', width: 90, sortable: true},
         { field: '运行时长', title: '运行时长', width: 60, align: "right"},
         { field: '访问人', title: '访问人', width: 60, sortable: true },
-        { field: 'origin', title: '来源', width: 110 },
+        { field: 'origin', title: '来源', width: 90 },
     ],
     [
         { field: '操作对象', title: '操作对象', width: 80 },
-        { field: '操作人', title: '操作人', width: 70, sortable: true },
-        { field: '操作内容', title: '操作内容', width: 350},
-        { field: '操作时间', title: '操作时间', width: 100, sortable: true},
-        { field: 'origin', title: '来源', width: 110 },
-        { field: 'ip', title: 'ip', width: 90 }
+        { field: '操作人', title: '操作人', width: 60, sortable: true },
+        { field: '操作内容', title: '操作内容', width: 400},
+        { field: '操作时间', title: '操作时间', width: 90, sortable: true},
+        { field: 'origin', title: '来源', width: 80 },
+        { field: 'ip', title: 'ip', width: 85 }
     ],
     [
         { field: '任务', title: 'ETL任务', width: 150 },
@@ -168,8 +183,8 @@ var FIELDS_2 = [[],
         { field: '处理结果', title: '处理结果', width: 80 },
         { field: '处理人', title: '处理人', width: 70, sortable: true },
         { field: '处理意见', title: '处理意见', width: 350},
-        { field: '处理时间', title: '处理时间', width: 100, sortable: true},
-        { field: 'origin', title: '来源', width: 110 }
+        { field: '处理时间', title: '处理时间', width: 90, sortable: true},
+        { field: 'origin', title: '来源', width: 80 }
     ]
 ];
 
@@ -253,7 +268,13 @@ function showChart(serviceName, type) {
     }
 
     tssJS.getJSON(json_url('visit-trend'), params, function(data){
-        if(data.length == 0) return $("#" + canvas).html("");
+        if(data.length == 0) {
+            data.push({name: "00", value: 0, v2: 0});
+            data.push({name: "01", value: 0, v2: 0});
+            data.push({name: "02", value: 0, v2: 0});
+            data.push({name: "03", value: 0, v2: 0});
+            data.push({name: "04", value: 0, v2: 0});
+        }
 
         var data2 = [], labels = [], _v1 = 1000, _v2 = 0;
 
@@ -316,9 +337,8 @@ function beginQuery() {
 
     _params.theme = $('#theme').combobox("getValue");
     
-    if( $('#vistor').val() ) {
-        _params.vistor = $('#vistor').val();
-    } else {
+    _params.vistor = $('#vistor').combobox("getValue");
+    if( !_params.vistor ) {
         delete _params["vistor"];
     }
     
@@ -373,8 +393,8 @@ var nextDay = subDateS(toDate(today), -1);
     </div>
 
     <div class="querycondition" id="tb">
-        <label>主题:</label><input id="theme" class="easyui-textbox"/>
-        <label>人员:</label><input id="vistor" class="easyui-textbox" style="width: 140px;" />
+        <label>主题:</label><input id="theme" class="easyui-textbox" style="width: 85px;"/>
+        <label>人域:</label><input id="vistor" class="easyui-textbox" style="width: 160px;" />
         <br><br>
         <label>时间:</label><input id="time1" class="easyui-datebox"/> --
             <input id="time2" class="easyui-datebox"/> &nbsp;
@@ -410,7 +430,6 @@ var nextDay = subDateS(toDate(today), -1);
             columns : [FIELDS_3]
         });
 
-    setInterval(showRunning, 5*1000);
     function showRunning() {
         tssJS.getXML("/tss/cache/list/SHORT", {}, function(xml) {
             var rootNode = xml.documentElement;
@@ -442,18 +461,35 @@ var nextDay = subDateS(toDate(today), -1);
 
             if(key.indexOf('QC_') != 0) return true;
 
-            var info = key.substring(54, key.length-1);
-            var _params = info.substring(info.indexOf("{")+1, info.indexOf("}"));
-            info = info.replace(_params, "").split(",");
-            item.params = _params.substring(0, 120);
+            // 报表服务 queryReport(Long reportId, Map<String, String> requestMap, int page, int pagesize, Object cacheFlag);
+            var info;
+            if( key.indexOf("queryReport") > 0 ) {
+                info = key.substring(54, key.length-1);
+                var _params = info.substring(info.indexOf("{")+1, info.indexOf("}"));
+                info = info.replace(_params, "").split(",");
+                item.params = _params.substring(0, 120);
 
-            var reportId = parseInt(info[0]);
-            var report = reports[reportId];
-            if(report) {
-                item.report = report.name;
-                item.datasource = report.datasource;
-                item.creator = report.username;
+                var reportId = parseInt(info[0]);
+                var report = reports[reportId];
+                if(report) {
+                    item.report = report.name;
+                    item.datasource = report.datasource;
+                    item.creator = report.username;
+                }
             }
+            else if( key.indexOf("queryByScript") > 0 ) {
+                info = key.substring(55, key.length-1);
+                var _params = info.substring(info.indexOf("{")+1, info.indexOf("}"));
+                info = info.replace(_params, "").split(",");
+                item.params = _params.substring(0, 120);
+
+                item.report = info[0];
+                item.creator = 'sys';
+            }
+            else {
+                item.report = key;
+            }
+
             // 报表的缓存策略
             item.rpCache = parseInt(info[4]);
             if(item.rpCache == -1) {

@@ -85,6 +85,9 @@ public class Global {
     		params = new HashMap<Integer, Object>();
     		params.put(1, DateUtil.today());
     		SQLExcutor.excute("delete from x_serialno where day < ? and day > '2018-08-24' ", params, DMConstants.LOCAL_CONN_POOL);
+    		
+    		params.put(1, DateUtil.subDays(DateUtil.today(), 31));
+    		SQLExcutor.excute("delete from x_serialno where day = '2018-08-23' and createTime < ? and lastNum < 4 and precode like '%-%' and domain <> '无域'", params, DMConstants.LOCAL_CONN_POOL);
     	} 
     	catch( Exception e ) { }
 	}

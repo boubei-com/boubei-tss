@@ -17,6 +17,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.boubei.tss.EX;
 import com.boubei.tss.framework.Global;
@@ -46,15 +47,15 @@ public class CheckEmail extends HttpServlet {
     }
  
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String accout = request.getParameter("loginName");
+		String account = request.getParameter("loginName");
 		String email  = request.getParameter("email");
 		
 		IUserService service = (IUserService) Global.getBean("UserService");
-		User user = service.getUserByLoginName(accout);
+		User user = service.getUserByLoginName(account);
 		
 		response.setContentType("text/html;charset=UTF-8");
 		if ( user == null ) {
-			ErrorMessageEncoder encoder = new ErrorMessageEncoder( EX.parse(EX.U_41, accout) );
+			ErrorMessageEncoder encoder = new ErrorMessageEncoder( EX.parse(EX.U_41, account) );
 			encoder.print(new XmlPrintWriter(response.getWriter()));
 		} 
 		else {
@@ -66,7 +67,9 @@ public class CheckEmail extends HttpServlet {
             else {
             	// 产生一个登录随机数，发到用户的邮箱里
                 int randomKey = MathUtil.randomInt6();
-    			request.getSession(true).setAttribute(SSOConstants.RANDOM_KEY, randomKey);
+    			HttpSession session = request.getSession(true);
+    			session.setAttribute(SSOConstants.RANDOM_KEY, randomKey);
+				session.setAttribute(SSOConstants.USER_ACCOUNT, account);
             	String info = "凭此随机数修改您的密码，打死不要告诉其它人，随机数：" + randomKey;
             	MailUtil.sendHTML("验证码确认", info, new String[] { email }, MailUtil.DEFAULT_MS);
             	

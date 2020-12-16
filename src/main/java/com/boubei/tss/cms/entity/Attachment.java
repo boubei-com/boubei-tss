@@ -27,6 +27,7 @@ import com.boubei.tss.framework.persistence.IEntity;
 import com.boubei.tss.framework.sso.context.Context;
 import com.boubei.tss.framework.web.display.grid.GridAttributesMap;
 import com.boubei.tss.framework.web.display.grid.IGridNode;
+import com.boubei.tss.util.DateUtil;
 
 /** 
  * <p> 文件附件Attachment实体对象</p>
@@ -145,9 +146,15 @@ public class Attachment implements IEntity, IGridNode {
         map.put("localPath", localPath);
         map.put("type", type);
         map.put("name", name);
+        map.put("fileSize", this.getFileSize());
         map.put("downloadUrl", this.getDownloadUrl());
         map.put("relationUrl", this.getRelationUrl());
         map.put("hitCount", this.getHitCount());
+        map.put("uploadDate", DateUtil.formatCare2Second(uploadDate));
+        
+        map.put("_url", "<a href='/tss/" + this.getRelationUrl() + "' target='_blank'>打开</a>");
+		map.put("topOpt", "<a href='javascript:void(0)' onclick='setTop(" + this.getPK() + ")'>置顶</a>");
+		map.put("delOpt", "<a href='javascript:void(0)' onclick='delAttach(" + this.getPK() + ")'>删除</a>");
         
         return map;
     }

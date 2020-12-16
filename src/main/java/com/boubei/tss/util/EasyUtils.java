@@ -89,12 +89,11 @@ public class EasyUtils {
     }
     
     public static final Integer obj2Int(Object value) {
-        try{
-            return Integer.valueOf( toNumberString(value) );
-        } 
-        catch (Exception e) {
-        	throw new RuntimeException("【" +value+ "】不是有效数字");
+        Long lv = obj2Long(value);
+        if(lv > 2147483647) {
+        	throw new RuntimeException("【" +value+ "】过大，不是int");
         }
+		return lv.intValue();
     }
     
     private static final String toNumberString(Object value) {
@@ -405,12 +404,16 @@ public class EasyUtils {
         } 
         catch (Exception e) {
 			String errorMsg = FM_PARSE_ERROR + e.getMessage();
-	    	log.error(errorMsg + ", template = " + str + ", data = " + data);
+	    	log.error(errorMsg + ", template = " + str.substring(0, Math.min(800, str.length())) + ", data = " + data);
 	    	
 	    	return errorMsg;
 	    }
     }
     
+    /**
+		Map<String, ?> data = _Util.json2Map("{\"64G\":4}");
+		EasyUtils.fmParse("${64G}", data); ===> 报错，key需要非数字开头
+     */
     public static String fmParse( String template, Map<String, ?> data ) {
     	Writer out = new StringWriter();
     	return fmParse(template, data, out, new Configuration(Configuration.VERSION_2_3_28));
@@ -444,12 +447,10 @@ public class EasyUtils {
 	/**
 	 * 是否是服务器环境, 约定：本地或dev环境envirment必须是带local或dev字样的（test需要当prod对待，保证测试覆盖）
 	 * 
-	 * @param script
-	 * @param params
 	 * @return
 	 */
     public static boolean isProd() {
     	String envirment = ParamConfig.getAttribute(PX.ENVIRONMENT);
-    	return envirment.indexOf("local") == -1 && envirment.indexOf("dev") == -1;
+    	return envirment != null && envirment.indexOf("local") == -1 && envirment.indexOf("dev") == -1;
     }
 }

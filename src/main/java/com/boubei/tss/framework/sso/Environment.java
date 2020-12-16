@@ -148,6 +148,10 @@ public class Environment {
     	}
 		return group.equals( getUserGroup() );
     }
+    
+    public static Long getUserOrg() {
+    	return EasyUtils.obj2Long( getInSession(SSOConstants.USER_ORG) ) ;
+    }
 
     public static String getDomainOrign() {
     	return (String) getInSession(SSOConstants.USER_DOMAIN);

@@ -12,6 +12,7 @@
 		<column caption="置顶"   name="isTop" width="35px" texts="是|否" values="1|0"/>
 		<column caption="排序号"  name="seqNo" width="40px" />
 		<column caption="点击次数" name="hitCount" width="50px" />
+		<column caption="评论次数" name="commentNum" width="50px" />
 		<column caption="所属栏目" name="channel.name" width="80px"/>
 		<column caption="栏目编号" name="channel.id" display="none"/>
 	</declare>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Request service="BoxId_GetShipItemInfoByTime" lang="zh-CN">
+<Head>6057,r}IT4bh#4HfdK}3}zEL#</Head>
+<Body>
+<Order timebegin="2019-05-08 08:00:00" timeend="2019-05-08 23:00:00" />
+</Body>
+</Request>

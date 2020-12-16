@@ -1,11 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sqls>
-	<sql code="test1">
+<sqls role="">
+	<sql code="test1" role="Admin,,匿名用户">
 		<![CDATA[
 			 select id, 方法名称  from (
 				select id, methodName as 方法名称 from dm_access_log where id > ?
 			 ) t
 			 order by id desc
+		]]>
+	</sql>
+
+	<sql code="test2" role="99">
+		<![CDATA[
+			 select * from um_user where id > ${id}
+		]]>
+	</sql>
+
+	<sql code="test3" log="on">
+		<![CDATA[
+			 select * from um_user where id > ${id} or id in (${id})
+		]]>
+	</sql>
+	<sql code="test31">
+		<![CDATA[
+			 select s.id <#if um_user_s_udf??>${um_user_s_udf}</#if> from um_user s where id > ${id} or id in (${id})
+		]]>
+	</sql>
+	
+	<sql code="test4" bIDataProcess="com.boubei.tss.modules.api.BIDataProcess1" defaultFilter="xxx">
+		<![CDATA[
+			 select id, loginName from um_user where id > ${id} or id in (${id})
 		]]>
 	</sql>
 </sqls>

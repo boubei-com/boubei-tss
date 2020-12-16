@@ -66,8 +66,8 @@ table {
   border-right: 1px solid #95B8E7;
 }
 #palette > div .bar {
-  height: 23px;
-  padding: 2px 0 0 4px;
+  height: 25px;
+  padding: 4px 0 0 4px;
   line-height: 18px;
   background-color: #E0ECFF;
   border-bottom: 1px solid #95B8E7;
@@ -76,7 +76,7 @@ table {
 }
 #palette > div .bar .search #searchKey {
   width: 80px;
-  height: 1.4em;
+  height: 17px;
   text-indent: 2px;
   margin-left: 8px;
 }

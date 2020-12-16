@@ -37,6 +37,7 @@ import com.boubei.tss.cms.service.IArticleService;
 import com.boubei.tss.cms.service.IRemoteArticleService;
 import com.boubei.tss.framework.Config;
 import com.boubei.tss.framework.exception.BusinessException;
+import com.boubei.tss.framework.persistence.ICommonService;
 import com.boubei.tss.framework.persistence.pagequery.PageInfo;
 import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.framework.web.display.grid.GridDataEncoder;
@@ -51,6 +52,7 @@ import com.boubei.tss.util.EasyUtils;
 public class ArticleAction extends BaseActionSupport {
 
 	@Autowired private IArticleService articleService;
+	@Autowired private ICommonService commonService;
 	
 	/**
 	 * 获取栏目下文章列表
@@ -310,6 +312,22 @@ public class ArticleAction extends BaseActionSupport {
         String returnXML = remoteService.search(siteId, searchStr, page, pageSize);
         print(returnXML);
     }
+    
+    @RequestMapping(value = "/attach/top/{id}", method = RequestMethod.POST)
+	@ResponseBody
+	public void setTopAttach(@PathVariable("id") Long id) {
+    	Attachment attach = (Attachment) commonService.getEntity(Attachment.class, id);
+		attach.setSeqNo(1);
+		commonService.update(attach);
+
+		List<?> list = commonService.getList("from Attachment where articleId = ? and id <> ? order by seqNo ", attach.getArticleId(), id);
+		int index = 2;
+		for (Object obj : list) {
+			Attachment _attach = (Attachment) obj;
+			_attach.setSeqNo(index++);
+			commonService.update(_attach);
+		}
+	}
     
     /**
      * 添加评论

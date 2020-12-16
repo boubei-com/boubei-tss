@@ -21,7 +21,7 @@ import com.boubei.tss.modules.cloud.entity.DomainConfig;
 import com.boubei.tss.util.EasyUtils;
 
 public class BIDataProcess {
-	Logger log = Logger.getLogger(this.getClass());
+	protected Logger log = Logger.getLogger(this.getClass());
 
 	public void handle(SQLExcutor ex, Map<String, String> requestMap, String tag) {
 		if ("query".equals(tag)) {

@@ -173,9 +173,92 @@
 	}
 
 	function sendNewMsg() {
-		
+        popupForm("message.xml", "Message", {}, function(params) {
+        	var users  = (params.user||'').split(",");
+        	var groups = (params.group||'').split(",");
+        	var roles  = (params.role||'').split(",");
+
+        	var receiver = [];
+        	users.each(function(i, u) {
+        		u && receiver.push(u);
+        	});
+        	groups.each(function(i, g) {
+        		g && receiver.push(u + "@tssGroup");
+        	});
+        	roles.each(function(i, r) {
+        		r && receiver.push(r + "@tssRole" + (userDomain ? "@"+userDomain : ""));
+        	});
+        	
+        	if( receiver.length == 0) {
+        		tssJS("#user").notice("收件人不能为空");
+        		return false;
+        	}
+        	if( !params.title || !params.content) {
+        		tssJS("#title").notice("标题和内容不能为空");
+        		return false;
+        	}
+        	
+        	sendMessage(receiver.join(","), params.title, params.content, params.category||'提醒', params.level||'低', outBox);
+
+        }, "发送消息", initSendForm);
 	}
-	
+
+	function initSendForm(xform) {
+    	$.get("/tss/api/users", {}, function(data) {
+			var userCodes = [], userNames = [];
+	 		$.each(data, function(key, val) {
+				userCodes.push( key );
+				userNames.push( val );
+			});
+			xform.updateField("user", [
+                    {"name": "mode", "value": "combotree"}, 
+                    {"name": "multiple", "value": "true"},
+                    {"name": "texts", "value": userNames.join("|")},
+                    {"name": "values", "value": userCodes.join("|")}
+                 ])
+		});
+
+		$.get("/tss/auth/service/domaingroups", {}, function(data) {
+			var groupIds = [], groups = [];
+	 		$.each(data, function(i, g) {
+				groupIds.push( g.id );
+				groups.push( g.text );
+			});
+			xform.updateField("group", [
+                    {"name": "mode", "value": "combotree"}, 
+                    {"name": "multiple", "value": "true"},
+                    {"name": "texts", "value": groups.join("|")},
+                    {"name": "values", "value": groupIds.join("|")}
+                 ])
+		});
+
+    	$.get("/tss/auth/service/roles", {}, function(data) {
+    		var roleIds = [], roles = [];
+			data.each(function(i, r) {
+				if( r[0] > 0) {
+					roleIds.push( r[0] );
+					roles.push( r[1] );
+				}
+			});
+			xform.updateField("role", [
+                    {"name": "mode", "value": "combotree"}, 
+                    {"name": "multiple", "value": "true"},
+                    {"name": "texts", "value": roles.join("|")},
+                    {"name": "values", "value": roleIds.join("|")}
+                 ])
+		});
+    }
+
+	function outBox() {
+		params.senderId = userHas[2];
+		loadGridData();
+	}
+
+	function inBox() {
+		params.senderId = null;
+		loadGridData();
+	}
+
     window.onload = init;
 
 //-->
@@ -208,11 +291,13 @@
 			  	</select>
 			  	<span class="icon-search" onclick="search()" title="搜 索"></span>
 			  </span>
-			  	<button class="tssbutton small white" onclick="batchDelete()"><span class="icon-x"></span>批量删除</button>
+			  	<button class="tssbutton small white" onclick="inBox()"><span class="icon-list-ordered"></span>收件箱</button>
+			  	<button class="tssbutton small white" onclick="outBox()"><span class="icon-list-ordered"></span>发件箱</button>
+			  	<button class="tssbutton small white" onclick="sendNewMsg()"><span class="icon-comment-discussion"></span>发送消息</button>
 			  	<button class="tssbutton small white" onclick="batchView()">批量已阅</button>
 			  	<button class="tssbutton small white" onclick="batchView('view_all')">全部已阅</button>
+			  	<button class="tssbutton small white" onclick="batchDelete()"><span class="icon-x"></span>批量删除</button>
 			  	<button class="tssbutton small white" onclick="batchDelete('del_all')"><span class="icon-trashcan"></span>清空站内信</button>
-			  	<button class="tssbutton small white" onclick="sendNewMsg()"><span class="icon-comment-discussion"></span>发送消息</button>
 			  </span>
 			</td>
 		</tr>

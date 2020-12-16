@@ -134,4 +134,6 @@ public interface PX {
 	/** 系统管理员邮箱 */
 	static String MONITORING_RECEIVERS = "Monitoring-Receivers";
 	
+	static String PUBLIC_DOMAINS = "PUBLIC_DOMAINS";
+	
 }

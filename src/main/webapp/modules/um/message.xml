@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Message>
+    	<xform>
+			<declare>
+				<column name="user" caption="收件人" mode="combotree" multiple="true"/>
+				<column name="group" caption="收件组织"/>
+				<column name="role" caption="收件角色" />
+				<!-- <column name="role" caption="收件角色" mode="function" cmd="getRoles()"/> -->
+				<column name="level" caption="重要等级" mode="combo" value="低" values="低|中|高" texts="低|中|高"/>
+				<column name="category" caption="类别" mode="combo" value="提醒" values="提醒|告警" texts="提醒|告警"/>
+                <column name="title" caption="标题" mode="string" empty="false"/>
+                <column name="content"  caption="内容" mode="string" empty="false"/>
+			</declare>
+			<layout>
+				<TR>
+					<TD width="60"><label binding="user"/></TD>
+					<TD colspan="3"><input binding="user" style="width:200px;"/></TD>
+				</TR>
+				<TR>
+					<TD><label binding="group"/></TD>
+					<TD  colspan="3"><input binding="group" style="width:200px;"/></TD>
+				</TR>
+				<TR>
+					<TD><label binding="role"/></TD>
+					<TD  colspan="3"><input binding="role" style="width:200px;"/></TD>
+				</TR>
+				<TR>
+					<TD><label binding="level"/></TD>
+					<TD><input binding="level" style="width:40px;"/></TD>
+					<TD width="60" align="center"><label binding="category"/></TD>
+					<TD><input binding="category" style="width:70px;"/></TD>
+				</TR>
+				<TR>
+					<TD><label binding="title"/></TD>
+					<TD colspan="3"><input binding="title" style="width:90%;"/></TD>
+				</TR>
+				<TR>
+					<TD valign="top"><label binding="content"/></TD>
+					<TD colspan="3"><textarea binding="content" style="width:100%; height: 120px"/></TD>
+				</TR>
+				
+			</layout>
+			<data>
+                <row/>
+			</data>
+		</xform>
+    </Message>
+</Response>

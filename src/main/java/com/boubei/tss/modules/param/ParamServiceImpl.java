@@ -199,7 +199,9 @@ public class ParamServiceImpl implements ParamService, ParamListener {
 
     public Param getParam(Long id) {
         Param param = paramDao.getEntity(id);
-        paramDao.evict(param);
+        if( param != null ) {
+        	paramDao.evict(param);
+        }
         return param;
     }
 

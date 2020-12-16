@@ -15,7 +15,11 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.apache.log4j.Logger;
+import org.easymock.EasyMock;
 
 import com.boubei.tss.cache.Cacheable;
 import com.boubei.tss.cache.JCache;
@@ -24,15 +28,20 @@ import com.boubei.tss.dm.dml.SQLExcutor;
 import com.boubei.tss.framework.Config;
 import com.boubei.tss.framework.persistence.IDao;
 import com.boubei.tss.framework.persistence.pagequery.PageInfo;
+import com.boubei.tss.framework.sso.context.RequestContext;
 import com.boubei.tss.modules.log.LogQueryCondition;
 import com.boubei.tss.modules.log.LogService;
 import com.boubei.tss.util.EasyUtils;
 import com.boubei.tss.util.FileHelper;
 import com.boubei.tss.util.URLUtil;
 
+import junit.framework.Assert;
+
 public class _TestUtil {
 	
 	protected static Logger log = Logger.getLogger(_TestUtil.class);
+	
+	static final String PROJECT_NAME = "boubei-tss";
 	
     static String dbDriverName = Config.getAttribute("db.connection.driver_class");
     
@@ -44,19 +53,37 @@ public class _TestUtil {
         return dbDriverName != null && dbDriverName.indexOf("mysql") >= 0;
     }
     
+    public static void assertExMsg(String info, Exception rlt) {
+    	Assert.assertTrue( rlt.getMessage().indexOf(info) >= 0 );
+    }
+    
+    public static void mockRequest(HttpServletRequest request, HttpSession session) {
+        EasyMock.expect(request.getHeader(RequestContext.USER_REAL_IP)).andReturn("127.0.0.1").times(0, 3);
+        EasyMock.expect(request.getAttribute(RequestContext.USER_ORIGN_IP)).andReturn("127.0.0.1");
+		EasyMock.expect(request.getRemoteAddr()).andReturn("127.0.0.1");
+		
+		EasyMock.expect(request.getHeader("Proxy-Client-IP")).andReturn("127.0.0.1").times(0, 3);
+		EasyMock.expect(request.getHeader("WL-Proxy-Client-IP")).andReturn("unknown").times(0, 3);
+		EasyMock.expect(request.getHeader("HTTP_CLIENT_IP")).andReturn(null).times(0, 3);
+		EasyMock.expect(request.getHeader("HTTP_X_FORWARDED_FOR")).andReturn("unknown").times(0, 3);
+    }
+    
     /**resourceId
      * 通过直接往权限表里插入数据，来虚构授权信息
      */
     public static void mockPermission(String table, String resourceName, Long resourceId, 
-    		Long userId, String operation, int permissionState, int isGrant, int isPass) {
+    		Long roleId, String operation, int permissionState, int isGrant, int isPass) {
     	
-    	Object[] params = new Object[] { resourceName, resourceId, userId, operation, permissionState,isGrant,isPass };
+    	Object[] params = new Object[] { resourceName, resourceId, roleId, operation, permissionState,isGrant,isPass };
 		SQLExcutor.excuteInsert("insert into " +table+ "(resourcename,resourceId,roleId,operationId,permissionState,isGrant,isPass) " +
 				"values (?,?,?,?,?,?,?)", params , "connectionpool");
     }
 	
 	public static String getProjectDir() {
-        return URLUtil.getClassesPath().getPath() + "/testdata";
+        String path = URLUtil.getResourceFileUrl("application.properties").getPath();
+        
+        int beginIndex = path.startsWith("/") ? 0 : 1; // linux or windows
+        return path.substring(beginIndex, path.indexOf(PROJECT_NAME) + PROJECT_NAME.length());
     }
 	
     public static String getInitSQLDir() {
@@ -64,11 +91,11 @@ public class _TestUtil {
     	if( isH2Database() ) {
     		dbType = "h2";
     	}
-        return getProjectDir() + "/" + dbType;
+        return getProjectDir() + "/sql/" + dbType;
     }
     
     public static String getSQLDir() {
-        return getProjectDir();
+        return getProjectDir() + "/sql";
     }
     
     public static void excuteSQL(String sqlDir) {  

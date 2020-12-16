@@ -57,6 +57,7 @@ public class ChannelService implements IChannelService {
 		
 		Channel parent = channelDao.getEntity(parentId);
         channel.setSite(parent.getSite());
+        channel.setDomain(parent.getSite().getDomain());
 		
         channel = channelDao.create(channel);
         
@@ -64,7 +65,12 @@ public class ChannelService implements IChannelService {
     }
 	
 	public Channel updateChannel(Channel channel) {
+		Long parentId = channel.getParentId();
+		Channel parent = channelDao.getEntity(parentId);
+        channel.setDomain(parent.getDomain());
+        
 		channelDao.updateChannel(channel);
+		
 	    return channel;
     }
 	
@@ -198,7 +204,7 @@ public class ChannelService implements IChannelService {
 	public void publishArticle(List<Article> articleList) {
 		for ( Article article : articleList) {
             // 更新发布日期
-			article.setIssueDate(new Date());
+			article.setIssueDate( (Date) EasyUtils.checkNull(article.getIssueDate(), new Date()) );
 			
 			// 取文章附件列表
             List<Attachment> attachments = articleDao.getArticleAttachments(article.getId());

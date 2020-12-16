@@ -1,5 +1,6 @@
 package com.boubei.tss.modules.cloud;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ import com.boubei.tss.framework.persistence.ICommonService;
 import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.modules.cloud.entity.Account;
 import com.boubei.tss.modules.param.ParamConfig;
+import com.boubei.tss.modules.param.ParamConstants;
 import com.boubei.tss.um.entity.SubAuthorize;
 import com.boubei.tss.util.DateUtil;
 import com.boubei.tss.util.EasyUtils;
@@ -102,6 +104,7 @@ public class AccountAction {
 		SubAuthorize sa = (SubAuthorize) commService.getEntity(SubAuthorize.class, strategyId);
 		sa.setStartDate(DateUtil.parse(startDay));
 		sa.setEndDate(DateUtil.parse(endDay));
+		sa.setDisabled( ParamConstants.FALSE );
 		commService.update(sa);
 	}
 
@@ -109,8 +112,9 @@ public class AccountAction {
 	@ResponseBody
 	public Object[] checkSubAuthorizeExpire() {
 		String hql = "select count(id), min(endDate) from SubAuthorize where ? in (buyerId, ownerId) and endDate between ? and ?";
-		Long userId = Environment.getUserId();
-		int preDays = EasyUtils.obj2Int(ParamConfig.getAttribute(PX.SA_EXPIRE_NOTIFY_DAYS, "15"));
-		return (Object[]) commService.getList(hql, userId, DateUtil.addDays(-3), DateUtil.addDays(preDays)).get(0);
+		int preDays = EasyUtils.obj2Int(ParamConfig.getAttribute(PX.SA_EXPIRE_NOTIFY_DAYS, "10"));
+		Date day1 = DateUtil.addDays(-1);      // 过去1天内已过期
+		Date day2 = DateUtil.addDays(preDays); // 未来10天内即将过期
+		return (Object[]) commService.getList(hql, Environment.getUserId(), day1, day2).get(0);
 	}
 }
