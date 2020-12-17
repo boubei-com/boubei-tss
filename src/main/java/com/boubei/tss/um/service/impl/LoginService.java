@@ -171,7 +171,7 @@ public class LoginService implements ILoginService {
 	}
     
     public List<Long> saveUserRoleMapping(Long logonUserId, List<Long> roleIds) {
-		List<?> exsits = userDao.getEntities("from RoleUserMapping where id.userId = ?", logonUserId);
+		List<?> exsits = userDao.getEntities("from RoleUserMapping where id.userId = ?1", logonUserId);
     	Map<Long, RoleUserMapping> history = new HashMap<Long, RoleUserMapping>();
     	for(Object obj : exsits) {
     		RoleUserMapping ru = (RoleUserMapping) obj;
@@ -200,14 +200,14 @@ public class LoginService implements ILoginService {
         // 删除之前有，现在没了的角色（可能存在重复的ru，用 userDao.deleteAll( history.values() ) 会删不干净）
         for( RoleUserMapping ru : history.values() ) {
         	RoleUserMappingId ruId = ru.getId();
-			userDao.executeHQL("delete from RoleUserMapping where userId = ? and roleId = ?", ruId.getUserId(), ruId.getRoleId());
+			userDao.executeHQL("delete from RoleUserMapping where userId = ?1 and roleId = ?2", ruId.getUserId(), ruId.getRoleId());
         }
         
         return roleIds;
 	}
 
 	public List<Long> getRoleIdsByUserId(Long userId) {
-		String hql = "select distinct o.id.roleId from ViewRoleUser o where o.id.userId = ? order by o.id.roleId ";
+		String hql = "select distinct o.id.roleId from ViewRoleUser o where o.id.userId = ?1 order by o.id.roleId ";
         return (List<Long>) userDao.getEntities(hql, userId);
     }
     
@@ -229,7 +229,7 @@ public class LoginService implements ILoginService {
 	
 	private List<Object[]> getUserGroups(Long userId, Integer groupType) {
         String hql = "select distinct g.id, g.name, g.domain from Group g, GroupUser gu " +
-        		" where g.id = gu.groupId and gu.userId = ? and g.groupType = ?";
+        		" where g.id = gu.groupId and gu.userId = ?1 and g.groupType = ?2";
         return (List<Object[]>) userDao.getEntities(hql, userId, groupType);
 	}
 

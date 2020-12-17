@@ -94,7 +94,7 @@ public class GroupDao extends TreeSupportDao<Group> implements IGroupDao {
 	public Group findMainGroupByUserId(Long userId){
         // 如此取出来的组唯一，即用户所在的主用户组
 		String hql = "select g from GroupUser gu, Group g " +
-				" where gu.groupId = g.id and gu.userId = ? and g.groupType = ?" +
+				" where gu.groupId = g.id and gu.userId = ?1 and g.groupType = ?2" +
 				" order by g.decode ";
 		List<?> list = getEntities(hql, userId, Group.MAIN_GROUP_TYPE);
         return list.size() > 0 ? (Group)list.get(0) : null;

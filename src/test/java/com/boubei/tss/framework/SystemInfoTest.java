@@ -12,6 +12,7 @@ package com.boubei.tss.framework;
 
 import javax.servlet.http.Cookie;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -29,7 +30,6 @@ import com.boubei.tss.um.AbstractTest4UM;
 import com.boubei.tss.um.UMConstants;
 import com.boubei.tss.um.helper.dto.OperatorDTO;
 
-import junit.framework.Assert;
 
 public class SystemInfoTest extends AbstractTest4UM {
 	

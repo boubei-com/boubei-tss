@@ -106,9 +106,9 @@ public class UserDao extends BaseDao<User> implements IUserDao {
  
 	public User getUserByAccount(String account, boolean vaildate) {
 		account = account.trim();
-	    List<?> users = getEntities("from User o where o.loginName = ? ", account);
+	    List<?> users = getEntities("from User o where o.loginName = ?1 ", account);
 	    if( users.isEmpty() ) {
-	    	users = getEntities("from User o where ? in (o.telephone, o.email) ", account);
+	    	users = getEntities("from User o where ?1 in (o.telephone, o.email) ", account);
 	    }
 	    
         User user = users.size() > 0 ? (User) users.get(0) : null;
@@ -132,20 +132,20 @@ public class UserDao extends BaseDao<User> implements IUserDao {
 	}
 
 	public List<?> findUser2GroupByUserId(Long userId) {
-		return getEntities("from GroupUser o where o.userId = ? ", userId);
+		return getEntities("from GroupUser o where o.userId = ?1 ", userId);
 	}
 
 	public List<?> findRoleUserByUserId(Long userId) {
-		return getEntities("from RoleUser o where o.userId = ? and o.strategyId is null", userId);
+		return getEntities("from RoleUser o where o.userId = ?1 and o.strategyId is null", userId);
 	}
 
 	public List<?> findRolesByUserId(Long userId) {
-		String hql = "select distinct r, ru.strategyId from RoleUser ru, Role r where ru.roleId = r.id and ru.userId = ? order by r.decode ";
+		String hql = "select distinct r, ru.strategyId from RoleUser ru, Role r where ru.roleId = r.id and ru.userId = ?1 order by r.decode ";
 		return getEntities(hql, userId);
 	}
  
 	public GroupUser getGroup2User(Long groupId, Long userId) {
-        List<?> list = getEntities("from GroupUser o where o.groupId = ? and o.userId = ?", groupId, userId);
+        List<?> list = getEntities("from GroupUser o where o.groupId = ?1 and o.userId = ?2", groupId, userId);
 		return !list.isEmpty() ? (GroupUser)list.get(0) : null;
 	}
 	

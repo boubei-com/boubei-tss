@@ -149,7 +149,7 @@ public class ParamServiceImpl implements ParamService, ParamListener {
         // 如果保存的是参数（区分参数组、参数、参数项的概念），则要保证code值对所有“参数”唯一
         Integer type = param.getType();
         if (ParamConstants.NORMAL_PARAM_TYPE.equals(type)) {
-            String hql = "select p.id from Param p where p.type = ? and p.code = ?";
+            String hql = "select p.id from Param p where p.type = ?1 and p.code = ?2";
             String code = param.getCode();
 			List<?> list = paramDao.getEntities(hql, ParamConstants.NORMAL_PARAM_TYPE, code);
             list.remove(param.getId()); // 自己不算

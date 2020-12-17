@@ -26,16 +26,16 @@ public class ApplicationDao extends BaseDao<Application> implements IApplication
 	}
 	
 	public Application getApplication(String applicationId){
-		List<?> list = getEntities("from Application o where o.applicationId = ?", applicationId);
+		List<?> list = getEntities("from Application o where o.applicationId = ?1", applicationId);
 		return list.size() > 0 ? (Application)list.get(0) : null;
 	}
  
     // 删除Operation、ResourceTypeRoot、ResourceType、Application表
 	public void clearDirtyData(String applicationId) {
-        deleteAll(getEntities("from Operation        where applicationId = ?", applicationId));
-        deleteAll(getEntities("from ResourceTypeRoot where applicationId = ?", applicationId));
-        deleteAll(getEntities("from ResourceType     where applicationId = ?", applicationId));
-        deleteAll(getEntities("from Application      where applicationId = ?", applicationId));
+        deleteAll(getEntities("from Operation        where applicationId = ?1", applicationId));
+        deleteAll(getEntities("from ResourceTypeRoot where applicationId = ?1", applicationId));
+        deleteAll(getEntities("from ResourceType     where applicationId = ?1", applicationId));
+        deleteAll(getEntities("from Application      where applicationId = ?1", applicationId));
 		flush();
 	}
  

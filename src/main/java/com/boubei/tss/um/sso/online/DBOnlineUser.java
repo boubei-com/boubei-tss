@@ -17,8 +17,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 import com.boubei.tss.framework.persistence.IEntity;
 import com.boubei.tss.framework.sso.Environment;
@@ -30,11 +31,11 @@ import com.boubei.tss.matrix.MatrixUtil;
  */
 @Entity
 @Table(name="online_user")
-@SequenceGenerator(name = "online_user_sequence", sequenceName = "online_user_sequence", initialValue = 1000, allocationSize = 10)
 public class DBOnlineUser extends OnlineUser implements IEntity {
 	
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "online_user_sequence")
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "online_user_gen")
+    @GenericGenerator(name = "online_user_gen", strategy = "native")
 	private Long id;
     
     private Date   loginTime;

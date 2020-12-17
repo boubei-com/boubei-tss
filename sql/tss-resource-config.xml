@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 注册TSS应用系统、资源类型、操作选项 -->
+<application applicationId="tss" name="TSS">
+	<!-- UM -->
+	<resourceType resourceTypeId="1" name="用户组" seqNo="1" description="用户组织资源"
+		permissionTable="com.boubei.tss.um.entity.permission.GroupPermission"
+		resourceTable="com.boubei.tss.um.entity.permission.GroupResource">
+ 
+		<operation operationId="1" name="查看" seqNo="1" dependParent="2" />
+		<operation operationId="2" name="管理" seqNo="2" dependId="opt1" />
+	</resourceType>
+
+	<resourceType resourceTypeId="2" name="角色" seqNo="2" description="角色资源"
+		permissionTable="com.boubei.tss.um.entity.permission.RolePermission"
+		resourceTable="com.boubei.tss.um.entity.permission.RoleResource">
+
+		<operation operationId="1" name="查看" seqNo="1" dependParent="2" />
+		<operation operationId="2" name="管理" seqNo="2" dependId="opt1" />
+	</resourceType>
+
+	<resourceTypeRoot applicationId="tss" resourceTypeId="1" rootId="-1"/>
+	<resourceTypeRoot applicationId="tss" resourceTypeId="2" rootId="-6"/>
+	
+	<!-- CMS -->
+	<resourceType resourceTypeId="3" name="内容栏目" seqNo="3" description="内容栏目资源" 
+		permissionTable="com.boubei.tss.cms.entity.permission.ChannelPermission" 
+		resourceTable="com.boubei.tss.cms.entity.permission.ChannelResource">
+		
+		<operation operationId="1"  name="查看浏览" seqNo="1" dependParent="2" />
+		<operation operationId="2"  name="新建栏目" seqNo="2" dependId="opt1" />	
+		<operation operationId="3"  name="新建文章" seqNo="3" dependId="opt1" />	
+		<operation operationId="4"  name="发布文章" seqNo="4" dependId="opt1" dependParent="3"/>
+		<operation operationId="5"  name="编辑权限" seqNo="5" dependId="opt1" />
+		<operation operationId="6"  name="删除权限" seqNo="6" dependId="opt1" dependParent="3"/>
+		<operation operationId="7"  name="停用启用" seqNo="7" dependId="opt1" dependParent="2,3"/>
+		<operation operationId="8"  name="排序权限" seqNo="8" dependId="opt1" />
+		<operation operationId="9"  name="移动权限" seqNo="9" dependId="opt1" />	
+	</resourceType>
+	
+	<resourceTypeRoot applicationId="tss" resourceTypeId="3" rootId="-1"/>
+	
+	<!-- portal -->
+	<resourceType resourceTypeId="4" name="门户结构" seqNo="4" description="门户结构资源" 
+		permissionTable="com.boubei.tss.portal.entity.permission.PortalPermission" 
+		resourceTable="com.boubei.tss.portal.entity.permission.PortalResource">
+		
+		<operation operationId="1" name="查看" seqNo="1" description="查看门户结构" dependParent="2"/>
+		<operation operationId="2" name="编辑" seqNo="2" description="编辑门户结构" dependId="opt1" />
+		<operation operationId="3" name="删除" seqNo="3" description="删除门户结构" dependId="opt1" dependParent="3"/>
+		<operation operationId="4" name="增加" seqNo="4" description="增加门户结构" dependId="opt1" />
+		<operation operationId="5" name="排序" seqNo="5" description="排序门户结构" dependId="opt1" />
+		<operation operationId="6" name="停用" seqNo="6" description="停用门户结构" dependId="opt1" dependParent="3"/>
+		<operation operationId="7" name="启用" seqNo="7" description="启用门户结构" dependId="opt1" dependParent="2"/>
+	</resourceType>
+	
+	<resourceType resourceTypeId="5" name="菜单导航" seqNo="5" description="菜单导航资源" 
+		permissionTable="com.boubei.tss.portal.entity.permission.NavigatorPermission" 
+		resourceTable="com.boubei.tss.portal.entity.permission.NavigatorResource">	
+		
+		<operation operationId="1" name="浏览" seqNo="1" description="浏览" dependParent="2" />
+		<operation operationId="2" name="维护" seqNo="2" description="维护" />
+	</resourceType>
+	
+	<resourceTypeRoot applicationId="tss" resourceTypeId="4" rootId="0"/>
+	<resourceTypeRoot applicationId="tss" resourceTypeId="5" rootId="0"/>
+ 
+ 	<!-- DM -->
+	<resourceType resourceTypeId="D1" name="数据报表" seqNo="21" description="数据报表资源" 
+		permissionTable="com.boubei.tss.dm.report.permission.ReportPermission" 
+		resourceTable="com.boubei.tss.dm.report.permission.ReportResource">
+		
+		<operation operationId="1"  name="查看报表" seqNo="1" dependParent="2"/>
+		<operation operationId="2"  name="维护报表" seqNo="2" dependId="opt1" />	
+		<operation operationId="3"  name="删除报表" seqNo="3" dependId="opt1" dependParent="3"/>
+		<operation operationId="4"  name="停用启用" seqNo="4" dependId="opt1" dependParent="2,3"/>
+	</resourceType>
+	<resourceTypeRoot applicationId="tss" resourceTypeId="D1" rootId="0"/>
+	
+	<resourceType resourceTypeId="D2" name="数据表" seqNo="22" description="数据表资源" 
+		permissionTable="com.boubei.tss.dm.record.permission.RecordPermission" 
+		resourceTable="com.boubei.tss.dm.record.permission.RecordResource">
+		
+		<operation operationId="1"  name="录入数据" seqNo="3" dependParent="2"/>
+		<operation operationId="2"  name="定义数据表" seqNo="1" dependId="opt1" />	
+		<operation operationId="3"  name="删除数据表" seqNo="2" dependParent="3"/>
+		<operation operationId="4"  name="浏览数据" seqNo="4" dependParent="2"/>
+		<operation operationId="5"  name="维护数据" seqNo="5" dependId="opt4" />
+	
+	</resourceType>
+	<resourceTypeRoot applicationId="tss" resourceTypeId="D2" rootId="0"/>
+	
+</application>

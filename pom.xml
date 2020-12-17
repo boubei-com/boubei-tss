@@ -19,7 +19,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<tss.version>5.0</tss.version>
 		<jdk.version>1.8</jdk.version>
-		<spring.version>5.1.5.RELEASE</spring.version>
+		<spring.version>5.3.2</spring.version>
 		<hibernate.version>5.3.7.Final</hibernate.version>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 	</properties>
@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.8.3</version>
+			<version>1.9.4</version>
 		</dependency>
 
 		<dependency>
@@ -46,7 +46,7 @@
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
-			<version>1.2.2</version>
+			<version>1.4.15</version>
 		</dependency>
 		<dependency>
 			<groupId>dom4j</groupId>
@@ -185,7 +185,7 @@
 		<dependency>
 		    <groupId>org.quartz-scheduler</groupId>
 		    <artifactId>quartz</artifactId>
-		    <version>2.2.1</version>
+		    <version>2.3.2</version>
 		</dependency>
 
 		<!-- Jackson JSON Mapper -->

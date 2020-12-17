@@ -47,7 +47,7 @@ public class ResourcePermissionImpl extends TreeSupportDao<IDecodable> implement
             throw new BusinessException(EX.parse(EX.U_11, resourceTable));
         }
         
-        String hql = "from " + permissionTable + " t where t.resourceId = ? and t.permissionState = ?";
+        String hql = "from " + permissionTable + " t where t.resourceId = ?1 and t.permissionState = ?2";
 		List<?> parentPermissions = getEntities(hql, resource.getParentId(), UMConstants.PERMIT_SUB_TREE); 
         for (Object temp : parentPermissions) {
         	AbstractPermission parentPermission = (AbstractPermission) temp;
@@ -60,7 +60,7 @@ public class ResourcePermissionImpl extends TreeSupportDao<IDecodable> implement
         
         String applicationID = PermissionHelper.getApplicationID();
 		String permissionTable  = resourceTypeDao.getPermissionTable(applicationID, resourceTypeId);
-        executeHQL("delete " + permissionTable + " t where t.resourceId = ?", resourceId);    // 删除该资源的所有授权信息
+        executeHQL("delete " + permissionTable + " t where t.resourceId = ?1", resourceId);    // 删除该资源的所有授权信息
 	}
  
 	public void moveResource(Long resourceId, String resourceTypeId){
@@ -71,11 +71,11 @@ public class ResourcePermissionImpl extends TreeSupportDao<IDecodable> implement
 		List<?> subTree = getChildrenById(resourceTable, resourceId); // 连同自身节点
 		
 		IResource resource = (IResource) getEntity(BeanUtil.createClassByName(resourceTable), resourceId);
-		String hql = "from " + permissionTable + " t where t.resourceId = ?";
+		String hql = "from " + permissionTable + " t where t.resourceId = ?1";
 		List<?> parentPermissions = getEntities(hql, resource.getParentId()); 
 		
-		String deleteHQL = "delete " + permissionTable + " t where t.resourceId = ? and t.roleId = ? " +
-				" and t.operationId = ? and t.isGrant = ? and t.isPass = ?";
+		String deleteHQL = "delete " + permissionTable + " t where t.resourceId = ?1 and t.roleId = ?2 " +
+				" and t.operationId = ?3 and t.isGrant = ?4 and t.isPass = ?5";
 		
 		for (Object temp : parentPermissions) {
         	AbstractPermission parentPermission = (AbstractPermission) temp;

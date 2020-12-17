@@ -29,7 +29,7 @@ public class ResourceTypeDao extends BaseDao<ResourceType> implements IResourceT
 	}
  
 	public ResourceTypeRoot getResourceTypeRoot(String applicationId,String resourceTypeId){
-		String hql = " from ResourceTypeRoot o where upper(o.applicationId) = ? and o.resourceTypeId = ?";
+		String hql = " from ResourceTypeRoot o where upper(o.applicationId) = ?1 and o.resourceTypeId = ?2";
         List<?> list = getEntities(hql, applicationId.toUpperCase(), resourceTypeId );
         if (list.isEmpty()) {
 			throw new BusinessException(EX.parse(EX.U_09, applicationId, resourceTypeId));
@@ -38,7 +38,7 @@ public class ResourceTypeDao extends BaseDao<ResourceType> implements IResourceT
 	}
  
     public ResourceType getResourceType(String applicationId, String resourceTypeId) {
-    	String hql = " from ResourceType o where upper(o.applicationId) = ? and o.resourceTypeId = ?";
+    	String hql = " from ResourceType o where upper(o.applicationId) = ?1 and o.resourceTypeId = ?2";
 		List<?> list = getEntities(hql, applicationId.toUpperCase(), resourceTypeId);
 		if (list.isEmpty()) {
 			throw new BusinessException(EX.parse(EX.U_10, applicationId, resourceTypeId));
@@ -55,12 +55,12 @@ public class ResourceTypeDao extends BaseDao<ResourceType> implements IResourceT
     }
  
     public List<?> getOperationIds(String applicationId, String resourceTypeId) {
-        String hql = "select t.operationId from Operation t where upper(t.applicationId) = ? and t.resourceTypeId = ? order by t.seqNo";
+        String hql = "select t.operationId from Operation t where upper(t.applicationId) = ?1 and t.resourceTypeId = ?2 order by t.seqNo";
         return getEntities(hql, applicationId.toUpperCase(), resourceTypeId);
     }
  
     public List<?> getOperations(String applicationId, String resourceTypeId) {
-        String hql = " from Operation t where upper(t.applicationId) = ? and t.resourceTypeId = ? order by t.seqNo";
+        String hql = " from Operation t where upper(t.applicationId) = ?1 and t.resourceTypeId = ?2 order by t.seqNo";
         return getEntities(hql, applicationId.toUpperCase(), resourceTypeId);
     }
 }

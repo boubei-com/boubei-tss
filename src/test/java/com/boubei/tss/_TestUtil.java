@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
+import org.junit.Assert;
 
 import com.boubei.tss.cache.Cacheable;
 import com.boubei.tss.cache.JCache;
@@ -33,9 +34,8 @@ import com.boubei.tss.modules.log.LogQueryCondition;
 import com.boubei.tss.modules.log.LogService;
 import com.boubei.tss.util.EasyUtils;
 import com.boubei.tss.util.FileHelper;
+import com.boubei.tss.util.MathUtil;
 import com.boubei.tss.util.URLUtil;
-
-import junit.framework.Assert;
 
 public class _TestUtil {
 	
@@ -74,16 +74,17 @@ public class _TestUtil {
     public static void mockPermission(String table, String resourceName, Long resourceId, 
     		Long roleId, String operation, int permissionState, int isGrant, int isPass) {
     	
-    	Object[] params = new Object[] { resourceName, resourceId, roleId, operation, permissionState,isGrant,isPass };
-		SQLExcutor.excuteInsert("insert into " +table+ "(resourcename,resourceId,roleId,operationId,permissionState,isGrant,isPass) " +
-				"values (?,?,?,?,?,?,?)", params , "connectionpool");
+    	Long id = System.currentTimeMillis() - MathUtil.randomInt6();
+    	Object[] params = new Object[] { resourceName, resourceId, roleId, operation, permissionState,isGrant,isPass, id };
+		SQLExcutor.excuteInsert("insert into " +table+ "(resourcename,resourceId,roleId,operationId,permissionState,isGrant,isPass,id) " +
+				"values (?,?,?,?,?,?,?,?)", params , "connectionpool");
     }
 	
 	public static String getProjectDir() {
         String path = URLUtil.getResourceFileUrl("application.properties").getPath();
         
         int beginIndex = path.startsWith("/") ? 0 : 1; // linux or windows
-        return path.substring(beginIndex, path.indexOf(PROJECT_NAME) + PROJECT_NAME.length());
+        return path.substring(beginIndex, path.indexOf("target") - 1 );
     }
 	
     public static String getInitSQLDir() {

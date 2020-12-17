@@ -115,7 +115,7 @@ public class MessageService implements IMessageService {
 	}
 	
 	public List<?> getUnReadHignLevelMsg(int days) {
-		String hql = "from Message where level = ? and receiverId = ? and sendTime > ? and readTime is null order by id desc";
+		String hql = "from Message where level = ?1 and receiverId = ?2 and sendTime > ?3 and readTime is null order by id desc";
 		Object userId = Environment.getNotnullUserId();
 		return commonDao.getEntities(hql, Message.LEVEL_LIST[2], userId, DateUtil.subDays(new Date(), days));
 	}

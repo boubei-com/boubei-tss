@@ -48,7 +48,7 @@ public class ParamDaoImpl extends TreeSupportDao<Param> implements ParamDao {
     @SuppressWarnings("unchecked")
 	public List<Param> getChildrenByDecode(String decode) {
     	String hql = "from Param o " +
-    			" where  o.decode <> ? and o.decode like ? and o.disabled <> 1 order by o.decode";
+    			" where  o.decode <> ?1 and o.decode like ?2 and o.disabled <> 1 order by o.decode";
         return (List<Param>) getEntities(hql, decode, decode + "%");
     }
 }
