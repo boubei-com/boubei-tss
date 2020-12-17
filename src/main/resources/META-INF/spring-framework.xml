@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>  
-<beans xmlns="http://www.springframework.org/schema/beans" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns:context="http://www.springframework.org/schema/context" 
-	xmlns:tx="http://www.springframework.org/schema/tx" 
-	xmlns:p="http://www.springframework.org/schema/p" 
-	xmlns:aop="http://www.springframework.org/schema/aop" 
-	xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-3.0.xsd  http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-3.0.xsd  http://www.springframework.org/schema/tx  http://www.springframework.org/schema/tx/spring-tx-3.0.xsd  http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
- 
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop.xsd">
+
 	<!-- 在主容器中，将Controller的注解排除掉. 注：过滤包目录需要spring-mvc.xml里一致  -->
 	<context:component-scan base-package="com.boubei"> 
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" /> 
@@ -54,6 +64,39 @@
 				<value>queryCacheInterceptor</value>
 				<value>cacheInterceptor</value>
 				<value>businessLogInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<value>*Service</value>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>accessLogInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 资源权限自动补齐拦截器  -->
+	<bean id="ResourcePermissionInterceptor" class="com.boubei.tss.um.permission.ResourcePermissionInterceptor"/>
+	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames"> <value>*DAO, *Dao</value> </property>
+		<property name="interceptorNames">
+			<list>
+				<value>ResourcePermissionInterceptor</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 对资源进行权限过滤或检查的拦截器 -->
+	<bean id="PermissionCheckInterceptor" class="com.boubei.tss.um.permission.filter.PermissionCheckInterceptor"/>
+	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames"> <value> *Service, *DAO, *Dao </value> </property>
+		<property name="interceptorNames">
+			<list>
+				<value>PermissionCheckInterceptor</value>
 			</list>
 		</property>
 	</bean>

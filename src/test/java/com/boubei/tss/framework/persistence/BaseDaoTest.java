@@ -75,7 +75,7 @@ public class BaseDaoTest extends AbstractTest4F {
     
     @Test
     public void testGetEntities() {
-    	String hql = " from _User t where t.userName = ? ";
+    	String hql = " from _User t where t.userName = ?1 ";
 		List<?> result = dao.getEntities(hql, "JohnXa");
 		try {
 			result = dao.getEntities(hql, new Object[] {null});

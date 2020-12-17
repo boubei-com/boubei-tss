@@ -47,7 +47,7 @@ public class TempTableTest extends AbstractTest4F {
 		rt = commonDao.getEntitiesByNativeSql("select count(*) from TBL_TEMP_");
 		System.out.println(rt.get(0));
 		
-		List<?> temps = commonDao.getEntities("from Temp where thread=?", Environment.threadID());
+		List<?> temps = commonDao.getEntities("from Temp where thread=?1", Environment.threadID());
 		Assert.assertEquals(3, temps.size());
 		Temp t1 = (Temp) temps.get(0);
 		Assert.assertEquals(t1.getThread().longValue(), Environment.threadID());

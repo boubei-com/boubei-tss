@@ -78,7 +78,7 @@ public class DecodeInterceptorTest extends AbstractTest4F {
             }
         }
         
-        List<_Group> list = umSerivce.queryGroups("from _Group o where o.decode <> ? and o.decode like ? order by o.decode", 
+        List<_Group> list = umSerivce.queryGroups("from _Group o where o.decode <> ?1 and o.decode like ?2 order by o.decode", 
                 "0000100002", "0000100002%");
         log.info(list.size());
         for(_Group temp : list) {

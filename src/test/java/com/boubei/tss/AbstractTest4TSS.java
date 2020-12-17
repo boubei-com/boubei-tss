@@ -27,6 +27,7 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.boubei.tss.dm.DMConstants;
@@ -76,12 +77,11 @@ import com.boubei.tss.util.XMLDocUtil;
         locations={
             "classpath:META-INF/spring-test.xml",  
             "classpath:META-INF/spring-framework.xml",  
-            "classpath:META-INF/spring-um.xml",
-            "classpath:META-INF/spring-dm.xml",
             "classpath:META-INF/spring-mvc.xml"
         } 
         , inheritLocations = false // 是否要继承父测试用例类中的 Spring 配置文件，默认为 true
       )
+@WebAppConfiguration
 @Rollback
 @Transactional // 自动回滚，每个用力测试完成后自动清空产生的数据
 public abstract class AbstractTest4TSS extends AbstractTransactionalJUnit4SpringContextTests { 

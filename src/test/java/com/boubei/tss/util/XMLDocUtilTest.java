@@ -36,7 +36,7 @@ public class XMLDocUtilTest {
 
         Element node = XMLDocUtil.map2DataNode(map, "row");
         
-        String dataXml = "<row><id><![CDATA[23]]></id><id><![CDATA[&lt;![CDATA[sss]]&gt;]]></id><email><![CDATA[jinpj@g-soft.com.cn]]></email><age><![CDATA[24]]></age><tel><![CDATA[057188889999]]></tel><tel><![CDATA[13588899889]]></tel></row>";
+        String dataXml = "<row><tel><![CDATA[057188889999]]></tel><tel><![CDATA[13588899889]]></tel><id><![CDATA[23]]></id><id><![CDATA[&lt;![CDATA[sss]]&gt;]]></id><email><![CDATA[jinpj@g-soft.com.cn]]></email><age><![CDATA[24]]></age></row>";
         assertEquals(dataXml, node.asXML());
 
         Assert.assertEquals(4, XMLDocUtil.dataNodes2Map(node).size());
@@ -68,7 +68,7 @@ public class XMLDocUtilTest {
 			Assert.assertTrue("读取XML文件出错", true);
 		}
 		
-		String licenseFile = URLUtil.getResourceFileUrl("cpu.license").getFile();
+		String licenseFile = URLUtil.getResourceFileUrl("H2.properties").getFile();
 		try {
 			XMLDocUtil.createDocByAbsolutePath2( licenseFile );
 		} catch (Exception e) {

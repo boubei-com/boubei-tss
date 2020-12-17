@@ -28,7 +28,7 @@ import com.boubei.tss.framework.persistence.entityaop.OperateInfo;
 
 @Entity
 @Table(name="test_user", uniqueConstraints = { @UniqueConstraint(columnNames = { "userName" }) })
-@SequenceGenerator(name = "test_user_sequence", sequenceName = "test_user_sequence", initialValue = 1000, allocationSize = 10)
+@SequenceGenerator(name = "test_user_sequence", sequenceName = "test_user_sequence", initialValue = 1, allocationSize = 10)
 public class _User extends OperateInfo implements IEntity {
     
     @Id

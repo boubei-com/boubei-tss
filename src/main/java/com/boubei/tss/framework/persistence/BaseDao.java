@@ -392,7 +392,7 @@ public abstract class BaseDao<T extends IEntity> implements IDao<T>{
     
     public void clearTempTable() {
         long threadID = Environment.threadID();
-		deleteAll( getEntities("from Temp where thread=?", threadID) );
+		deleteAll( getEntities("from Temp where thread = ?1", threadID) );
 		flush();
 		
 		// 强制用SQL再删除一遍，以防get/select/query打头的service方法没有写事务

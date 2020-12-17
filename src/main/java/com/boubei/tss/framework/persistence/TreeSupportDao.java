@@ -46,7 +46,7 @@ public class TreeSupportDao<T extends IDecodable> extends BaseDao<T> implements 
     }
     
     public Integer getNextSeqNo(String entityName, Long parentId) {
-        String hql = "select max(o.seqNo) from " + entityName + " o where o.parentId = ?";
+        String hql = "select max(o.seqNo) from " + entityName + " o where o.parentId = ?1";
         List<?> list = getEntities(hql, parentId); 
         return (!list.isEmpty() && list.get(0) != null) ? (Integer) list.get(0) + 1 : 1;
     }
@@ -59,7 +59,7 @@ public class TreeSupportDao<T extends IDecodable> extends BaseDao<T> implements 
      */
     @SuppressWarnings("unchecked")
     public List<T> getChildrenByDecode(String decode){
-        String hql = "from " + entityName + " o where  o.decode <> ? and o.decode like ? order by o.decode";
+        String hql = "from " + entityName + " o where  o.decode <> ?1 and o.decode like ?2 order by o.decode";
         return (List<T>) getEntities(hql, decode, decode + "%");
     }
     
@@ -75,7 +75,7 @@ public class TreeSupportDao<T extends IDecodable> extends BaseDao<T> implements 
     
     public List<?> getChildrenById(String entityName, Long id){
         String hql = "select o from " + entityName + " o, " + entityName + " o1 " +
-        		" where o.decode like o1.decode||'%' and o1.id=? order by o.decode";
+        		" where o.decode like o1.decode||'%' and o1.id = ?1 order by o.decode";
         return getEntities(hql, id);
     }
     
@@ -87,7 +87,7 @@ public class TreeSupportDao<T extends IDecodable> extends BaseDao<T> implements 
     @SuppressWarnings("unchecked")
     public List<T> getChildrenExcludeSelfByDocode(String decode){
         String hql = "select o from " + entityName + " o " + 
-                " where o.decode like ? and o.decode <> ? order by o.decode";
+                " where o.decode like ?1 and o.decode <> ?2 order by o.decode";
         return (List<T>)getEntities(hql, decode + "%", decode);
     }
     
@@ -103,7 +103,7 @@ public class TreeSupportDao<T extends IDecodable> extends BaseDao<T> implements 
     
     public List<?> getParentsById(String entityName, Long id){
         String hql = "select o from " + entityName + " o, " + entityName + " o1 " +
-        		" where o1.decode like o.decode||'%' and o1.id=? order by o.decode";
+        		" where o1.decode like o.decode||'%' and o1.id=?1 order by o.decode";
         return getEntities(hql, id);
     }
     
@@ -125,7 +125,7 @@ public class TreeSupportDao<T extends IDecodable> extends BaseDao<T> implements 
         //如果资源表中找不到了该id对应的资源，则可能该资源已经被删除
         if(startnode == null) return new ArrayList<Object>();
 
-        String hql = "from " + entityName + " o where ? like o.decode || '%' ";
+        String hql = "from " + entityName + " o where ?1 like o.decode || '%' ";
         if (breaknode != null) {
             hql += " and decode like '" +breaknode.getDecode()+ "%' ";
         }
@@ -145,7 +145,7 @@ public class TreeSupportDao<T extends IDecodable> extends BaseDao<T> implements 
     public List<T> getRelationsNodeWhenSort(Long parentId, Integer sourceOrder, Integer targetOrder){
         Integer max = sourceOrder.compareTo(targetOrder) > 0 ? sourceOrder : targetOrder;
         Integer min = sourceOrder.compareTo(targetOrder) > 0 ? targetOrder : sourceOrder;
-        String hql = " from " + entityName + " o where o.seqNo < ? and o.seqNo > ? and o.parentId = ?";
+        String hql = " from " + entityName + " o where o.seqNo < ?1 and o.seqNo > ?2 and o.parentId = ?3";
         return (List<T>) getEntities(hql, max, min, parentId);
     }
     

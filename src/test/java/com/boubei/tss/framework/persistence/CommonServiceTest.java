@@ -50,7 +50,7 @@ public class CommonServiceTest extends AbstractTest4F {
         
         Assert.assertNotNull(commonService.getEntity(_User.class, user.getId()));
  
-    	String hql = " from _User t where t.userName = ? ";
+    	String hql = " from _User t where t.userName = ?1 ";
 		List<?> result = commonService.getList(hql, "JonKing");
 		Assert.assertEquals(1, result.size());
 		try {
