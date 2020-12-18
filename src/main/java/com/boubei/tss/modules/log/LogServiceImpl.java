@@ -29,7 +29,7 @@ public class LogServiceImpl implements LogService {
     public List<?> getAllOperateObjects() {
     	Date day = DateUtil.subDays(new Date(), 7);
         return dao.getEntities("select distinct o.operateTable from Log o " +
-        		" where o.operateTime >= ? order by o.operateTable", day);
+        		" where o.operateTime >= ?1 order by o.operateTable", day);
     }
 
     public PageInfo getLogsByCondition(LogQueryCondition condition) {

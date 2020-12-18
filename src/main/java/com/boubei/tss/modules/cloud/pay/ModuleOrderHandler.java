@@ -100,7 +100,7 @@ public class ModuleOrderHandler extends AbstractProduct {
 		createSubAuthorize(isNewDomain); 
 
 		// 如果此时还没有选择 购买过此模块， 在此创建 ModuleUser 映射关系
-		String hql = "from ModuleUser where userId = ? and moduleId = ? and domain = ? and isBuy = 1";
+		String hql = "from ModuleUser where userId = ?1 and moduleId = ?2 and domain = ?3 and isBuy = 1";
 		List<?> list = dao.getEntities(hql, buyerId, module_id, domain);
 		if (list.isEmpty()) {
 			ModuleUser mu = new ModuleUser(buyerId, module_id);
@@ -119,7 +119,7 @@ public class ModuleOrderHandler extends AbstractProduct {
 			price_def = (String) EasyUtils.checkNull(md.getPrice_def(), priceDefDefault);
 		} else {
 			// 查找这个用户的设置价格 优先取针对用户的报价，其次是-1的（代理设置的默认价）
-			String hql = " select price from ProxyPrice where buyer = ? and creator = ? and module.id = ? ";
+			String hql = " select price from ProxyPrice where buyer = ?1 and creator = ?2 and module.id = ?3 ";
 			List<?> proxyPrices = dao.getEntities(hql, co.getCreator(), proxy.getLoginName(), co.getModule_id());
 			if (proxyPrices.isEmpty()) {
 				proxyPrices = dao.getEntities(hql, "default", proxy.getLoginName(), co.getModule_id());

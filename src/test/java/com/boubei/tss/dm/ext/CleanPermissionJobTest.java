@@ -12,10 +12,12 @@ package com.boubei.tss.dm.ext;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.test.annotation.Commit;
 
 import com.boubei.tss.AbstractTest4DM;
 
 
+@Commit
 public class CleanPermissionJobTest extends AbstractTest4DM {
 
 	@Test
@@ -27,6 +29,7 @@ public class CleanPermissionJobTest extends AbstractTest4DM {
         	Assert.assertTrue( job.needSuccessLog() );
 		} 
 		catch(Exception e) {
+			log.error(e);
 			Assert.assertFalse(true);
         }
 	}

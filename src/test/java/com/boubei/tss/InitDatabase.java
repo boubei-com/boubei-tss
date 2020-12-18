@@ -28,12 +28,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.boubei.tss.cms.CMSConstants;
-import com.boubei.tss.cms.entity.Article;
-import com.boubei.tss.cms.entity.Channel;
-import com.boubei.tss.cms.entity.permission.ChannelPermission;
-import com.boubei.tss.cms.service.IArticleService;
-import com.boubei.tss.cms.service.IChannelService;
 import com.boubei.tss.dm.DMConstants;
 import com.boubei.tss.dm.dml.SQLExcutor;
 import com.boubei.tss.dm.ext.ImportRecord;
@@ -99,8 +93,6 @@ public class InitDatabase extends AbstractTransactionalJUnit4SpringContextTests 
     
     @Autowired private IComponentService elementService;
     @Autowired private INavigatorService navigatorService;
-    @Autowired private IChannelService channelService;
-    @Autowired private IArticleService articleService;
     
     @Autowired private ReportService reportService;
     @Autowired private RecordService recordService;
@@ -144,7 +136,6 @@ public class InitDatabase extends AbstractTransactionalJUnit4SpringContextTests 
  
         initUM();
         initDM();
-        initCMS();
         initPortal();
         
         importSystemProperties();
@@ -165,7 +156,7 @@ public class InitDatabase extends AbstractTransactionalJUnit4SpringContextTests 
     }
  
     /**
-     * 初始化UM、CMS、Portal相关应用、资源类型、权限选型信息
+     * 初始化UM、资源类型、权限选型信息
      */
     private void initUM() {
         /* 初始化应用系统、资源、权限项 */
@@ -195,42 +186,6 @@ public class InitDatabase extends AbstractTransactionalJUnit4SpringContextTests 
         
         Param dlParam = ParamManager.addComboParam(group.getId(), PX.DATASOURCE_LIST, "数据源列表");
         ParamManager.addParamItem(dlParam.getId(), "connectionpool", "本地数据源", ParamConstants.COMBO_PARAM_MODE);
-    }
-    
-    private void initCMS() {
-    	 Channel site = new Channel();
-         site.setParentId(CMSConstants.HEAD_NODE_ID);
-         site.setName("我的站点");
-         site.setPath("temp");
-         site.setDocPath("doc");
-         site.setImagePath("img");
-         site.setOverdueDate("0");
-         
-         site = channelService.createSite(site);
-         
-         Channel channel = new Channel();
-         channel.setName("公告栏");
-         channel.setOverdueDate(site.getOverdueDate());
-         channel.setParentId(site.getId());
-         channel = channelService.createChannel(channel);
-         
-         Article article = new Article();
-         article.setTitle("欢迎来到它山石的世界");
-         article.setAuthor("Jon.King");
-         article.setKeyword("它山石 BI 数据管理");
-         article.setChannel(channel);
-         String content = " 欢迎来到它山石的世界";
-         article.setContent(content);
-         article.setStatus(CMSConstants.TOPUBLISH_STATUS);
-         articleService.createArticle(article, channel.getId(), "", -1L);
-         
-         ph.createPermission(UMConstants.DOMAIN_ROLE_ID, site, CMSConstants.OPERATION_VIEW, 1, 0, 0, ChannelPermission.class.getName());
-         ph.createPermission(UMConstants.DOMAIN_ROLE_ID, channel, CMSConstants.OPERATION_VIEW, 1, 0, 0, ChannelPermission.class.getName());
-         ph.createPermission(UMConstants.DOMAIN_ROLE_ID, channel, CMSConstants.OPERATION_ADD_ARTICLE, 1, 0, 0, ChannelPermission.class.getName());
-         ph.createPermission(UMConstants.DOMAIN_ROLE_ID, channel, CMSConstants.OPERATION_EDIT, 1, 0, 0, ChannelPermission.class.getName());
-         ph.createPermission(UMConstants.DOMAIN_ROLE_ID, channel, CMSConstants.OPERATION_PUBLISH, 1, 0, 0, ChannelPermission.class.getName());
-         
-         ph.createPermission(UMConstants.ANONYMOUS_ROLE_ID, channel, CMSConstants.OPERATION_VIEW, 1, 0, 0, ChannelPermission.class.getName());
     }
     
     /** 初始化默认的修饰器，布局器 */

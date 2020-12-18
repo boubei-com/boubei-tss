@@ -39,7 +39,7 @@ public class AccountAction {
 	@ResponseBody
 	public Account queryAccount() {
 		Long userID = Environment.getUserId();
-		List<?> accounts = commService.getList(" from Account where belong_user_id = ?", userID);
+		List<?> accounts = commService.getList(" from Account where belong_user_id = ?1", userID);
 		if (accounts.size() > 0) {
 			return (Account) accounts.get(0);
 		}
@@ -75,14 +75,14 @@ public class AccountAction {
 	@RequestMapping(value = "/subauthorize", method = RequestMethod.GET)
 	@ResponseBody
 	public List<?> querySubAuthorize() {
-		return commService.getList(" from SubAuthorize where buyerId = ? order by id desc", Environment.getUserId());
+		return commService.getList(" from SubAuthorize where buyerId = ?1 order by id desc", Environment.getUserId());
 	}
 
 	@RequestMapping(value = "/subauthorize/role", method = RequestMethod.GET)
 	@ResponseBody
 	public List<?> querySubAuthorizeRoles(Long strategyId) {
 		String hql = "select ru, r.name, r.description from RoleUser ru, Role r "
-				+ " where ru.strategyId = ? and ru.roleId = r.id and ru.moduleId is not null " + " order by r.decode desc";
+				+ " where ru.strategyId = ?1 and ru.roleId = r.id and ru.moduleId is not null " + " order by r.decode desc";
 		return commService.getList(hql, strategyId);
 	}
 
@@ -111,7 +111,7 @@ public class AccountAction {
 	@RequestMapping("/subauthorize/check")
 	@ResponseBody
 	public Object[] checkSubAuthorizeExpire() {
-		String hql = "select count(id), min(endDate) from SubAuthorize where ? in (buyerId, ownerId) and endDate between ? and ?";
+		String hql = "select count(id), min(endDate) from SubAuthorize where ?1 in (buyerId, ownerId) and endDate between ?2 and ?3";
 		int preDays = EasyUtils.obj2Int(ParamConfig.getAttribute(PX.SA_EXPIRE_NOTIFY_DAYS, "10"));
 		Date day1 = DateUtil.addDays(-1);      // 过去1天内已过期
 		Date day2 = DateUtil.addDays(preDays); // 未来10天内即将过期

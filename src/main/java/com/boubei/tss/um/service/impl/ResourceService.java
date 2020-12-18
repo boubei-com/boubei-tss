@@ -80,7 +80,7 @@ public class ResourceService implements IResourceService{
 		ResourceType resourceType = resourceTypeDao.getEntity(id);
 		
         // 删除Operation表
-		List<?> operationList = resourceTypeDao.getEntities("from Operation o where o.resourceTypeId = ?", resourceType.getResourceTypeId());
+		List<?> operationList = resourceTypeDao.getEntities("from Operation o where o.resourceTypeId = ?1", resourceType.getResourceTypeId());
 		for(Object obj : operationList) {
 		    removeOperation(((Operation)obj).getId());
 		}
@@ -96,7 +96,7 @@ public class ResourceService implements IResourceService{
         ResourceType resourceType = resourceTypeDao.getResourceType(operation.getApplicationId(), operation.getResourceTypeId());
         String permissionTable = resourceType.getPermissionTable();
         String operationId = operation.getOperationId();
-		resourceTypeDao.deleteAll(resourceTypeDao.getEntities("from " + permissionTable   + " o where o.operationId = ?", operationId));
+		resourceTypeDao.deleteAll(resourceTypeDao.getEntities("from " + permissionTable   + " o where o.operationId = ?1", operationId));
 	}
     
 	public void saveApplication(Application application) {

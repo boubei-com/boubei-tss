@@ -81,7 +81,7 @@ public class PermissionHelper extends TreeSupportDao<IDecodable> {
     public List<String> getOperationsByResource(Long resourceId, String permissionTable, Class<?> resourceClass, Long userId) {
     	List<String> operations = new ArrayList<String>();
         String hql = "select distinct p.operationId from " + permissionTable + " p, RoleUserMapping ru "  +
-                " where p.resourceId = ? and p.roleId = ru.id.roleId and ru.id.userId = ? ";  
+                " where p.resourceId = ?1 and p.roleId = ru.id.roleId and ru.id.userId = ?2 ";  
         
         userId = (Long) EasyUtils.checkNull(userId, Anonymous._ID);
 		List<?> operationsOnResource = getEntities(hql, resourceId, userId);
@@ -102,7 +102,7 @@ public class PermissionHelper extends TreeSupportDao<IDecodable> {
      * 判断某个角色对指定的资源节点是否拥有某项权限
      */
     public List<?> getOperationsByResourceAndRole(String permissionTable, Long resourceId, Long roleId) {
-        String hql = "select distinct p.operationId from " + permissionTable + " p  where p.resourceId = ? and p.roleId = ? ";  
+        String hql = "select distinct p.operationId from " + permissionTable + " p  where p.resourceId = ?1 and p.roleId = ?2 ";  
 		return getEntities(hql, resourceId, roleId);
     }
     
@@ -192,7 +192,7 @@ public class PermissionHelper extends TreeSupportDao<IDecodable> {
     }
 
     public static String permissionCondition() {
-        return " where ru.id.roleId = p.roleId and ru.id.userId = ? and o.id = p.resourceId and p.operationId = ? ";
+        return " where ru.id.roleId = p.roleId and ru.id.userId = ?1 and o.id = p.resourceId and p.operationId = ?2 ";
     }
 
     public static String permissionConditionII() {
@@ -241,7 +241,7 @@ public class PermissionHelper extends TreeSupportDao<IDecodable> {
 	 */
 	public void deletePermissionByRole(Long roleId, String permissionRank, String permissionTable, String resourceTable) {
         String rankCondition = genRankCondition4DeleletePermission(permissionRank);
-        List<?> exsitPermissions = getEntities(" from " + permissionTable + " p where p.roleId = ? " + rankCondition, roleId);
+        List<?> exsitPermissions = getEntities(" from " + permissionTable + " p where p.roleId = ?1 " + rankCondition, roleId);
         deleteAll(exsitPermissions);
 	}
 	
@@ -258,7 +258,7 @@ public class PermissionHelper extends TreeSupportDao<IDecodable> {
 	 */
 	public void deletePermissionByResource(Long resourceId, String permissionRank, String permissionTable, String resourceTable) {
         String rankCondition = genRankCondition4DeleletePermission(permissionRank);
-        List<?> exsitPermissions = getEntities(" from " + permissionTable + " p where p.resourceId = ? " + rankCondition, resourceId);
+        List<?> exsitPermissions = getEntities(" from " + permissionTable + " p where p.resourceId = ?1 " + rankCondition, resourceId);
     	deleteAll(exsitPermissions); 
     	
     	// 根据这些记录的PermissionState值，来判断在删除补全表时是否删除子节点的权限
@@ -271,7 +271,7 @@ public class PermissionHelper extends TreeSupportDao<IDecodable> {
             if (permission.getPermissionState().equals(UMConstants.PERMIT_SUB_TREE)) { 
                 List<?> childResources = getChildrenById(resourceTable, resourceId);
                 for (Object child : childResources) {
-                    String hql = "delete " + permissionTable + " p where" + " p.resourceId=? and p.roleId=? and p.operationId=? ";
+                    String hql = "delete " + permissionTable + " p where" + " p.resourceId=?1 and p.roleId=?2 and p.operationId=?3 ";
                     executeHQL(hql + rankCondition, ((IResource) child).getId(), roleId, operationId);
                 }
             } 
@@ -414,7 +414,7 @@ public class PermissionHelper extends TreeSupportDao<IDecodable> {
 	public List<PermissionDTO> getOneResourcePermissions(String permissionRank, String permissionTable, Long resourceId) {
 		String hql = "select distinct p.resourceId, p.operationId, p.permissionState, max(p.isGrant), max(p.isPass), p.roleId"
 				+ " from " + permissionTable + " p, Temp t " 
-				+ " where t.thread=" + Environment.threadID() + " and t.id=p.roleId and p.resourceId = ? " 
+				+ " where t.thread=" + Environment.threadID() + " and t.id=p.roleId and p.resourceId = ?1 " 
 				+ genRankCondition4SelectPermission(permissionRank) 
 				+ " group by p.resourceId, p.operationId, p.permissionState, p.roleId";
 
@@ -439,7 +439,7 @@ public class PermissionHelper extends TreeSupportDao<IDecodable> {
     public List<Long> getResourceIdsByOperation(String permissionTable, String operation, Long operatorId){
     	operatorId = (Long) EasyUtils.checkNull(operatorId, Anonymous.one.getId());
         String hql = "select distinct p.resourceId from RoleUserMapping ur, " + permissionTable + " p" +
-              " where p.operationId = ? and p.roleId = ur.id.roleId and ur.id.userId = ? ";
+              " where p.operationId = ?1 and p.roleId = ur.id.roleId and ur.id.userId = ?2 ";
         return (List<Long>) getEntities( hql, operation, operatorId );
     }
     

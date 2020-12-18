@@ -40,7 +40,7 @@ public class ByDayETLJob extends AbstractETLJob {
 	}
  
 	protected  List<String> getExsitDays(Long taskId) {
-		String hql = "select distinct dataDay from TaskLog where taskId = ? and exception='no'";
+		String hql = "select distinct dataDay from TaskLog where taskId = ?1 and exception='no'";
 		List<String> exsitDays = new ArrayList<String>();
 		List<?> list = commonService.getList(hql, taskId);
 		for(Object obj : list) {

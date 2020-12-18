@@ -21,7 +21,7 @@ public class JobServiceImpl implements JobService {
 	@Autowired IBusinessLogger businessLogger;
 	
 	public String excuteJob(String jobKey, Object tag) {
-		List<?> list = commonDao.getEntities("from JobDef where ? in (id, code) ", jobKey);
+		List<?> list = commonDao.getEntities("from JobDef where ?1 in (id, code) ", jobKey);
 		if( list.isEmpty() ) {
 			throw new BusinessException( EX.parse(EX.XX_NOT_FOUND, jobKey, "Job") );
 		}
@@ -36,7 +36,7 @@ public class JobServiceImpl implements JobService {
 	}
 
 	public String excuteTask(String idOrName, Object tag) {
-		List<?> list = commonDao.getEntities("from Task where ? in (id, name) ", idOrName);
+		List<?> list = commonDao.getEntities("from Task where ?1 in (id, name) ", idOrName);
 		if( list.isEmpty() ) {
 			throw new BusinessException( EX.parse(EX.XX_NOT_FOUND, idOrName, "ETL") );
 		}

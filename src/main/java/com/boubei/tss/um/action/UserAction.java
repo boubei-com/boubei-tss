@@ -403,7 +403,7 @@ public class UserAction extends BaseActionSupport {
 				Context.sessionMap.get(sessionId).invalidate();
 			} catch(Exception e) { }
 			
-			List<?> list = commonService.getList("from DBOnlineUser where sessionId = ?", sessionId);
+			List<?> list = commonService.getList("from DBOnlineUser where sessionId = ?1", sessionId);
 			for(Object o : list) {
 				commonService.delete(DBOnlineUser.class, ((DBOnlineUser)o).getId() );
 			}

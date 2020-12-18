@@ -28,10 +28,10 @@ import com.boubei.tss.framework.sso.context.Context;
 import com.boubei.tss.modules.cloud.entity.DomainInfo;
 import com.boubei.tss.modules.cloud.entity.ModuleDef;
 import com.boubei.tss.modules.cloud.entity.ModuleUser;
+import com.boubei.tss.modules.menu.INavigatorService;
+import com.boubei.tss.modules.menu.Navigator;
+import com.boubei.tss.modules.menu.PortalConstants;
 import com.boubei.tss.modules.param.ParamConstants;
-import com.boubei.tss.portal.PortalConstants;
-import com.boubei.tss.portal.entity.Navigator;
-import com.boubei.tss.portal.service.INavigatorService;
 import com.boubei.tss.um.UMConstants;
 import com.boubei.tss.um.action.SubAuthorizeAction;
 import com.boubei.tss.um.service.IGroupService;
@@ -168,7 +168,7 @@ public class ModuleTest extends AbstractTest4DM {
 		menuService.getMenuTree(0L);
 		menuService.getMenuTree(1L);
 		
-		List<?> roleIds = commonDao.getEntities("select roleId from RoleUser where moduleId = ? and userId = ?", moduleId, domainUser.getId());
+		List<?> roleIds = commonDao.getEntities("select roleId from RoleUser where moduleId = ?1 and userId = ?2", moduleId, domainUser.getId());
 		Assert.assertEquals(3, roleIds.size());
 		Assert.assertTrue(roleIds.contains(-8L));
 		Assert.assertTrue(roleIds.contains(12L));
@@ -180,7 +180,7 @@ public class ModuleTest extends AbstractTest4DM {
 		module.setMenus("");
 		commonDao.update(module);
 		action.refreshModuleUserRoles(moduleId);
-		roleIds = commonDao.getEntities("select roleId from RoleUser where moduleId = ? and userId = ?", moduleId, domainUser.getId());
+		roleIds = commonDao.getEntities("select roleId from RoleUser where moduleId = ?1 and userId = ?2", moduleId, domainUser.getId());
 		Assert.assertEquals(3, roleIds.size());
 		Assert.assertTrue(roleIds.contains(-8L));
 		Assert.assertTrue(roleIds.contains(-9L));

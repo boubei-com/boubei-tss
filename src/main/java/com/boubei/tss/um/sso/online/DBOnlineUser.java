@@ -21,10 +21,10 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.boubei.tss.MatrixUtil;
 import com.boubei.tss.framework.persistence.IEntity;
 import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.framework.sso.online.OnlineUser;
-import com.boubei.tss.matrix.MatrixUtil;
 
 /** 
  * <p> 在线用户信息 </p> 

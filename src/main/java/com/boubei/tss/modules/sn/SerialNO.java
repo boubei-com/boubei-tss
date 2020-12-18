@@ -8,8 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 import com.boubei.tss.dm.record.ARecordTable;
 import com.boubei.tss.modules.log.LogDisable;
@@ -20,11 +21,11 @@ import com.boubei.tss.modules.log.LogDisable;
 @LogDisable
 @Entity
 @Table(name = "x_serialno")
-@SequenceGenerator(name = "serialno_sequence", sequenceName = "serialno_sequence", initialValue = 1, allocationSize = 10)
 public class SerialNO extends ARecordTable {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "serialno_sequence")
+	@GenericGenerator(name = "serialno_sequence", strategy = "native")
 	private Long id;
 	
 	@Column(nullable = false, length = 50)

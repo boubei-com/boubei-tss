@@ -133,13 +133,13 @@ public class SyncService implements ISyncService, Progressable {
             parentId = (Long) EasyUtils.checkNull(parentId, UMConstants.MAIN_GROUP_ID);
             
             // 检查组（和该fromApp下的组对应的组）是否已经存在
-            List<?> temp = groupDao.getEntities("from Group t where t.fromGroupId=? ", fromGroupId);
+            List<?> temp = groupDao.getEntities("from Group t where t.fromGroupId=?1 ", fromGroupId);
             if( EasyUtils.isNullOrEmpty(temp) ) {
         		/* 
         		 * 有可能管理员已经在tss里手动创建了同名的分组，这样情况下同步组过来会违反组名唯一性约束 
         		 * 先找出同名的Group, 为其设置fromApp和fromGroup
         		 */
-        		temp = groupDao.getEntities("from Group t where t.parentId=? and t.name=?", parentId, name);
+        		temp = groupDao.getEntities("from Group t where t.parentId=?1 and t.name=?2", parentId, name);
         		if( !EasyUtils.isNullOrEmpty(temp) ) {
         			group = (Group) temp.get(0);
         		} 
@@ -164,7 +164,7 @@ public class SyncService implements ISyncService, Progressable {
             } 
             else {
             	group = (Group) temp.get(0);
-            	temp = groupDao.getEntities("from Group t where t.parentId=? and t.name=?", parentId, name);
+            	temp = groupDao.getEntities("from Group t where t.parentId=?1 and t.name=?2", parentId, name);
         		if( EasyUtils.isNullOrEmpty(temp) ) {
         			group.setName(name);
         		} 
@@ -218,7 +218,7 @@ public class SyncService implements ISyncService, Progressable {
 		// 检测用户是否非法：跨域同步等
 		SyncDataHelper.checkSecurity(group, userDto);
 		
-		List<?> temp = groupDao.getEntities("from User t where ? in (t.loginName, t.email, t.telephone)", userDto.getLoginName());
+		List<?> temp = groupDao.getEntities("from User t where ?1 in (t.loginName, t.email, t.telephone)", userDto.getLoginName());
 		User user;
 		if( temp.size() > 0 ) { // 更新已存在用户的信息
 			user = (User) temp.get(0);
@@ -260,7 +260,7 @@ public class SyncService implements ISyncService, Progressable {
 			Long oldGroupId = oldGroup.getId();
 			Long nowGroupId = nowGroup.getId();
 			if( !nowGroupId.equals(oldGroupId) ) {
-				String updateHQL = "update GroupUser set groupId=? where userId=? and groupId=?";
+				String updateHQL = "update GroupUser set groupId=? where userId=?1 and groupId=?2";
 				userDao.executeHQL(updateHQL, nowGroupId, userId, oldGroupId);
 			}
 		}

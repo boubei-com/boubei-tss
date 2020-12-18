@@ -135,7 +135,7 @@ public class BIDataProcess {
 	}
 	
 	public static List<RecordField> getRecordFields(String domain, String table, List<Long> roles) {
-		String hql = " from RecordField where tbl = ? and domain = ? order by code";
+		String hql = " from RecordField where tbl = ?1 and domain = ?2 order by code";
 		@SuppressWarnings("unchecked")
 		List<RecordField> recordFields = (List<RecordField>) Global.getCommonService().getList(hql, table, domain);
 		for (RecordField recordField : recordFields) {

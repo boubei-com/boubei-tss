@@ -83,7 +83,7 @@ public class MessageService implements IMessageService {
 	
 	public void batchRead(String ids) {
 		if("view_all".equals(ids)) { // 设置用户的所有站内消息为已阅
-			String hql = "update Message m set m.readTime = ?  where m.receiverId = ? and readTime is null";
+			String hql = "update Message m set m.readTime = ?1  where m.receiverId = ?2 and readTime is null";
 			commonDao.executeHQL(hql, new Date(), Environment.getUserId());
 			return;
 		}
@@ -96,7 +96,7 @@ public class MessageService implements IMessageService {
 	
 	public void deleteMessage(String ids){
 		if("del_all".equals(ids)) { // 清空用户的站内消息
-			List<?> list = commonDao.getEntities("from Message m where m.receiverId = ?", Environment.getUserId());
+			List<?> list = commonDao.getEntities("from Message m where m.receiverId = ?1", Environment.getUserId());
 			commonDao.deleteAll(list);
 			return;
 		}
@@ -109,7 +109,7 @@ public class MessageService implements IMessageService {
 	
 	public int getUnReadMsgNum() {
 		Long userId = Environment.getUserId();
-		String hql = " select count(m) from Message m where m.receiverId = ? and sendTime > ? and readTime is null ";
+		String hql = " select count(m) from Message m where m.receiverId = ?1 and sendTime > ?2 and readTime is null ";
 		List<?> list = commonDao.getEntities(hql, userId, DateUtil.subDays(new Date(), 3));
 		return EasyUtils.obj2Int( list.get(0) );
 	}

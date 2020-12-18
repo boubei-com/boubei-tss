@@ -79,7 +79,7 @@ public class ReportServiceImpl implements ReportService {
 	}
     
     public List<?> getReportIds(String fname, Object idCodeName, int type) {
-		String hql = "select o.id from Report o where o." +fname+ " = ? and type = ? order by o.id desc";
+		String hql = "select o.id from Report o where o." +fname+ " = ?1 and type = ?2 order by o.id desc";
 		return reportDao.getEntities(hql, idCodeName, type); 
     }
     
@@ -100,7 +100,7 @@ public class ReportServiceImpl implements ReportService {
     
     @SuppressWarnings("unchecked")
     public List<Report> getAllReportGroups() {
-        return (List<Report>) reportDao.getEntities("from Report o where o.type = ? order by o.decode", Report.TYPE0);
+        return (List<Report>) reportDao.getEntities("from Report o where o.type = ?1 order by o.decode", Report.TYPE0);
     }
 
     public Report createReport(Report report) {

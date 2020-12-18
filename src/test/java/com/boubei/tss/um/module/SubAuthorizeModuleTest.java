@@ -181,7 +181,7 @@ public class SubAuthorizeModuleTest extends AbstractTest4UM {
     }
     
     protected void printUserRoleMapping(Long userId, int count) {
-        List<?> list = permissionHelper.getEntities("from RoleUserMapping where userId=?", userId);
+        List<?> list = permissionHelper.getEntities("from RoleUserMapping where userId=?1", userId);
         assertEquals(count, list.size());
         
         log.debug("表【RoleUserMapping】的所有记录:");

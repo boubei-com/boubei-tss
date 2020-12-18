@@ -51,7 +51,7 @@ public abstract class AbstractETLJob extends AbstractJob {
 	}
 
 	protected String excuteJob(String jobConfig, Long jobID) {
-		String hql = "from Task where type = ? and status = 'opened' and jobId = ? order by priority desc, id asc ";
+		String hql = "from Task where type = ?1 and status = 'opened' and jobId = ?2 order by priority desc, id asc ";
 		List<?> tasks = commonService.getList(hql, etlType(), jobID);
 		
 		List<String> msgList = new ArrayList<String>();

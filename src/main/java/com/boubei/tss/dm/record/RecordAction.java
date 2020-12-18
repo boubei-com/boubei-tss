@@ -193,7 +193,7 @@ public class RecordAction extends BaseActionSupport {
     @RequestMapping(value = "/wf/domain", method = RequestMethod.GET)
     @ResponseBody
     public WFDefine queryWFDef4Domain(Long recordId, String domain) {
-    	List<?> list = commService.getList("from WFDefine where tableId = ? and domain = ? ", recordId, domain);
+    	List<?> list = commService.getList("from WFDefine where tableId = ?1 and domain = ?2 ", recordId, domain);
     	if( list.isEmpty() ) {
     		String def = recordService.getRecord(recordId).getWorkflow();
     		WFDefine wd = new WFDefine();

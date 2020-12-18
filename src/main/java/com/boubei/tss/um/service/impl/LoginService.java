@@ -283,7 +283,7 @@ public class LoginService implements ILoginService {
  
     private List<OperatorDTO> _getDomainUsersByRole(Long roleId, String domainCondition) {
         String hql = "select distinct u, g.decode from ViewRoleUser ru, User u, GroupUser gu, Group g" +
-                " where ru.id.userId = u.id and ru.id.roleId = ? " +
+                " where ru.id.userId = u.id and ru.id.roleId = ?1 " +
                 " 	and u.id = gu.userId and gu.groupId = g.id and g.groupType = 1 " + domainCondition + 
                 " order by g.decode desc, u.id asc ";
         
@@ -297,7 +297,7 @@ public class LoginService implements ILoginService {
     }
     
     public List<OperatorDTO> getUsersByRole(String roleName, String domain) {
-    	List<?> roles = roleDao.getEntities("from Role where name = ? and isGroup = 0", roleName);
+    	List<?> roles = roleDao.getEntities("from Role where name = ?1 and isGroup = 0", roleName);
     	if( roles.isEmpty()) {
     		throw new BusinessException("角色：" + roleName + " 不存在");
     	}
@@ -312,12 +312,12 @@ public class LoginService implements ILoginService {
     	
     	// 如果当前用户属于开发者域或自注册域，则只返回自己个人账号
     	if(domain.equals(selfRegDomain) || domain.equals(devDomain)) {
-    		return userDao.getEntities( "select distinct u." +field+ " from User u where u.id=?", logonUserId );
+    		return userDao.getEntities( "select distinct u." +field+ " from User u where u.id=?1", logonUserId );
     	}
     	
         String hql = "select distinct u." +field+ " from Group g, GroupUser gu, User u" +
                 " where gu.userId = u.id and gu.groupId = g.id and groupType = 1 " +
-                "	and ? in (g.domain, '无域') " +
+                "	and ?1 in (g.domain, '无域') " +
                 " order by u." + field;
        
         return userDao.getEntities( hql, domain );

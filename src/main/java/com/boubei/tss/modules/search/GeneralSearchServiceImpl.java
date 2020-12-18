@@ -126,7 +126,7 @@ public class GeneralSearchServiceImpl implements GeneralSearchService {
 	 *  查出组下用户ID列表并插入临时表
 	 */
 	private void queryUsersInsertTemp(Long groupId) {
-        String hql = "select distinct u.id from GroupUser gu, User u where gu.userId = u.id and gu.groupId = ? ";
+        String hql = "select distinct u.id from GroupUser gu, User u where gu.userId = u.id and gu.groupId = ?1 ";
         List<?> list = commonDao.getEntities(hql, groupId);
         
         log.debug(list.size());

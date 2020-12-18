@@ -68,7 +68,7 @@ public class UserDao extends BaseDao<User> implements IUserDao {
 		try {
 			if( Context.getRequestContext().isApiCall() ) return;
 
-			String hql = "update User set lastLogonTime = ?, logonCount = logonCount+1 where id = ?";
+			String hql = "update User set lastLogonTime = ?1, logonCount = logonCount+1 where id = ?2";
 			this.executeHQL(hql, new Date(), userId);
 		} 
     	catch( Exception e ) { }
@@ -160,7 +160,7 @@ public class UserDao extends BaseDao<User> implements IUserDao {
 			log.setDomain( group.getDomain() );
 		}
 		
-		String hql = "select distinct r from RoleUser ru, Role r where ru.roleId = r.id and ru.userId = ?";
+		String hql = "select distinct r from RoleUser ru, Role r where ru.roleId = r.id and ru.userId = ?1";
 		List<?> roles = getEntities(hql, user.getId());
 		log.setRoleIds( EasyUtils.objAttr2Str(roles, "id") );
 		log.setRoleNames( EasyUtils.objAttr2Str(roles, "name") );

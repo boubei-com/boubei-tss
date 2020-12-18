@@ -72,7 +72,7 @@ public class GroupService implements IGroupService {
         /* 1、加上因【域管理员】选用功能模块而得来的模块角色，以用来给域内用户定岗
          * （注：只适合定价为0的免费模块，付费的需要域管理员通过使用转授策略把购买的模块角色赋予域用户）
          */
-        String hql = "select o from ModuleDef o, ModuleUser mu where mu.moduleId = o.id and mu.userId = ? and o.status in ('opened') ";
+        String hql = "select o from ModuleDef o, ModuleUser mu where mu.moduleId = o.id and mu.userId = ?1 and o.status in ('opened') ";
         Long userId = Environment.getNotnullUserId();
 		List<ModuleDef> modules = (List<ModuleDef>) roleDao.getEntities(hql, userId);  // 非域管理员获取不到此处角色
         for(ModuleDef module : modules ) {
@@ -148,7 +148,7 @@ public class GroupService implements IGroupService {
 			throw new BusinessException(EX.parse(EX.U_53, parent));
 		}
 		
-		List<?> list = groupDao.getEntities("from Group where ? in (domain, name)", domain);
+		List<?> list = groupDao.getEntities("from Group where ?1 in (domain, name)", domain);
 		if(list.size() > 0) {
 			throw new BusinessException(EX.parse(EX.U_19, domain));
 		}
@@ -181,7 +181,7 @@ public class GroupService implements IGroupService {
 	    	// 控制注册时域名必须为英文字母或数字，方便小程序传递域参数; 或者字符数 > 7
 		    if( isDomainGroup && (!Pattern.compile("[a-z|A-Z|0-9]+").matcher(domain).matches() || domain.length() > 7) ) {
 		    	String _domain = SerialNOer.get("Dxxxx", true);
-		    	List<?> list = groupDao.getEntities("from Group where domain = ?", _domain);
+		    	List<?> list = groupDao.getEntities("from Group where domain = ?1", _domain);
 		    	domain = (String) EasyUtils.checkTrue(list.isEmpty(), _domain, "G" + group.getId());
 		    }
 	    }
@@ -327,7 +327,7 @@ public class GroupService implements IGroupService {
     // 停用组以及组下的子组和所有的用户
     private void stopGroup(Long groupId) {
         Group group = groupDao.getEntity(groupId);
-        groupDao.executeHQL("update Group set disabled = ? where decode like ?", ParamConstants.TRUE, group.getDecode() + "%");
+        groupDao.executeHQL("update Group set disabled = ?1 where decode like ?2", ParamConstants.TRUE, group.getDecode() + "%");
        
         /* 
          * 停用主用户组，需要停用组下的用户。

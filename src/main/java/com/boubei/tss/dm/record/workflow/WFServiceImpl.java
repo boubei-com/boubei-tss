@@ -59,7 +59,7 @@ public class WFServiceImpl implements WFService {
 	@Autowired RecordService recordService;
  
 	public WFStatus getWFStatus(Long tableId, Long itemId) {
-		List<?> list = commonDao.getEntities("from WFStatus where tableId = ? and itemId = ? ", tableId, itemId);
+		List<?> list = commonDao.getEntities("from WFStatus where tableId = ?1 and itemId = ?2 ", tableId, itemId);
 		return  list.isEmpty() ? null : (WFStatus)list.get(0);
 	}
 	
@@ -277,13 +277,13 @@ public class WFServiceImpl implements WFService {
 			params.put("wfcc", "true");
 			condition = EasyUtils.fmParse(_condition, params);
 		}
-		String hsql = "from WFStatus where ( 1=0 " +condition+ " )  and tableId = ? and currentStatus ";
+		String hsql = "from WFStatus where ( 1=0 " +condition+ " )  and tableId = ?1 and currentStatus ";
 		String currStatus = params.remove("wf_status"); // 按流程状态查询
 		if( currStatus != null ) {
-			hsql += " = ? ";
+			hsql += " = ?2 ";
 		} else {
 			currStatus = WFStatus.CANCELED;
-			hsql += " <> ? ";
+			hsql += " <> ?2 ";
 		}
 		List<?> statusList = commonDao.getEntities(hsql, _db.recordId, currStatus);
 		
@@ -352,7 +352,7 @@ public class WFServiceImpl implements WFService {
 		itemIds.add(-999L);
 		
 		Map<String, String> usersMap = loginSerivce.getUsersMap(Environment.getDomain());
-		List<?> statusList = commonDao.getEntities("from WFStatus where tableId = ? and itemId in (" +EasyUtils.list2Str(itemIds)+ ") ", _db.recordId);
+		List<?> statusList = commonDao.getEntities("from WFStatus where tableId = ?1 and itemId in (" +EasyUtils.list2Str(itemIds)+ ") ", _db.recordId);
     	
     	for(Object obj : statusList) {
     		WFStatus wfStatus = (WFStatus) obj;
@@ -391,7 +391,7 @@ public class WFServiceImpl implements WFService {
 		item.put("cc_list", EasyUtils.attr2Str(getUserList(cc), "username"));
 		
 		// 流程日志
-		String hql = "from WFLog where tableId = ? and itemId = ? and processResult <> ? order by id ";
+		String hql = "from WFLog where tableId = ?1 and itemId = ?2 and processResult <> ?3 order by id ";
 		@SuppressWarnings("unchecked")
 		List<WFLog> logs = (List<WFLog>) commonDao.getEntities(hql, _db.recordId, itemId, WFStatus.MODIFIED);
 		

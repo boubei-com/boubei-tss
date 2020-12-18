@@ -17,12 +17,13 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.boubei.tss.AbstractTest4DM;
 import com.boubei.tss.dm.DMConstants;
 import com.boubei.tss.dm.ddl._Database;
 import com.boubei.tss.dm.ddl._MySQL;
 import com.boubei.tss.dm.dml.SQLExcutor;
 
-public class BuildTableTest {
+public class BuildTableTest extends AbstractTest4DM {
 	
 	@Test
 	public void test() {

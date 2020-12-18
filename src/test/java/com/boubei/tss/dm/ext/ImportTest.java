@@ -187,7 +187,7 @@ public class ImportTest extends AbstractTest4DM {
         String path = URLUtil.getResourceFileUrl("testdata/test_sales.xlsx").getPath();
         callExcel2Record(group1, path);
 		 
-	    List<?> list = commonDao.getEntities("from Record where name = ?", "销售情况");
+	    List<?> list = commonDao.getEntities("from Record where name = ?1", "销售情况");
 	    Assert.assertTrue(list.size() == 1);
 	    Record rc = (Record) list.get(0);
 	    
@@ -196,7 +196,7 @@ public class ImportTest extends AbstractTest4DM {
 	    Assert.assertEquals(31, result.size());
 	    log.debug(result.get(0));
 	    
-	    list = commonDao.getEntities("from Record where name = ?", "图书定价");
+	    list = commonDao.getEntities("from Record where name = ?1", "图书定价");
 	    Assert.assertTrue(list.size() == 1);
 	    rc = (Record) list.get(0);
 	    

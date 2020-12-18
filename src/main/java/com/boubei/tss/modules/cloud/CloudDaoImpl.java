@@ -46,12 +46,12 @@ public class CloudDaoImpl extends BaseDao<IEntity> implements CloudDao {
 
     @SuppressWarnings("unchecked")
 	public List<AccountFlow> getAccountFlowsByFeeType(String feeType, String remark) {
-        String hql = " from AccountFlow where type = ? and remark like '%" + remark + "'";
+        String hql = " from AccountFlow where type = ?1 and remark like '%" + remark + "'";
         return (List<AccountFlow>) getEntities(hql, feeType);
     }
 
     public Account getAccountByBelongUserName(String loginName) {
-        List<?> accounts = getEntities(" from Account where belong_user.loginName = ?", loginName);
+        List<?> accounts = getEntities(" from Account where belong_user.loginName = ?1", loginName);
         return (Account) accounts.get(0);
     }
 

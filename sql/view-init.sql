@@ -1,28 +1,10 @@
-DROP table IF EXISTS `view_channel_resource`;
 DROP table IF EXISTS `view_group_resource`;
 DROP table IF EXISTS `view_navigator_resource`;
-DROP table IF EXISTS `view_portal_resource`;
 DROP table IF EXISTS `view_record_resource`;
 DROP table IF EXISTS `view_role_resource`;
 DROP table IF EXISTS `view_report_resource`;
 DROP table IF EXISTS `view_roleuser`;
 DROP table IF EXISTS `view_roleuser4subauthorize`;
-
---
--- Final view structure for view `view_channel_resource`
---
-
-/*!50001 DROP VIEW IF EXISTS `view_channel_resource`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8 */;
-/*!50001 SET character_set_results     = utf8 */;
-/*!50001 SET collation_connection      = utf8_general_ci */;
-/*!50001 CREATE VIEW `view_channel_resource` AS select -(1) AS `id`,'全部' AS `name`,0 AS `parentId`,'00001' AS `decode` union select `cms_channel`.`id` AS `id`,`cms_channel`.`name` AS `name`,`cms_channel`.`parentId` AS `parentId`,`cms_channel`.`decode` AS `decode` from `cms_channel` */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
 
 --
 -- Final view structure for view `view_group_resource`
@@ -56,21 +38,6 @@ DROP table IF EXISTS `view_roleuser4subauthorize`;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
 
---
--- Final view structure for view `view_portal_resource`
---
-
-/*!50001 DROP VIEW IF EXISTS `view_portal_resource`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8 */;
-/*!50001 SET character_set_results     = utf8 */;
-/*!50001 SET collation_connection      = utf8_general_ci */;
-/*!50001 CREATE VIEW `view_portal_resource` AS select 0 AS `id`,'root' AS `name`,-(1) AS `parentId`,'00001' AS `decode` union select `portal_structure`.`id` AS `id`,`portal_structure`.`name` AS `name`,`portal_structure`.`parentId` AS `parentId`,`portal_structure`.`decode` AS `decode` from `portal_structure` */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
 
 --
 -- Final view structure for view `view_record_resource`

@@ -25,18 +25,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.boubei.tss.cms.AbstractTest4CMS;
-
 public class ImgUtilTest {
 	
 	File tempDir1;
 	
 	@Before
 	public void setUp() {
-		URL url = URLUtil.getResourceFileUrl(AbstractTest4CMS.CK_FILE_PATH);
+		URL url = URLUtil.getResourceFileUrl("application.properties");
         String log4jPath = url.getPath(); 
         File classDir = new File(log4jPath).getParentFile();
-        Assert.assertTrue(FileHelper.checkFile(classDir, AbstractTest4CMS.CK_FILE_PATH));
         
         tempDir1 = FileHelper.createDir(classDir + "/temp1");
 	}

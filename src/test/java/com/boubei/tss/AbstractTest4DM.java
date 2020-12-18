@@ -102,10 +102,10 @@ public abstract class AbstractTest4DM extends AbstractTest4TSS {
 		domainUser.setPassword("123456");
 		userService.regBusiness(domainUser, domain, mg.getId());
 		
-		domainGroup = (Group) commonDao.getEntities("from Group where name=?", domain).get(0);
+		domainGroup = (Group) commonDao.getEntities("from Group where name=?1", domain).get(0);
 		long domainUserId = domainUser.getId();
 		
-		domainInfo =  (DomainInfo) commonDao.getEntities("from DomainInfo where name=?", domain).get(0);
+		domainInfo =  (DomainInfo) commonDao.getEntities("from DomainInfo where name=?1", domain).get(0);
 		Assert.assertNotNull(domainInfo);
 		
 		// 新增一个辅助组（审批流暂时用不到辅助组）

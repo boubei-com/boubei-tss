@@ -75,7 +75,7 @@ public class ImportReport implements AfterUpload {
             	report.setDatasource(dataSource);
             }
             
-            String hql = "from Report where name = ? and (id = ? or code = ?)";
+            String hql = "from Report where name = ?1 and (id = ?2 or code = ?3)";
             List<?> exists = Global.getCommonService().getList(hql, report.getName(), oldId, EasyUtils.obj2String(report.getCode()));
             if( exists.isEmpty() ) {
             	Integer status = report.getDisabled();

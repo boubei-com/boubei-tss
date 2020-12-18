@@ -58,7 +58,7 @@ public class PermissionServiceImpl implements PermissionService {
 		String rankCondition = pHelper.genRankCondition4DeleletePermission(permissionRank);
 		String field = ParamConstants.TRUE.equals(isRole2Resource) ? "roleId" : "resourceId";
  
-        pHelper.executeHQL("delete " + permissionTable + " p where" + " p." + field + "=? " + rankCondition, roleId);
+        pHelper.executeHQL("delete " + permissionTable + " p where" + " p." + field + "=?1 " + rankCondition, roleId);
         
         pHelper.flush();
 	}
@@ -248,7 +248,7 @@ public class PermissionServiceImpl implements PermissionService {
         /* 将选中角色（角色树上选中来【角色权限设置】的那个节点 ）拥有的资源授权信息和授权级别进行映射。
          * 目的是把角色对资源已有的权限信息展示到界面上，界面上体现为对应的位置已经打上勾。
          */
-        List<?> roleResList = pHelper.getEntities("from " + permissionTable + " p where p.roleId = ? ",  roleId);
+        List<?> roleResList = pHelper.getEntities("from " + permissionTable + " p where p.roleId = ?1 ",  roleId);
         Map<String, Integer[]> rolePermissionMappingRank = rolePermissionMappingRank(roleResList); // 这是【被授权角色】已经拥有的对【当前资源列表】的权限。
    
         /* 将用户可见的资源和其【permissionState：权限维护状态(1-仅此节点，2-该节点及所有下层节点)】进行映射。
@@ -411,7 +411,7 @@ public class PermissionServiceImpl implements PermissionService {
         
         /* 获取登录用户对UM中的【角色资源】中有“角色权限设置”权限的那些个角色的ID集合（用于生成【资源授予角色】时的角色树） */
         String hql = "select distinct p.resourceId from " + rolePermissionTable + " p, RoleUserMapping ru " +
-                " where p.roleId = ru.id.roleId and p.operationId = ? and ru.id.userId = ?";
+                " where p.roleId = ru.id.roleId and p.operationId = ?1 and ru.id.userId = ?2";
         List<?> setableRoleIds = pHelper.getEntities(hql, UMConstants.ROLE_EDIT_OPERRATION, Environment.getUserId());
         
         // 登录用户有“角色权限设置”权限的角色列表

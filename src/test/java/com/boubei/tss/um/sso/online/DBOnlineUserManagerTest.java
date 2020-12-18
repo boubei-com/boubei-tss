@@ -68,7 +68,7 @@ public class DBOnlineUserManagerTest extends AbstractTest4UM {
         log.debug(first.hashCode());
         
         // testGetAllOnlineInfos4Token
-        List<?> userInfos = commonDao.getEntities("from DBOnlineUser o where o.token = ? ", "token_1");
+        List<?> userInfos = commonDao.getEntities("from DBOnlineUser o where o.token = ?1 ", "token_1");
         assertEquals(2, userInfos.size());
         assertTrue(userInfos.contains(new OnlineUser(new Long(2), "TSS", "sessionId2", "token_1")));
         assertTrue(userInfos.contains(new OnlineUser(new Long(1), "TSS", "sessionId1", "token_1")));
@@ -96,11 +96,11 @@ public class DBOnlineUserManagerTest extends AbstractTest4UM {
 
         manager.logout("TSS1", "sessionId1");
         assertEquals(2, this.getOnlineUsersByToken("token_1").size());
-        commonDao.deleteAll(commonDao.getEntities("from DBOnlineUser where sessionId = ?", "sessionId1"));
+        commonDao.deleteAll(commonDao.getEntities("from DBOnlineUser where sessionId = ?1", "sessionId1"));
         
         manager.logout("TSS", "sessionId3");
         assertEquals(1, this.getOnlineUsersByToken("token_1").size());
-        commonDao.deleteAll(commonDao.getEntities("from DBOnlineUser where sessionId = ?", "sessionId3"));
+        commonDao.deleteAll(commonDao.getEntities("from DBOnlineUser where sessionId = ?1", "sessionId3"));
         
         // test api call 
         XHttpServletRequest request = Context.getRequestContext().getRequest();
@@ -118,6 +118,6 @@ public class DBOnlineUserManagerTest extends AbstractTest4UM {
     }
 
     private List<?> getOnlineUsersByToken(String token) {
-    	return commonDao.getEntities("from DBOnlineUser o where o.token = ? ", token);
+    	return commonDao.getEntities("from DBOnlineUser o where o.token = ?1 ", token);
     }
 }

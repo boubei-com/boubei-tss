@@ -59,7 +59,9 @@ public abstract class BaseDao<T extends IEntity> implements IDao<T>{
     }
     
     public void evict(Object o) {
-        em.detach(o); // <==> getHibernateTemplate().evict(o);
+    	if(o != null) {
+    		em.detach(o); // <==> getHibernateTemplate().evict(o);
+    	}
     }
 
     public void flush() {

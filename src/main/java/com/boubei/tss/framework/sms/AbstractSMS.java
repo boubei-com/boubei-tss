@@ -93,7 +93,7 @@ public abstract class AbstractSMS {
         }
 
         Date from = DateUtil.subDays(new Date(), 30.0 / (24 * 60));
-        String hql = " from SMSLog where randomnum = ? and ((phonenum = ?  and createTime > ?) or creator='SMS_Admin') ";
+        String hql = " from SMSLog where randomnum = ?1 and ((phonenum = ?2  and createTime > ?3) or creator='SMS_Admin') ";
         List<?> list = commService.getList(hql, code, mobile, from);
 
         return list.size() > 0;

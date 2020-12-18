@@ -43,8 +43,8 @@ import com.boubei.tss.modules.cloud.pay.AbstractProduct;
 import com.boubei.tss.modules.cloud.pay.AfterPayService;
 import com.boubei.tss.modules.cloud.pay.ModuleOrderHandler;
 import com.boubei.tss.modules.cloud.pay.Result;
+import com.boubei.tss.modules.menu.PortalConstants;
 import com.boubei.tss.modules.param.ParamConstants;
-import com.boubei.tss.portal.PortalConstants;
 import com.boubei.tss.um.UMConstants;
 import com.boubei.tss.um.entity.RoleUser;
 import com.boubei.tss.um.entity.SubAuthorize;
@@ -126,7 +126,7 @@ public class CloudServiceImpl implements CloudService, AfterPayService {
         List<Long> roles = def.resourcelist("roles");
 
         // 模块角色减少时，本方法只能去掉域管理员的角色；域管理员也已经把角色授给了其它域成员的话，则无法收回
-        List<RoleUser> ruList = (List<RoleUser>) commonDao.getEntities("from RoleUser where moduleId = ?", moduleID);
+        List<RoleUser> ruList = (List<RoleUser>) commonDao.getEntities("from RoleUser where moduleId = ?1", moduleID);
         for (Iterator<RoleUser> it = ruList.iterator(); it.hasNext(); ) {
             RoleUser ru = it.next();
             if (!roles.contains(ru.getRoleId())) {
@@ -136,8 +136,8 @@ public class CloudServiceImpl implements CloudService, AfterPayService {
         }
 
         // 模块已被多少域用户购买使用
-        List<Long> userIds = (List<Long>) commonDao.getEntities("select userId from ModuleUser where moduleId = ?", moduleID);
-        String hql3 = "select id from SubAuthorize where moduleId = ? and buyerId = ?";
+        List<Long> userIds = (List<Long>) commonDao.getEntities("select userId from ModuleUser where moduleId = ?1", moduleID);
+        String hql3 = "select id from SubAuthorize where moduleId = ?1 and buyerId = ?2";
         for (Long domainUserId : userIds) {
             // 当前域用户已经获得的模块策略
             List<Long> strategyIds = (List<Long>) commonDao.getEntities(hql3, moduleID, domainUserId);
@@ -162,20 +162,20 @@ public class CloudServiceImpl implements CloudService, AfterPayService {
         checkIsDomainAdmin();
 
         // 不能删除购买获得的策略（按照策略的命名判断，"_try"结尾）
-        String hql = "from SubAuthorize where name like ?";
+        String hql = "from SubAuthorize where name like ?1";
         List<?> list = commonDao.getEntities(hql, module + "\\_%\\_" + user + "_try");
         if (list.size() > 0) {
             SubAuthorize sa = (SubAuthorize) list.get(0);
-            commonDao.deleteAll(commonDao.getEntities("from RoleUser where strategyId=?", sa.getId()));
+            commonDao.deleteAll(commonDao.getEntities("from RoleUser where strategyId=?1", sa.getId()));
             commonDao.delete(sa);
 
             // 删除选择试用产生的ModuleUser
-            commonDao.deleteAll(commonDao.getEntities("from ModuleUser where userId=? and moduleId=? and isBuy=0", user, module));
+            commonDao.deleteAll(commonDao.getEntities("from ModuleUser where userId=?1 and moduleId=?2 and isBuy=0", user, module));
         }
     }
 
     public List<?> listSelectedModules(Long user) {
-        String hql = "select o from ModuleDef o, ModuleUser mu " + " where mu.moduleId = o.id and mu.userId = ? and o.status in ('opened', 'closed')"
+        String hql = "select o from ModuleDef o, ModuleUser mu " + " where mu.moduleId = o.id and mu.userId = ?1 and o.status in ('opened', 'closed')"
                 + " order by o.id desc ";
         return commonDao.getEntities(hql, user);
     }
@@ -199,7 +199,7 @@ public class CloudServiceImpl implements CloudService, AfterPayService {
 
     private Set<Long> limitResources(String permissionTable, String rType, String prefix, String... opts) {
         Set<Long> result = new LinkedHashSet<Long>();
-        String hql1 = "select distinct p.resourceId from " + permissionTable + " p  where p.operationId = ? and p.roleId in (";
+        String hql1 = "select distinct p.resourceId from " + permissionTable + " p  where p.operationId = ?1 and p.roleId in (";
 
         String domain = Environment.getDomain();
         List<ModuleDef> list = queryDomainModules(domain);
@@ -239,8 +239,8 @@ public class CloudServiceImpl implements CloudService, AfterPayService {
      * */
     private List<ModuleDef> queryDomainModules(String domain) {
         String hql = "from ModuleDef "
-        		+ " where id in (select moduleId from ModuleUser where domain = ?) "
-                + "   and id in (select sa.moduleId from SubAuthorize sa where ? in (sa.buyerId,sa.ownerId) and sa.endDate > now()) ";
+        		+ " where id in (select moduleId from ModuleUser where domain = ?1) "
+                + "   and id in (select sa.moduleId from SubAuthorize sa where ?2 in (sa.buyerId,sa.ownerId) and sa.endDate > now()) ";
 
         Object userId = Environment.getNotnullUserId();
         List<ModuleDef> list = (List<ModuleDef>) commonDao.getEntities(hql, domain, userId);
@@ -346,7 +346,7 @@ public class CloudServiceImpl implements CloudService, AfterPayService {
             }
         }
 
-        List<?> users = commonDao.getEntities(" from User where ? in (loginName, telephone, email)", mobile);
+        List<?> users = commonDao.getEntities(" from User where ?1 in (loginName, telephone, email)", mobile);
         if (users.size() > 0) {
             return false;
         }
@@ -426,7 +426,7 @@ public class CloudServiceImpl implements CloudService, AfterPayService {
             }
         }
         Object exclude = EasyUtils.checkTrue(ruIDList.isEmpty(), "", " and id not in(" + ruIds + ")");
-        rus.addAll((List<RoleUser>) commonDao.getEntities("from RoleUser where strategyId = ? " + exclude, strategyId));
+        rus.addAll((List<RoleUser>) commonDao.getEntities("from RoleUser where strategyId = ?1 " + exclude, strategyId));
 
         // 剔除掉冗余的RoleUser记录
         Map<String, RoleUser> map = new HashMap<>();

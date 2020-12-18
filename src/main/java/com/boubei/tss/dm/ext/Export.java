@@ -27,9 +27,9 @@ import com.boubei.tss.dm.record.RecordService;
 import com.boubei.tss.dm.report.Report;
 import com.boubei.tss.dm.report.ReportService;
 import com.boubei.tss.framework.sso.Environment;
+import com.boubei.tss.modules.menu.INavigatorService;
+import com.boubei.tss.modules.menu.Navigator;
 import com.boubei.tss.modules.param.ParamConstants;
-import com.boubei.tss.portal.entity.Navigator;
-import com.boubei.tss.portal.service.INavigatorService;
 import com.boubei.tss.util.EasyUtils;
 import com.boubei.tss.util.FileHelper;
 

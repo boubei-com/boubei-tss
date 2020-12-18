@@ -139,13 +139,13 @@ public class CloudAction {
     @RequestMapping(value = "/order/pay/{order_no}", method = RequestMethod.POST)
     @ResponseBody
     public void payedByAccountBalance(@PathVariable String order_no) {
-        List<?> accounts = commonService.getList("from Account where belong_user.id = ?", Environment.getUserId());
+        List<?> accounts = commonService.getList("from Account where belong_user.id = ?1", Environment.getUserId());
         if (accounts.isEmpty()) {
             throw new BusinessException(EX.CO_2);
         }
         Account account = (Account) accounts.get(0);
 
-        List<?> cloudOrders = commonService.getList("from CloudOrder where order_no = ?", order_no);
+        List<?> cloudOrders = commonService.getList("from CloudOrder where order_no = ?1", order_no);
         if (cloudOrders.isEmpty()) {
             throw new BusinessException(EX.CO_3);
         }
@@ -173,7 +173,7 @@ public class CloudAction {
             return;
 
         AfterPayService afterPayService = (AfterPayService) cloudService;
-        List<?> list = commonService.getList(" from CloudOrder where order_no = ?", order_no);
+        List<?> list = commonService.getList(" from CloudOrder where order_no = ?1", order_no);
         CloudOrder co = (CloudOrder) list.get(0);
 
         money_real = (Double) EasyUtils.checkNull(money_real, co.getMoney_cal());

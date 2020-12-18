@@ -22,6 +22,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import com.boubei.tss.cache.aop.CacheClear;
 import com.boubei.tss.util.EasyUtils;
 
@@ -49,12 +51,12 @@ import com.boubei.tss.util.EasyUtils;
  */
 @Entity
 @Table(name = "dm_record_field")
-@SequenceGenerator(name = "record_field_sequence", sequenceName = "record_field_sequence", initialValue = 1, allocationSize = 10)
 @CacheClear
 public class RecordField extends ARecordTable {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "record_field_sequence")
+	@GenericGenerator(name = "record_field_sequence", strategy = "native")
 	private Long id;
 	
 	@Column(name = "tbl")

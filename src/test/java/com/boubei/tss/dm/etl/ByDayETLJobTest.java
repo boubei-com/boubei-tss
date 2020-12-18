@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.boubei.tss.AbstractTest4DM;
 import com.boubei.tss.EX;
 import com.boubei.tss.cache.extension.CacheHelper;
-import com.boubei.tss.cms.job.PublishJob;
 import com.boubei.tss.dm.DMConstants;
 import com.boubei.tss.dm.dml.SQLExcutor;
 import com.boubei.tss.dm.record.Record;
@@ -30,6 +29,7 @@ import com.boubei.tss.dm.record.RecordService;
 import com.boubei.tss.dm.report.Report;
 import com.boubei.tss.dm.report.ReportDao;
 import com.boubei.tss.dm.report.ReportService;
+import com.boubei.tss.modules.timer.Demo2Job;
 import com.boubei.tss.modules.timer.JobAction;
 import com.boubei.tss.modules.timer.JobDef;
 import com.boubei.tss.um.entity.User;
@@ -180,7 +180,7 @@ public class ByDayETLJobTest extends AbstractTest4DM {
 		JobDef job2 = new JobDef();
 		job2.setCode("JOB-1p");
 		job2.setName("JOB-1p");
-		job2.setJobClassName(PublishJob.class.getName());
+		job2.setJobClassName(Demo2Job.class.getName());
 		job2.setTimeStrategy("0 0 01 * * ?");
 		reportDao.createObject(job2);
 		
@@ -193,7 +193,7 @@ public class ByDayETLJobTest extends AbstractTest4DM {
 			taskAction.exucteTask(taskId.toString());
         	Assert.fail("should throw exception but didn't.");
         } catch (Exception e) {
-        	Assert.assertEquals( EX.parse(EX.DM_28, job2.getName(), task.getType(), PublishJob.class.getSimpleName()) , e.getMessage());
+        	Assert.assertEquals( EX.parse(EX.DM_28, job2.getName(), task.getType(), Demo2Job.class.getSimpleName()) , e.getMessage());
         }
 	}
 	

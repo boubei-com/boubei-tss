@@ -75,27 +75,8 @@
 	<entity class="com.boubei.tss.dm.record.file.OrignUploadFile"/>
 	<entity class="com.boubei.tss.dm.record.file.RecordImpTL"/>
 	
-	<!-- cms -->	
-	<entity class="com.boubei.tss.cms.entity.Channel"/>
-	<entity class="com.boubei.tss.cms.entity.Article"/>
-	<entity class="com.boubei.tss.cms.entity.Attachment"/>
- 
-	<entity class="com.boubei.tss.cms.entity.permission.ChannelResource"/>
-	<entity class="com.boubei.tss.cms.entity.permission.ChannelPermission"/>
+	<entity class="com.boubei.tss.modules.menu.Navigator"/>
+	<entity class="com.boubei.tss.modules.menu.NavigatorResource"/>
+	<entity class="com.boubei.tss.modules.menu.NavigatorPermission"/>
 	
-	<!-- portal -->	
-	<entity class="com.boubei.tss.portal.entity.Component"/>
-	<entity class="com.boubei.tss.portal.entity.FlowRate"/>
-	<entity class="com.boubei.tss.portal.entity.ReleaseConfig"/>
-	<entity class="com.boubei.tss.portal.entity.Navigator"/>
-	<entity class="com.boubei.tss.portal.entity.Structure"/>
-	<entity class="com.boubei.tss.portal.entity.Theme"/>
-	<entity class="com.boubei.tss.portal.entity.ThemeInfo"/>
- 
-	<entity class="com.boubei.tss.portal.entity.permission.NavigatorResource"/>
-	<entity class="com.boubei.tss.portal.entity.permission.NavigatorPermission"/>
-	
-	<entity class="com.boubei.tss.portal.entity.permission.PortalResource"/>
-	<entity class="com.boubei.tss.portal.entity.permission.PortalPermission"/>
-
 </entity-mappings>

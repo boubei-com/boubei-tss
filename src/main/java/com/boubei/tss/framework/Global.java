@@ -17,12 +17,12 @@ import java.util.Map;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.boubei.tss.MatrixUtil;
 import com.boubei.tss.PX;
 import com.boubei.tss.dm.DMConstants;
 import com.boubei.tss.dm.dml.SQLExcutor;
 import com.boubei.tss.framework.persistence.ICommonService;
 import com.boubei.tss.framework.sso.LoginCustomizerFactory;
-import com.boubei.tss.matrix.MatrixUtil;
 import com.boubei.tss.modules.param.ParamListener;
 import com.boubei.tss.modules.param.ParamManager;
 import com.boubei.tss.modules.param.ParamService;

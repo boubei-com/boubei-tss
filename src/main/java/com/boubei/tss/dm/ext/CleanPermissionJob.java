@@ -39,8 +39,8 @@ public class CleanPermissionJob extends AbstractJob {
  
 		log.info("------------------- 清理权限信息......");
 		
-		String[] resources = "role,group,report,record,channel,navigator,portal".split(",");
-		String[] permissionTables = "um_permission_role,um_permission_group,dm_permission_report,dm_permission_record,cms_permission_channel,portal_permission_navigator,portal_permission_portal".split(",");
+		String[] resources = "role,group,report,record,navigator".split(",");
+		String[] permissionTables = "um_permission_role,um_permission_group,dm_permission_report,dm_permission_record,portal_permission_navigator".split(",");
 		
 		int index = 0;
 		for(String resource : resources ) {

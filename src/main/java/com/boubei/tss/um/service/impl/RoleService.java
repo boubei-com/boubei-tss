@@ -51,12 +51,12 @@ public class RoleService implements IRoleService {
     }
 
     public List<?> getPlatformApplication() {
-		String hql = "from Application o where o.applicationType = ? order by o.id desc";
+		String hql = "from Application o where o.applicationType = ?1 order by o.id desc";
 		return roleDao.getEntities(hql, UMConstants.PLATFORM_SYSTEM_APP);
     }
 
     public List<?> getResourceTypeByAppId(String applicationId) {
-		String hql = "select resourceTypeId as id, name from ResourceType a where a.applicationId = ? order by a.seqNo desc";
+		String hql = "select resourceTypeId as id, name from ResourceType a where a.applicationId = ?1 order by a.seqNo desc";
 		return resourceTypeDao.getEntities(hql, applicationId);
     }
     
@@ -79,7 +79,7 @@ public class RoleService implements IRoleService {
 		List<Role> subRoles = roleDao.removeRole(roleDao.getEntity(roleId));
 		
 		// Portal、CMS、DMS等其他基于平台应用的相关授权也需一并删除
-		String hql = "from ResourceType o where o.applicationId = ? order by o.seqNo";
+		String hql = "from ResourceType o where o.applicationId = ?1 order by o.seqNo";
         for( Role temp : subRoles ){
             if(ParamConstants.TRUE.equals(temp.getIsGroup())){
                continue;
@@ -89,7 +89,7 @@ public class RoleService implements IRoleService {
 			List<?> resourceTypes = resourceTypeDao.getEntities(hql, UMConstants.TSS_APPLICATION_ID);    
     		for(Object obj : resourceTypes) {
     			ResourceType rt = (ResourceType) obj;
-				List<?> permissions = roleDao.getEntities("from " +rt.getPermissionTable()+ " where roleId = ? ", childRoleId);
+				List<?> permissions = roleDao.getEntities("from " +rt.getPermissionTable()+ " where roleId = ?1 ", childRoleId);
 				roleDao.deleteAll(permissions);
     		}
         }
@@ -206,7 +206,7 @@ public class RoleService implements IRoleService {
 
 	private void saveRole2Group(Long roleId, String groupIdsStr) {
 	    // 根据角色id找到角色-用户组的list（只涉及授权信息，不涉及转授）
-		List<?> roleGroups = roleDao.getEntities("from RoleGroup o where o.roleId = ? and o.strategyId is null", roleId);
+		List<?> roleGroups = roleDao.getEntities("from RoleGroup o where o.roleId = ?1 and o.strategyId is null", roleId);
 		Map<Long, RoleGroup> historyMap = new HashMap<Long, RoleGroup>(); // 以"groupId"为key
 		for (Object temp : roleGroups) {
 		    RoleGroup roleGroup = (RoleGroup) temp;
@@ -237,7 +237,7 @@ public class RoleService implements IRoleService {
 
 	private void saveRole2User(Long roleId, String userIdsStr) {
 	    // 根据角色id找到角色-用户的list（只涉及授权信息，不涉及转授
-		List<?> roleUsers = roleDao.getEntities("from RoleUser o where o.roleId = ? and o.strategyId is null", roleId);
+		List<?> roleUsers = roleDao.getEntities("from RoleUser o where o.roleId = ?1 and o.strategyId is null", roleId);
 		Map<Long, RoleUser> historyMap = new HashMap<Long, RoleUser>(); // 以"groupId"为key
         for (Object temp : roleUsers) {
             RoleUser roleUser = (RoleUser) temp;
@@ -273,7 +273,7 @@ public class RoleService implements IRoleService {
  
     @SuppressWarnings("unchecked")
 	public List<Long[]> getRoles4Permission(){
-        String hql = "select distinct t.id.userId, t.id.roleId from ViewRoleUser t where t.id.userId = ?";
+        String hql = "select distinct t.id.userId, t.id.roleId from ViewRoleUser t where t.id.userId = ?1";
         return (List<Long[]>) roleDao.getEntities(hql, Environment.getUserId() );  
     }
 }

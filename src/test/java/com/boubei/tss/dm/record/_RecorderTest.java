@@ -304,7 +304,7 @@ public class _RecorderTest extends AbstractTest4DM {
 		Assert.assertTrue(attachList.size() == 1);
 		
 		// test delete record
-		commonDao.executeHQL("update Record set logicDel=1 where id = ? ", recordId);
+		commonDao.executeHQL("update Record set logicDel=1 where id = ?1 ", recordId);
 		CacheHelper.flushCache(CacheLife.LONG.toString(), "_db_record_" + recordId);
 		
 		recorder.delete(request, response, recordId, 1L);
@@ -320,7 +320,7 @@ public class _RecorderTest extends AbstractTest4DM {
 		Assert.assertTrue(result.size() == 1);
 		
 		recorder.restore(request, response, recordId, 1L); // 还原后在物理删除
-		commonDao.executeHQL("update Record set logicDel=0 where id = ? ", recordId);
+		commonDao.executeHQL("update Record set logicDel=0 where id = ?1 ", recordId);
 		CacheHelper.flushCache(CacheLife.LONG.toString(), "_db_record_" + recordId);
 		
 		recorder.delete(request, response, recordId, 1L);

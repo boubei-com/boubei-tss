@@ -221,7 +221,7 @@ public class ReportAction extends BaseActionSupport {
         
         // 删除定时JOB，如果有的话
         String jobCode = "ReportJob-" + id;
-		List<?> list = commonService.getList("from JobDef where code like ?", jobCode + "%");
+		List<?> list = commonService.getList("from JobDef where code like ?1", jobCode + "%");
 		for( Object obj : list ) {
 			commonService.delete(JobDef.class, ((JobDef)obj).getId() );
 		}
@@ -337,7 +337,7 @@ public class ReportAction extends BaseActionSupport {
 	
 	private JobDef queryReportJob( Long reportId, boolean self) {
 		String jobCode = "ReportJob-" + reportId + (self ? "-" + Environment.getUserId() : "");
-		List<?> list = commonService.getList("from JobDef where code = ?", jobCode);
+		List<?> list = commonService.getList("from JobDef where code = ?1", jobCode);
 		return (JobDef) (list.isEmpty() ? null : list.get(0));
 	}
 	
@@ -421,7 +421,7 @@ public class ReportAction extends BaseActionSupport {
 	public void collectReport(HttpServletResponse response, 
 			@PathVariable("reportId") Long reportId, @PathVariable("state") boolean state) {
 		
-		String hql = "from ReportUser ru where ru.userId=? and ru.reportId=? and ru.type=1";
+		String hql = "from ReportUser ru where ru.userId = ?1 and ru.reportId = ?2 and ru.type=1";
 		Long userId = Environment.getUserId();
 		List<?> list = commonService.getList(hql, userId, reportId);
 		ReportUser ru;
@@ -443,7 +443,7 @@ public class ReportAction extends BaseActionSupport {
 	@ResponseBody
 	public List<?> queryCollectReports() {
 		String hql = "select r.id, r.name from Report r, ReportUser ru " +
-				" where r.id = ru.reportId and ru.userId = ? and ru.type=1 and r.disabled<>1 ";
+				" where r.id = ru.reportId and ru.userId = ?1 and ru.type=1 and r.disabled<>1 ";
 		return commonService.getList(hql, Environment.getUserId());
 	}
 	
@@ -452,7 +452,7 @@ public class ReportAction extends BaseActionSupport {
 	public void zanReport(HttpServletResponse response,
 			@PathVariable Long reportId, @PathVariable Integer type) {
 		
-		String hql = "from ReportUser ru where ru.userId=? and ru.reportId=? and ru.type=?";
+		String hql = "from ReportUser ru where ru.userId=?1 and ru.reportId=?2 and ru.type=?3";
 		Long userId = Environment.getUserId();
 		List<?> list = commonService.getList(hql, userId, reportId, type);
 		if( list.isEmpty() ) {
@@ -466,7 +466,7 @@ public class ReportAction extends BaseActionSupport {
 	@RequestMapping(value = "/zan/{reportId}/{type}", method = RequestMethod.GET)
 	@ResponseBody
 	public Object countZan(@PathVariable Long reportId, @PathVariable Integer type) {
-		String hql = "select count(*) from ReportUser ru where ru.reportId=? and ru.type=?";
+		String hql = "select count(*) from ReportUser ru where ru.reportId=?1 and ru.type=?2";
 		return commonService.getList(hql, reportId, type).get(0);
 	}
 }

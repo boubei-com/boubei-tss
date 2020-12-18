@@ -107,7 +107,7 @@ public class ResourcePermissionImpl extends TreeSupportDao<IDecodable> implement
         
         String permissionTable = resourceTypeDao.getPermissionTable(applicationId, resourceTypeId);
         String hql = "select distinct t.id from " + resourceClazz.getName() + " t, RoleUserMapping r, " + permissionTable + " v" +
-            " where t.id = v.resourceId and v.roleId = r.id.roleId and r.id.userId = ? and v.operationId = ? and ? like t.decode || '%'";
+            " where t.id = v.resourceId and v.roleId = r.id.roleId and r.id.userId = ?1 and v.operationId = ?2 and ?3 like t.decode || '%'";
         
         return getEntities(hql, operatorId, operationId, resource.getDecode());
 	}
@@ -121,7 +121,7 @@ public class ResourcePermissionImpl extends TreeSupportDao<IDecodable> implement
         
         String permissionTable = resourceTypeDao.getPermissionTable(applicationId, resourceTypeId);
         String hql = "select distinct t.id from " + resourceTable + " t, RoleUserMapping r, " + permissionTable + " v" +
-            " where t.id = v.resourceId and v.roleId = r.id.roleId and r.id.userId = ? and v.operationId = ? and t.decode like ?";
+            " where t.id = v.resourceId and v.roleId = r.id.roleId and r.id.userId = ?1 and v.operationId = ?2 and t.decode like ?3";
         
         return getEntities(hql, operatorId, operationId, resource.getDecode() + "%");	
 	}

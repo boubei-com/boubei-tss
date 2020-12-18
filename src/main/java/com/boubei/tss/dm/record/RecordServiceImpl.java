@@ -70,7 +70,7 @@ public class RecordServiceImpl implements RecordService {
 	
 	// 名字、表名二者有一个能对上即可
 	public Long getRecordID(String nameOrTable, int type, boolean auth) {
-		String hql = "select o.id from Record o where (o.name = ? or o.table = ?) and type = ? order by o.id asc"; 
+		String hql = "select o.id from Record o where (o.name = ?1 or o.table = ?2) and type = ?3 order by o.id asc"; 
 		List<?> list = recordDao.getEntities(hql, nameOrTable, nameOrTable, type); 
 		
 		if(!auth && list.size() > 0) {
@@ -132,7 +132,7 @@ public class RecordServiceImpl implements RecordService {
 	}
 
 	public List<Record> getAllRecordGroups() {
-		String hql = "from Record o where o.type = ? order by o.decode";
+		String hql = "from Record o where o.type = ?1 order by o.decode";
 		return (List<Record>) recordDao.getEntities(hql, Record.TYPE0);
 	}
 	
@@ -231,14 +231,14 @@ public class RecordServiceImpl implements RecordService {
 	}
 	
 	public Integer getAttachSeqNo(Long recordId, Long itemId) {
-		String hql = "select max(o.seqNo) from RecordAttach o where o.recordId = ? and o.itemId = ?";
+		String hql = "select max(o.seqNo) from RecordAttach o where o.recordId = ?1 and o.itemId = ?2";
         List<?> list = recordDao.getEntities(hql, recordId, itemId);
         Integer nextSeqNo = (Integer) EasyUtils.checkNull(list.get(0), 0);
         return nextSeqNo + 1;
 	}
 
 	public List<?> getAttachList(Long recordId, Long itemId) {
-		String hql = "from RecordAttach o where o.recordId = ? and o.itemId = ? order by seqNo";
+		String hql = "from RecordAttach o where o.recordId = ?1 and o.itemId = ?2 order by seqNo";
 		return recordDao.getEntities(hql, recordId, itemId);
 	}
 

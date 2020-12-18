@@ -18,8 +18,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 import com.boubei.tss.dm.record.ARecordTable;
 
@@ -35,11 +36,11 @@ import com.boubei.tss.dm.record.ARecordTable;
  */
 @Entity
 @Table(name = "um_user_token")
-@SequenceGenerator(name = "user_token_seq", sequenceName = "user_token_seq", initialValue = 1, allocationSize = 10)
 public class UserToken extends ARecordTable {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "user_token_seq")
+	@GenericGenerator(name = "user_token_seq", strategy = "native")
     private Long id; 
     
 	@Column(nullable = false)

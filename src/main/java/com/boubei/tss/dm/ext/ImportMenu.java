@@ -22,8 +22,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.boubei.tss.framework.Global;
 import com.boubei.tss.framework.web.servlet.AfterUpload;
-import com.boubei.tss.portal.entity.Navigator;
-import com.boubei.tss.portal.service.INavigatorService;
+import com.boubei.tss.modules.menu.INavigatorService;
+import com.boubei.tss.modules.menu.Navigator;
 import com.boubei.tss.util.BeanUtil;
 import com.boubei.tss.util.EasyUtils;
 import com.boubei.tss.util.FileHelper;
@@ -63,7 +63,7 @@ public class ImportMenu implements AfterUpload {
             Navigator menu = new ObjectMapper().readValue(EasyUtils.obj2Json(obj), Navigator.class);
             Long oldId = menu.getId();
             
-            String hql = "from Navigator where name = ? and id = ?";
+            String hql = "from Navigator where name = ?1 and id = ?2";
             List<?> exists = Global.getCommonService().getList(hql, menu.getName(), oldId);
             if( exists.isEmpty() ) {
             	menu.setId(null);

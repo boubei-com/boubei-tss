@@ -154,19 +154,19 @@ public class CloudOrderTest extends AbstractTest4DM {
         String token = TokenUtil.createToken(sessionId, userId);
         ouManager.register(token, "TSS", sessionId, userId, domainUser.getUserName());
         ouManager.register(token, "TSS", sessionId, userId, domainUser.getUserName());
-        Assert.assertEquals(1, commonDao.getEntities("from DBOnlineUser where sessionId = ?", sessionId).size()); // domainUser
+        Assert.assertEquals(1, commonDao.getEntities("from DBOnlineUser where sessionId = ?1", sessionId).size()); // domainUser
 
         // 允许多地登录 multiLogin
         domainInfo.setMultilogin(ParamConstants.TRUE);
         commonDao.update(domainInfo);
         request.getSession().setAttribute("domain_multilogin", ParamConstants.TRUE);
         ouManager.register(token, "TSS", sessionId, staff1.getId(), staff1.getUserName());
-        Assert.assertEquals(2, commonDao.getEntities("from DBOnlineUser where sessionId = ?", sessionId).size()); // domainUser + staff1
+        Assert.assertEquals(2, commonDao.getEntities("from DBOnlineUser where sessionId = ?1", sessionId).size()); // domainUser + staff1
 
         // mock WX reg
         request.addHeader("USER-AGENT", "xxx micromessenger/6.7.2 nettype/4g language/zh_cn");
         ouManager.register(token, "TSS", sessionId, userId, domainUser.getUserName());
-        Assert.assertEquals(3, commonDao.getEntities("from DBOnlineUser where sessionId = ?", sessionId).size()); // domainUser(pc + wx) + staff1
+        Assert.assertEquals(3, commonDao.getEntities("from DBOnlineUser where sessionId = ?1", sessionId).size()); // domainUser(pc + wx) + staff1
 
         // mock api call (不踢人)
         request = new MockHttpServletRequest();
@@ -179,7 +179,7 @@ public class CloudOrderTest extends AbstractTest4DM {
         Context.sessionMap.put(sessionId, session);
 
         ouManager.register(token, "TSS", sessionId, userId, domainUser.getUserName());
-        Assert.assertEquals(4, commonDao.getEntities("from DBOnlineUser where sessionId = ?", sessionId).size()); // domainUser(pc*2 + wx) + staff1
+        Assert.assertEquals(4, commonDao.getEntities("from DBOnlineUser where sessionId = ?1", sessionId).size()); // domainUser(pc*2 + wx) + staff1
     }
 
     private List<?> listOrders() {
@@ -284,11 +284,11 @@ public class CloudOrderTest extends AbstractTest4DM {
         Assert.assertEquals(0, groupService.findEditableRoles().size()); // 未支付
         login(UMConstants.ADMIN_USER);
         oAction.payedOrders(co2.getOrder_no(), co2.getMoney_cal());
-        commonDao.executeHQL("update RoleUser set userId = ? where moduleId = ?", buyerId, module2.getId());
+        commonDao.executeHQL("update RoleUser set userId = ?1 where moduleId = ?2", buyerId, module2.getId());
 
         // test 转授的角色前台禁止选择
-        Long groupId = (Long) commonDao.getEntities("select groupId from GroupUser where userId = ?", buyerId).get(0);
-        List<?> roles = commonDao.getEntities("select roleId from RoleUser where userId = ? and roleId < 0", buyerId);
+        Long groupId = (Long) commonDao.getEntities("select groupId from GroupUser where userId = ?1", buyerId).get(0);
+        List<?> roles = commonDao.getEntities("select roleId from RoleUser where userId = ?1 and roleId < 0", buyerId);
 
         // for maven test 下多线程方式跑Test --- start
         Assert.assertEquals(UMConstants.ADMIN_USER_ID, Environment.getUserId());
@@ -627,7 +627,7 @@ public class CloudOrderTest extends AbstractTest4DM {
         mAction.selectModule(moduleId);
 
         cloudService.unSelectModule(userId, moduleId);
-        Assert.assertEquals(0, commonDao.getEntities("from ModuleUser where userId=? and moduleId=?", userId, moduleId).size());
+        Assert.assertEquals(0, commonDao.getEntities("from ModuleUser where userId=?1 and moduleId=?2", userId, moduleId).size());
         cloudService.unSelectModule(userId, moduleId);
 
         mAction.selectModule(moduleId);
@@ -644,7 +644,7 @@ public class CloudOrderTest extends AbstractTest4DM {
         oAction.payedOrders(co1.getOrder_no(), null);
         login(domainUser);
 
-        String hql = "from SubAuthorize where name like ?";
+        String hql = "from SubAuthorize where name like ?1";
 
         List<?> list = commonDao.getEntities(hql, moduleId + "\\_%\\_" + userId + "_try");
         Assert.assertEquals(1, list.size());
@@ -656,7 +656,7 @@ public class CloudOrderTest extends AbstractTest4DM {
         saService.saveSubauth(sa, domainUser.getId() + ",-1000", "", role0.getId() + "," + role1.getId());
 
         cloudService.unSelectModule(userId, moduleId);
-        Assert.assertEquals(1, commonDao.getEntities("from ModuleUser where userId=? and moduleId=?", userId, moduleId).size()); // 剩下购买的策略
+        Assert.assertEquals(1, commonDao.getEntities("from ModuleUser where userId=?1 and moduleId=?2", userId, moduleId).size()); // 剩下购买的策略
         cloudService.unSelectModule(userId, moduleId);
     }
 

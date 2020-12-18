@@ -38,7 +38,7 @@ public class ParamDaoImpl extends TreeSupportDao<Param> implements ParamDao {
 	}
 	
 	public List<?> getCanAddGroups(){
-		String hql = "from Param p where p.type = ? and p.hidden <> 1 order by p.decode";
+		String hql = "from Param p where p.type = ?1 and p.hidden <> 1 order by p.decode";
 		return getEntities(hql, ParamConstants.GROUP_PARAM_TYPE);
 	}
 	

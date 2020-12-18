@@ -94,7 +94,7 @@ public abstract class AbstractProduct {
             this.contract.setPrice(0.0d);
             this.proxy = dao.getEntity(UMConstants.ADMIN_USER_ID);
         } else {
-            String hql = "from ProxyContract where appid = ? and disabled = ? order by id desc";
+            String hql = "from ProxyContract where appid = ?1 and disabled = ?2 order by id desc";
             List<?> proxys = dao.getEntities(hql, co.getAppid(), ParamConstants.FALSE);
             this.noProxy = proxys.isEmpty();
             if (this.noProxy) {
@@ -238,7 +238,7 @@ public abstract class AbstractProduct {
     }
 
     protected List<?> getAccountWithNoAutoCreate(Long userId) {
-        return dao.getEntities(" from Account where belong_user.id = ?", userId);
+        return dao.getEntities(" from Account where belong_user.id = ?1", userId);
     }
 
     // 普通购买，同时创建一条充值流水和扣款流水
@@ -276,7 +276,7 @@ public abstract class AbstractProduct {
     protected void createSubAuthorize(boolean isNewDomain) {
 
         // 检查是否已经有这个策略
-        String hql = " from SubAuthorize where buyerId = ? and moduleId = ?";
+        String hql = " from SubAuthorize where buyerId = ?1 and moduleId = ?2";
         boolean isFirstTimeBuyThisModule = dao.getEntities(hql, this.buyer.getId(), this.md.getId()).isEmpty();
 
         if (co.singleSubAuthorize && !isFirstTimeBuyThisModule) {

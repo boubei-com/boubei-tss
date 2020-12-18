@@ -58,23 +58,6 @@ public class EX {
 	public static String MODULE_1 = "您不是域管理员，无法执行此操作." ;
 	public static String MODULE_2 = "导入成功，如模块带有自定义HTML页面等资源文件，其相应目录及数据服务需另外修改";
 	
-	public static String CMS_0 = "未找到文章！";
-	public static String CMS_1 = "栏目IDs为空";
-	public static String CMS_2 = "ID为：${x1} 的站点/栏目不存在，可能已被删除";
-	public static String CMS_22= "ID为：${x1} 的站点不存在，无法进行全文检索";
-	public static String CMS_3 = "指定类型的附件路径不存在";
-	public static String CMS_4 = "您没有发布本栏目（站点）【id=${x1}】的权限！";
-	public static String CMS_5 = "您对正尝试访问的栏目【${x1}】没有浏览文章权限.";
-	public static String CMS_6 = "文章不能移动到站点目录下，请重新选择一个目标栏目";
-	public static String CMS_7 = "您没有删除该栏目的足够权限！";
-	public static String CMS_8 = "您对当前栏目没有停用权限！";
-	public static String CMS_9 = "选择节点不存在！id = ${x1}";
-	public static String CMS_10 = "年度或月份不能为空!";
-	public static String CMS_11 = "栏目不存在!";
-	public static String CMS_12 = "站点的发布路径填写错误，不能生成相应的发布文件路径！";
-	public static String CMS_13 = "站点的附件上传根路径填写错误，不能生成相应的附件上传根路径路径！";
-	public static String CMS_14 = "站点的图片根路径填写错误，不能生成相应的图片根路径路径！";
-	
 	public static String DM_01 = "日期【${x1}】格式有误.";
 	public static String DM_02 = "数据源【${x1}】不存在.";
 	public static String DM_03 = "参数个数不对.";
@@ -184,24 +167,6 @@ public class EX {
 	public static String U_51 = "短信验证码登录失败";
 	public static String U_52 = "您是域管理员，不能变换用户组";
 	public static String U_54 = "无法设置角色【${x1}】，权限不足。";
-	
-	public static String P_01 = "组件不存在，可能已被删除，读取失败！ID = ";
-	public static String P_02 = "同名文件(夹)已经存在，重命名失败！";
-	public static String P_03 = "节点不能移动到自身节点下";
-	public static String P_04 = "没有设定一个默认的修饰器！";
-	public static String P_05 = "没有设定一个默认的布局器！";
-	public static String P_07 = "组装门户时根节点必须是portal根节点， 【${x1}】不是根节点!";
-	public static String P_08 = "导入XML文件不是规范的门户组件，根节点名称不匹配！";
-	public static String P_09 = "导入文件不是规范的门户组件";
-	public static String P_10 = "您对当前门户【${x1}】没有浏览访问权限！";
-	public static String P_11 = "删除组件为默认的修饰器或布局器，删除失败！";
-	public static String P_12 = "停用组件为默认的修饰器或布局器，停用失败！";
-	public static String P_13 = "访问地址有误，找不到相应的门户发布消息.";
-	public static String P_14 = "相同的映射地址已经存在，请更换.";
-	public static String P_15 = "该主题为门户的默认主题或者当前主题，正在使用中，删除失败！";
-	public static String P_16 = "主题名称不能为空";
-	public static String P_17 = "解压文件【${x1}】到【${x2}】目录失败!!!";
-	public static String P_18 = "文件导入错误,可能不是规范的${x1}导入文件!!!";
 
 	public static String WF_1 = "流程已提交处理，无法再修改（或删除）";
 	public static String WF_2 = "流程已提交处理，无法再撤销";

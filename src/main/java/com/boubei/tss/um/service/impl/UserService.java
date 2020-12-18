@@ -106,7 +106,7 @@ public class UserService implements IUserService{
         		} 
         		catch(Exception e) { }
         		
-        		userDao.deleteAll( userDao.getEntities(" from ModuleDef where creator = ?", loginName) );
+        		userDao.deleteAll( userDao.getEntities(" from ModuleDef where creator = ?1", loginName) );
         	}
         }
 	}
@@ -114,12 +114,12 @@ public class UserService implements IUserService{
 	public void deepDeleteUser(Long groupId, Long userId) {
 		User user = this.getUserById(userId);
 
-		userDao.executeHQL("delete from SubAuthorize where buyerId = ?", userId);
-		userDao.executeHQL("delete from Account where belong_user = ?", user);
+		userDao.executeHQL("delete from SubAuthorize where buyerId = ?1", userId);
+		userDao.executeHQL("delete from Account where belong_user = ?1", user);
 		
 		this.deleteUser(groupId, userId);
 		
-		userDao.executeHQL("delete from CloudOrder where creator = ?", user.getLoginName());
+		userDao.executeHQL("delete from CloudOrder where creator = ?1", user.getLoginName());
 	}
 
 	public User getUserById(Long id) {
@@ -210,7 +210,7 @@ public class UserService implements IUserService{
 	}
 	
     private void checkDomainAdmin(Long userId) {
-		String hql1 = "select g from GroupUser gu, Group g where gu.userId = ? and gu.groupId = g.id and (g.levelNo = 4 or g.domainRoot = 1)";
+		String hql1 = "select g from GroupUser gu, Group g where gu.userId = ?1 and gu.groupId = g.id and (g.levelNo = 4 or g.domainRoot = 1)";
 		List<?> list = userDao.getEntities(hql1, userId);
 		if( Environment.isDomainAdmin() && Environment.getUserId().equals(userId) &&list.isEmpty() ) {
 			throw new BusinessException(EX.U_52);
@@ -375,7 +375,7 @@ public class UserService implements IUserService{
 	
 	public void moveUser(Long userId, Long groupId) {
         Group oldGroup = groupDao.findMainGroupByUserId(userId);
-        List<?> list = userDao.getEntities("from GroupUser where userId=? and groupId=?", userId, oldGroup.getId());
+        List<?> list = userDao.getEntities("from GroupUser where userId=?1 and groupId=?2", userId, oldGroup.getId());
         groupDao.deleteAll(list);
         
         GroupUser groupUser = new GroupUser(userId, groupId);
@@ -389,7 +389,7 @@ public class UserService implements IUserService{
 	
 	// 判断用户是否过期
 	private boolean isOverdue(Long userId){
-		List<?> list = userDao.getEntities(" from User o where o.id=? and o.accountLife < ?", userId, new Date());
+		List<?> list = userDao.getEntities(" from User o where o.id=?1 and o.accountLife < ?2", userId, new Date());
 		return !EasyUtils.isNullOrEmpty(list);
 	}
  
@@ -436,9 +436,9 @@ public class UserService implements IUserService{
 	 */
 	public void overdue() { 
 		Date today = new Date();
-		userDao.executeHQL("update User u set u.disabled = 1 where u.accountLife < ?", today);
-		userDao.executeHQL("update Role r set r.disabled = 1 where r.endDate < ?", today);
-		userDao.executeHQL("update SubAuthorize s set s.disabled = 1 where s.endDate < ?", today);
+		userDao.executeHQL("update User u set u.disabled = 1 where u.accountLife < ?1", today);
+		userDao.executeHQL("update Role r set r.disabled = 1 where r.endDate < ?1", today);
+		userDao.executeHQL("update SubAuthorize s set s.disabled = 1 where s.endDate < ?1", today);
 	}
 	
 	/************************************* register module **************************************/

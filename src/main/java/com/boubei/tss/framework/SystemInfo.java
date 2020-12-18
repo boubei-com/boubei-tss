@@ -116,7 +116,7 @@ public class SystemInfo {
 		String adminName = Environment.getUserName();
 				
 		// 先删除当前Admin账号的在线用户记录
-		List<?> list = commonService.getList("from DBOnlineUser where sessionId = ?", session.getId());
+		List<?> list = commonService.getList("from DBOnlineUser where sessionId = ?1", session.getId());
 		for(Object o : list) {
 			commonService.deleteWithLog(DBOnlineUser.class, ((DBOnlineUser)o).getId() );
 		}

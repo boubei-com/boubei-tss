@@ -87,7 +87,7 @@ public class ResourceModuleTest extends AbstractTest4UM {
         	Assert.assertTrue("未找到 TSS 系统中，资源类型为 not exists 的资源类型", true);
         }
 
-        String hql = " from ResourceType o where upper(o.applicationId) = ? and o.resourceTypeId = ?";
+        String hql = " from ResourceType o where upper(o.applicationId) = ?1 and o.resourceTypeId = ?2";
 		List<?> list = resourceTypeDao.getEntities(hql, applicationId, resourceTypeId);
 		assertTrue(list.size() > 0);
  

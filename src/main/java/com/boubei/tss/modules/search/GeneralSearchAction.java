@@ -67,21 +67,21 @@ public class GeneralSearchAction extends BaseActionSupport {
 	public List<?> searchResource(String resource, String key) {
 		
 		key = "%" +key+ "%";
-		String condition = "o.name like ?";
+		String condition = "o.name like ?1";
 		
 		// record、report检索需要更多的关键字
 		if( "Report".equals(resource) ) { 
-			condition = "(o.name like ? or o.param like '" +key+ "' or o.remark like '" +key+ "') and o.name not like '$%' and o.type=1 ";
+			condition = "(o.name like ?1 or o.param like '" +key+ "' or o.remark like '" +key+ "') and o.name not like '$%' and o.type=1 ";
 		}
 		if( "Record".equals(resource) ) { 
-			condition = "(o.name||o.define like ? or o.remark like '" +key+ "') and o.name not like '$%' and o.type=1 ";
+			condition = "(o.name||o.define like ?1 or o.remark like '" +key+ "') and o.name not like '$%' and o.type=1 ";
 		}
 		
 		String permissionTable = resource + "Permission";
 		String hql = "select distinct o.id, o.name, o.decode from " +resource+ " o, " +permissionTable+ " p " +
 				" where " +condition+ " and disabled = 0 " +
 				"   and p.resourceId = o.id and p.roleId in (" +Environment.getInSession(SSOConstants.USER_RIGHTS_S)+ ") ";
-		String hql2 = "select name from " +resource+ " o where ? like o.decode||'%' and id <> ? order by o.decode";
+		String hql2 = "select name from " +resource+ " o where ?1 like o.decode||'%' and id <> ?2 order by o.decode";
 		
 		List<?> result = commonService.getList(hql, key);
 		for(Object obj : result) {
@@ -256,7 +256,7 @@ public class GeneralSearchAction extends BaseActionSupport {
 	@RequestMapping("/rid")
 	@ResponseBody
 	public Long getRoleId(String role) {
-		List<?> roles = commonService.getList(" select id from Role where name=? order by id desc", role);
+		List<?> roles = commonService.getList(" select id from Role where name=?1 order by id desc", role);
 		return (Long) (roles.isEmpty() ? null : roles.get(0));
 	}
 

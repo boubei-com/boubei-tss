@@ -452,7 +452,7 @@ public class _Recorder extends ProgressActionSupport {
 		wfService.appendWFInfo(_db, result, id);
 		
 		// 添加流程提醒，由发起人提醒审批人（站内信）
-		result.put("wf_msgs", commService.getList("from Message where workflow=? and workflowItem=? order by id", recordId, id));
+		result.put("wf_msgs", commService.getList("from Message where workflow=?1 and workflowItem=?2 order by id", recordId, id));
 
 		result.put("id", id);
 		return result;

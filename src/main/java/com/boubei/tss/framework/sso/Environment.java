@@ -15,9 +15,9 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import com.boubei.tss.MatrixUtil;
 import com.boubei.tss.framework.sso.context.Context;
 import com.boubei.tss.framework.sso.context.RequestContext;
-import com.boubei.tss.matrix.MatrixUtil;
 import com.boubei.tss.um.UMConstants;
 import com.boubei.tss.util.EasyUtils;
 import com.boubei.tss.util.URLUtil;

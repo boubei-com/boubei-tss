@@ -68,7 +68,7 @@ public class DecodeInterceptor extends MatchByDaoMethodNameInterceptor {
     void repairChildrenDecode(IDecodable entity, String oldDecode, IDao<IEntity> dao){
         String newDecode = entity.getDecode();
  
-        List<?> list = dao.getEntities("from " + entity.getClass().getName() + " o where o.decode like ?", oldDecode + "%" );
+        List<?> list = dao.getEntities("from " + entity.getClass().getName() + " o where o.decode like ?1", oldDecode + "%" );
         DecodeUtil.repairSubNodeDecode(list, oldDecode, newDecode);
         dao.flush();
     }

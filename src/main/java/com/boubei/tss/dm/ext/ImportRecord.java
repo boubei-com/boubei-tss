@@ -78,7 +78,7 @@ public class ImportRecord implements AfterUpload {
                 record.setTable( table.substring(table.indexOf(".") + 1) ); // 去掉表空间|schema
             }
             
-            String hql = "from Record where name = ? and (id = ? or table = ?)";
+            String hql = "from Record where name = ?1 and (id = ?2 or table = ?3)";
             List<?> exists = Global.getCommonService().getList(hql, record.getName(), oldId, EasyUtils.obj2String(record.getTable()));
             if( exists.isEmpty() ) {
             	Integer status = record.getDisabled();

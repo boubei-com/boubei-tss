@@ -55,12 +55,12 @@ public class APIServiceImpl implements APIService {
 	public List<String> searchTokes(String uName, String resource, String type) {
 		Date now = new Date();
 		
-		String hql = "select token from UserToken where user=? and resource=? and type=? and expireTime > ?";
+		String hql = "select token from UserToken where user=?1 and resource=?2 and type=?3 and expireTime > ?4";
 		List<String> tokens = (List<String>) userDao.getEntities(hql, uName, resource, type, now );
 		tokens.addAll( (List<String>) userDao.getEntities(hql, Anonymous._CODE, resource, type, now ) );
 		
 		/* 专门用于SSO的令牌，一个用户可以有多个（比如一个手机号通过多个小程序登录同一后台，每个小程序的openId都可登录）*/
-		hql = "select token from UserToken where user=? and type='SSO' and expireTime > ? and (domain is null or domain not like '%@--')";
+		hql = "select token from UserToken where user=?1 and type='SSO' and expireTime > ?2 and (domain is null or domain not like '%@--')";
 		tokens.addAll( (List<String>) userDao.getEntities(hql, uName, now) );
 		
 		/*
@@ -92,12 +92,12 @@ public class APIServiceImpl implements APIService {
 		String groupStr;
 		
 		// 移动到目标组下
-		String hql = "select id from Group where domain = ? and ? in (name,id) order by decode asc";
+		String hql = "select id from Group where domain = ?1 and ?2 in (name,id) order by decode asc";
 		List<?> list = commService.getList(hql, Environment.getDomain(), EasyUtils.checkNull(group, "noGroup__"));
 		Object targetMainGroup = list.isEmpty() ? null : list.get(0);
 		
 		// 只能修改自己域下用户，修改别的域已存在的用户会报账号已存在 (可以指定例外的域：比如体验域的允许被其它域移走)
-		String hql2 = "select gu.userId from Group g, GroupUser gu where g.id = gu.groupId and g.groupType = ? and g.domain = ?";
+		String hql2 = "select gu.userId from Group g, GroupUser gu where g.id = gu.groupId and g.groupType = ?1 and g.domain = ?2";
         List<?> testAccouts = commService.getList(hql2, Group.MAIN_GROUP_TYPE, ParamManager.getValue("TEST_DOMAIN", "G1"));
 		
 		Map<String, String> domainUsersMap = loginService.getUsersMap(Environment.getDomain());

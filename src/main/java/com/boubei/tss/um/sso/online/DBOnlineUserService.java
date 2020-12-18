@@ -81,7 +81,7 @@ public class DBOnlineUserService implements IOnlineUserManager {
         		/*  销毁当前用户已经登录的session（登录在其它电脑上的），控制账号在多地登录. */
         		try {
         			session.invalidate(); 
-        			dao.executeHQL("delete from DBOnlineUser where id = ?", ou.getId());
+        			dao.executeHQL("delete from DBOnlineUser where id = ?1", ou.getId());
         			
         			// 销毁session时，ou也被删除了；此处重新保存
         			ou.setId(null);
@@ -99,18 +99,18 @@ public class DBOnlineUserService implements IOnlineUserManager {
         	}
 
         	int loginCount = EasyUtils.obj2Int(ou.getLoginCount()) + 1 ;
-        	dao.executeHQL("update DBOnlineUser set token = ?, sessionId = ?, loginCount = ?, loginTime = ?, clientIp = ?, origin = ? where id = ?", 
+        	dao.executeHQL("update DBOnlineUser set token = ?1, sessionId = ?2, loginCount = ?3, loginTime = ?4, clientIp = ?5, origin = ?6 where id = ?7", 
         			token, sessionId, loginCount, new Date(), Environment.getClientIp(), Environment.getOrigin(), ou.getId());
         }
         
         // 设置域信息（每次登陆domain可能已经发生了变化，重新设置）
     	if( domain != null && !domain.equals(ou.getDomain()) ) {
-    		dao.executeHQL("update DBOnlineUser set domain = ? where id = ?", domain, ou.getId());
+    		dao.executeHQL("update DBOnlineUser set domain = ?1 where id = ?2", domain, ou.getId());
     	}
     }
     
     private String queryDomain(Long userId) {
-    	String hql = "from Group where id in (select groupId from GroupUser where userId = ?) and groupType = ?";
+    	String hql = "from Group where id in (select groupId from GroupUser where userId = ?1) and groupType = ?2";
     	List<?> groups = dao.getEntities(hql, userId, Group.MAIN_GROUP_TYPE);
     	
     	String domain = null;
@@ -132,18 +132,18 @@ public class DBOnlineUserService implements IOnlineUserManager {
     	 * 2、检查域信息配置，判断当前用户所在域是否支持一个账号多地同时登陆；
     	 * 3、API call 也不踢人;
     	 */
-    	String hql = " from DBOnlineUser o where o.userId = ? and o.origin = ? ";
+    	String hql = " from DBOnlineUser o where o.userId = ?1 and o.origin = ?2 ";
     	String origin = Environment.getOrigin();
 		if( isMobile  ) {
             return dao.getEntities(hql, userId, origin); 
     	}
     	if( ParamConstants.TRUE.equals( multilogin ) || isAPICall ) {
-    		hql += " and clientIp = ? ";
+    		hql += " and clientIp = ?3 ";
             return dao.getEntities(hql, userId, origin, Environment.getClientIp());
     	}
     	
     	// 通常一个账号只能登录一台电脑（加上userName条件可以不踢Admin切换的记录）
-    	hql = " from DBOnlineUser o where o.userId = ? and o.userName = ?";
+    	hql = " from DBOnlineUser o where o.userId = ?1 and o.userName = ?2";
         return dao.getEntities(hql, userId, userName);
     }
 
@@ -157,7 +157,7 @@ public class DBOnlineUserService implements IOnlineUserManager {
      * 注：Jetty关闭前会失效所有的session，要在Jetty下测试自动登录，需要在重启jetty前把online_user表里的sessionId值清空
      */
     public String logout(String appCode, String sessionId) {
-    	String hql = " from DBOnlineUser o where o.appCode = ? and o.sessionId = ? ";
+    	String hql = " from DBOnlineUser o where o.appCode = ?1 and o.sessionId = ?2 ";
         List<?> list = dao.getEntities(hql, appCode, sessionId);
         
         String token = null;
@@ -172,13 +172,13 @@ public class DBOnlineUserService implements IOnlineUserManager {
 		Double delta = (Double) EasyUtils.checkTrue(currTime - restartTime.getTime() < 1000*60*3, 0.1d, 0d);
 		Date time1 = DateUtil.subDays(restartTime, delta); // 重启后3分钟内，删除2小时前登录的（允许近期登录的自动登录）；3分钟后，删除所有重启前的登录记录
 		Date time2 = DateUtil.subDays(now, 0.5); // 12小时
-    	dao.executeHQL("delete from DBOnlineUser where loginTime < ?", EasyUtils.checkTrue(time1.after(time2), time1, time2));
+    	dao.executeHQL("delete from DBOnlineUser where loginTime < ?1", EasyUtils.checkTrue(time1.after(time2), time1, time2));
     	
 		return token;
     }
     
     public boolean isOnline(String token) {
-        String hql = "from DBOnlineUser o where o.token = ? and clientIp = ? ";
+        String hql = "from DBOnlineUser o where o.token = ?1 and clientIp = ?2 ";
 		List<?> list = dao.getEntities(hql, token, Environment.getClientIp());
 		return list.size() > 0;
     }

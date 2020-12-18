@@ -57,9 +57,8 @@ public class GroupDao extends TreeSupportDao<Group> implements IGroupDao {
                 throw new BusinessException( EX.parse(EX.U_322, group.getName()) );
             }
             
-            Object[] params = new Object[]{ user.getId() };
-			deleteAll(getEntities("from GroupUser gu where gu.userId = ?", params));
-            deleteAll(getEntities("from RoleUser ru where ru.userId = ? and ru.strategyId is null", params));
+			deleteAll(getEntities("from GroupUser gu where gu.userId = ?1", user.getId()));
+            deleteAll(getEntities("from RoleUser ru where ru.userId = ?1 and ru.strategyId is null", user.getId()));
         }
         
         for(Iterator<?> it = groups.iterator(); it.hasNext();){
@@ -79,16 +78,16 @@ public class GroupDao extends TreeSupportDao<Group> implements IGroupDao {
     }
 
 	public List<?> findRolesByGroupId(Long groupId) {
-		String hql = "select distinct r from RoleGroup rg, Role r where rg.roleId = r.id and rg.groupId = ? and rg.strategyId is null ";
+		String hql = "select distinct r from RoleGroup rg, Role r where rg.roleId = r.id and rg.groupId = ?1 and rg.strategyId is null ";
 		return getEntities(hql, groupId);
 	}
 
 	public List<?> findGroup2UserByGroupId(Long groupId) {
-        return getEntities("from GroupUser gu where gu.groupId = ?", groupId);
+        return getEntities("from GroupUser gu where gu.groupId = ?1", groupId);
 	}
 
 	public List<?> findGroup2RoleByGroupId(Long groupId) {
-        return getEntities("from RoleGroup rg where rg.groupId = ? and rg.strategyId is null ", groupId);
+        return getEntities("from RoleGroup rg where rg.groupId = ?1 and rg.strategyId is null ", groupId);
 	}
  
 	public Group findMainGroupByUserId(Long userId){
@@ -101,7 +100,7 @@ public class GroupDao extends TreeSupportDao<Group> implements IGroupDao {
 	}
     
     public List<?> findGroupsByUserId(Long userId) {
-        String hql = "select distinct g from GroupUser gu, Group g where gu.groupId = g.id and gu.userId = ? ";
+        String hql = "select distinct g from GroupUser gu, Group g where gu.groupId = g.id and gu.userId = ?1 ";
         return getEntities(hql, userId);
     }
     
@@ -114,7 +113,7 @@ public class GroupDao extends TreeSupportDao<Group> implements IGroupDao {
 	public List<?> getVisibleSubGroups(Long groupId){
 		Group group = getEntity(groupId);
         
-        String hql = PermissionHelper.permissionHQL(entityName, GroupPermission.class.getName(), " and o.decode like ? ", true);
+        String hql = PermissionHelper.permissionHQL(entityName, GroupPermission.class.getName(), " and o.decode like ?3 ", true);
         return getEntities(hql, Environment.getUserId(), UMConstants.GROUP_VIEW_OPERRATION, group.getDecode() + "%" );
 	}
  
@@ -160,7 +159,7 @@ public class GroupDao extends TreeSupportDao<Group> implements IGroupDao {
 	
 	private Group getMainGroup(Long userId) {
         String hql = "select distinct g from Group g, GroupUser gu " +
-        		" where g.id = gu.groupId and gu.userId = ? and g.groupType = ?";
+        		" where g.id = gu.groupId and gu.userId = ?1 and g.groupType = ?2";
         List<?> list = getEntities(hql, userId, Group.MAIN_GROUP_TYPE);
         
         return (Group) list.get(0);
@@ -240,7 +239,7 @@ public class GroupDao extends TreeSupportDao<Group> implements IGroupDao {
 	public List<User> getUsersByGroupId(Long groupId) {
 		String hql = "select distinct u, g.id as groupId, g.name as groupName,g.domain" +
 				" from User u, GroupUser gu, Group g " +
-                " where u.id = gu.userId and gu.groupId = g.id and g.id = ? ";
+                " where u.id = gu.userId and gu.groupId = g.id and g.id = ?1 ";
 		return fillGroupInfo2User(getEntities(hql, groupId));
 	}
 

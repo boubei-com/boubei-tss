@@ -44,7 +44,7 @@ public class ByIDETLJob extends AbstractETLJob {
 		} catch(Exception e) { }
 		
 		// 如果没有设置，则取日志里记录下来的最大ID
-		String hql = "select max(maxID) from TaskLog where taskId = ? and exception='no'";
+		String hql = "select max(maxID) from TaskLog where taskId = ?1 and exception='no'";
 		List<?> list = commonService.getList(hql, task.getId());
 		Object maxId = null;
 		try {

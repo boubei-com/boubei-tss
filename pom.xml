@@ -125,9 +125,9 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>c3p0</groupId>
+			<groupId>com.mchange</groupId>
 			<artifactId>c3p0</artifactId>
-			<version>0.9.1.2</version>
+			<version>0.9.5.2</version>
 		</dependency>
 
 		<!-- Mysql DB driver 4 release -->
@@ -285,22 +285,6 @@
 			<scope>provided</scope>
 		</dependency>
 		
-		<!--  CMS DEPENDENCIES -->
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-core</artifactId>
-			<version>2.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-analyzers</artifactId>
-			<version>2.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-highlighter</artifactId>
-			<version>2.2.0</version>
-		</dependency>
 		
 	</dependencies>
 

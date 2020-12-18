@@ -184,7 +184,7 @@ public class TreeSupportDao<T extends IDecodable> extends BaseDao<T> implements 
          * 以消除存在相同序号的兄弟节点出现（相同序号则decode也相同，授权时打全勾会引起混乱，因为会把相同decode的兄弟节点及它的所有子节点都带上了）。
          */
         @SuppressWarnings("unchecked")
-		List<T> sibling = (List<T>) getEntities("from " + entityName + " o where o.parentId = ? order by o.seqNo", parentId);
+		List<T> sibling = (List<T>) getEntities("from " + entityName + " o where o.parentId = ?1 order by o.seqNo", parentId);
         int currentSeqNo = 1;
         for (T temp : sibling) {
         	if(currentSeqNo != EasyUtils.obj2Int(temp.getSeqNo())) {

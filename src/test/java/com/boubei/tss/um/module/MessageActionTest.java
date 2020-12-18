@@ -141,7 +141,7 @@ public class MessageActionTest extends AbstractTest4UM {
 	@SuppressWarnings("unchecked")
 	private List<Message> getInboxList(){
 		Long userId = Environment.getUserId();
-		String hql = " from Message m where m.receiverId = ? order by m.id desc ";
+		String hql = " from Message m where m.receiverId = ?1 order by m.id desc ";
 		return (List<Message>) commonDao.getEntities(hql, userId);
 	}
 

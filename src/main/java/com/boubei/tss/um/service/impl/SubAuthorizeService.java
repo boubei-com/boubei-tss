@@ -38,7 +38,7 @@ public class SubAuthorizeService implements ISubAuthorizeService {
 	@Autowired private IGroupDao groupDao;	
 	
 	public List<?> listMySubauth(Long creatorId) {
-		String hql = " from SubAuthorize where ? in (creatorId, buyerId) and endDate >= ? and disabled = 0 ";
+		String hql = " from SubAuthorize where ?1 in (creatorId, buyerId) and endDate >= ?2 and disabled = 0 ";
 		return roleDao.getEntities(hql, creatorId, new Date());
 	}
 	
@@ -102,7 +102,7 @@ public class SubAuthorizeService implements ISubAuthorizeService {
 	}
 
 	public List<?> getStrategyByCreator() {
-	    return roleDao.getEntities("from SubAuthorize o where ? in (o.creatorId, -1)" , Environment.getUserId());
+	    return roleDao.getEntities("from SubAuthorize o where ?1 in (o.creatorId, -1)" , Environment.getUserId());
 	}
 
 	public void saveSubauth(SubAuthorize strategy, String userIds, String groupIds, String roleIds) {

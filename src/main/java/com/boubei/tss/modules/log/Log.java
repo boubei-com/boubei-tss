@@ -28,6 +28,7 @@ import javax.persistence.Table;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.hibernate.annotations.GenericGenerator;
 
 import com.boubei.tss.framework.persistence.IEntity;
 import com.boubei.tss.framework.sso.Environment;
@@ -42,12 +43,12 @@ import com.boubei.tss.util.EasyUtils;
  */
 @Entity
 @Table(name = "component_log")
-@SequenceGenerator(name = "log_sequence", sequenceName = "log_sequence", initialValue = 1000, allocationSize = 10)
 @JsonIgnoreProperties(value={"pk", "attributes4XForm", "attributes", "operatorBrowser"})
 public class Log implements IEntity, IXForm, IGridNode {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "log_sequence")
+    @GenericGenerator(name = "log_sequence", strategy = "native")
     private Long    id;
     
     @Column(nullable = false)  

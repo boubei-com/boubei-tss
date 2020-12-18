@@ -164,7 +164,7 @@ public class UMServiceTest extends AbstractTest4F {
     	userDao.executeSQL("update test_group set name = 'XXX' where code = :code", 
     			new String[] {"code"}, new Object[] {"RD"});
     	
-    	userDao.executeHQL("delete _Group where code = ?", "RD");
+    	userDao.executeHQL("delete _Group where code = ?1", "RD");
     	userDao.executeHQL("delete _Group where code = :code", new String[] {"code"}, new Object[] {"RD"});
     	
     	list.add(temp);

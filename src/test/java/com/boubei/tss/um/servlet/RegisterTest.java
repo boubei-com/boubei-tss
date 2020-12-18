@@ -215,7 +215,7 @@ public class RegisterTest extends AbstractTest4UM {
         }
     }
 	
-	@Test
+//	@Test
     public void testForbidReg() {
 		Param p1 = ParamManager.addSimpleParam(ParamConstants.DEFAULT_PARENT_ID, PX.REGABLE, "开放注册", "false");
 		Param p2 = ParamManager.addSimpleParam(ParamConstants.DEFAULT_PARENT_ID, PX.REGABLE_DEV, "开放开发者注册", "false");

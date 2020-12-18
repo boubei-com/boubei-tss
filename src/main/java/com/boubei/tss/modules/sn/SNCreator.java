@@ -63,7 +63,7 @@ class SNCreator {
 		List<String> result = new ArrayList<String>();
 		
 		// 优先从SelfNO里出（tag = 取号人）
-		String hql = " from SelfNO where tag = ? and (used = 0 or used is null) and domain = ? order by id ";
+		String hql = " from SelfNO where tag = ?1 and (used = 0 or used is null) and domain = ?2 order by id ";
 		String userCode = Environment.getNotnullUserCode();
 		List<?> list = commonService.getList(hql, userCode, domain);
 		if( list.size() >= count ) {

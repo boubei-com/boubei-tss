@@ -64,7 +64,7 @@ public class DomainReportTest extends AbstractTest4DM {
 		valuesMap.put("domain", UMConstants.DEFAULT_DOMAIN);
 		db.insert(valuesMap );
 		
-  		String hql = "select table from Record where type = 1 and datasource=? and table=? ";
+  		String hql = "select table from Record where type = 1 and datasource=?1 and table=?2 ";
   		List<?> list = commonDao.getEntities(hql, DMConstants.LOCAL_CONN_POOL, record1.getTable());
 		Assert.assertEquals(1, list.size());
 		Assert.assertEquals(record1.getTable(), list.get(0));
