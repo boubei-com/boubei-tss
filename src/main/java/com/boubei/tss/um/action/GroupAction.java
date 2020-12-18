@@ -29,15 +29,12 @@ import com.boubei.tss.framework.web.display.tree.LevelTreeParser;
 import com.boubei.tss.framework.web.display.tree.TreeEncoder;
 import com.boubei.tss.framework.web.display.xform.XFormEncoder;
 import com.boubei.tss.framework.web.mvc.ProgressActionSupport;
-import com.boubei.tss.modules.progress.ProgressManager;
-import com.boubei.tss.modules.progress.Progressable;
 import com.boubei.tss.um.UMConstants;
 import com.boubei.tss.um.entity.Group;
 import com.boubei.tss.um.entity.User;
 import com.boubei.tss.um.helper.GroupTreeParser;
 import com.boubei.tss.um.permission.PermissionHelper;
 import com.boubei.tss.um.service.IGroupService;
-import com.boubei.tss.um.syncdata.ISyncService;
 import com.boubei.tss.util.EasyUtils;
  
 @Controller
@@ -45,7 +42,6 @@ import com.boubei.tss.util.EasyUtils;
 public class GroupAction extends ProgressActionSupport {
 
 	@Autowired private IGroupService service;
-	@Autowired private ISyncService  syncService;
 
 	@RequestMapping("/list")
 	public void getAllGroup2Tree(HttpServletResponse response) {
@@ -222,20 +218,4 @@ public class GroupAction extends ProgressActionSupport {
     	service.move(id, toGroupId);        
         printSuccessMessage();
 	}
-    
-    @RequestMapping("/sync/{groupId}")
-    public void syncData(HttpServletResponse response, @PathVariable("groupId") Long groupId) {
-        
-        Map<String, Object> datasMap = syncService.getCompleteSyncGroupData(groupId);
-        
-        List<?> groups = (List<?>)datasMap.get("groups");
-        List<?> users  = (List<?>)datasMap.get("users");
-        int total = users.size() + groups.size();
-        
-        // 因为同步数据会启用进度条中的线程进行，所以需要在action中启动，而不是在service，在service的话会导致事务提交不了
-        ProgressManager manager = new ProgressManager((Progressable) syncService, total, datasMap);
-        String code = manager.execute(); 
-        
-        printScheduleMessage(code);
-    }
 }

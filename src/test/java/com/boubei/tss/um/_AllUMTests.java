@@ -30,7 +30,6 @@ import com.boubei.tss.um.sso.FetchPermissionAfterLoginTest;
 import com.boubei.tss.um.sso.UMIdentityGetterTest;
 import com.boubei.tss.um.sso.UMPasswordIdentifierTest;
 import com.boubei.tss.um.sso.online.DBOnlineUserManagerTest;
-import com.boubei.tss.um.syncdata.SyncDataFromDBTest;
 import com.boubei.tss.um.zlast.ResourceModuleTest;
 
 @RunWith(Suite.class)
@@ -51,7 +50,6 @@ import com.boubei.tss.um.zlast.ResourceModuleTest;
 	ResetPasswordTest.class,
 	PasswordRuleTest.class,
 	GeneralSearchTest.class,
-	SyncDataFromDBTest.class,
 	DBOnlineUserManagerTest.class,
 	ImportAppConfigTest.class
 })

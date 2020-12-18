@@ -45,14 +45,12 @@ import com.boubei.tss.framework.sso.Anonymous;
 import com.boubei.tss.framework.sso.IdentityCard;
 import com.boubei.tss.framework.sso.TokenUtil;
 import com.boubei.tss.framework.sso.context.Context;
+import com.boubei.tss.modules.menu.INavigatorService;
+import com.boubei.tss.modules.menu.Navigator;
+import com.boubei.tss.modules.menu.PortalConstants;
 import com.boubei.tss.modules.param.Param;
 import com.boubei.tss.modules.param.ParamConstants;
 import com.boubei.tss.modules.param.ParamManager;
-import com.boubei.tss.portal.PortalConstants;
-import com.boubei.tss.portal.entity.Component;
-import com.boubei.tss.portal.entity.Navigator;
-import com.boubei.tss.portal.service.IComponentService;
-import com.boubei.tss.portal.service.INavigatorService;
 import com.boubei.tss.um.UMConstants;
 import com.boubei.tss.um.helper.dto.OperatorDTO;
 import com.boubei.tss.um.permission.PermissionHelper;
@@ -91,7 +89,6 @@ public class InitDatabase extends AbstractTransactionalJUnit4SpringContextTests 
     @Autowired private ResourcePermission resourcePermission;
     @Autowired private ILoginService loginSerivce;
     
-    @Autowired private IComponentService elementService;
     @Autowired private INavigatorService navigatorService;
     
     @Autowired private ReportService reportService;
@@ -190,49 +187,6 @@ public class InitDatabase extends AbstractTransactionalJUnit4SpringContextTests 
     
     /** 初始化默认的修饰器，布局器 */
     private void initPortal() {
-        Component layoutGroup = new Component();
-        layoutGroup.setName("布局器组");
-        layoutGroup.setIsGroup(true);
-        layoutGroup.setType(Component.LAYOUT_TYPE);
-        layoutGroup.setParentId(PortalConstants.ROOT_ID);   
-        layoutGroup = elementService.saveComponent(layoutGroup);
-        
-        Component defaultLayout = new Component();
-        defaultLayout.setIsDefault(ParamConstants.TRUE);
-        defaultLayout.setParentId(layoutGroup.getId());   
-        Document document = XMLDocUtil.createDoc("template/portal/defaultLayout.xml");
-        org.dom4j.Element propertyElement = document.getRootElement().element("property");
-        String layoutName = propertyElement.elementText("name");
-        defaultLayout.setName(layoutName);
-        defaultLayout.setPortNumber(new Integer(propertyElement.elementText("portNumber")));
-        defaultLayout.setDefinition(document.asXML());
-        elementService.saveComponent(defaultLayout);
-        
-        Component decoratorGroup = new Component();
-        decoratorGroup.setName("修饰器组");
-        decoratorGroup.setIsGroup(true);
-        decoratorGroup.setType(Component.DECORATOR_TYPE);
-        decoratorGroup.setParentId(PortalConstants.ROOT_ID);  
-        decoratorGroup = elementService.saveComponent(decoratorGroup);
-        
-        Component defaultDecorator = new Component();
-        defaultDecorator.setIsDefault(ParamConstants.TRUE);
-        defaultDecorator.setParentId(decoratorGroup.getId());
-        
-        document = XMLDocUtil.createDoc("template/portal/defaultDecorator.xml");
-        propertyElement = document.getRootElement().element("property");
-        String decoratorName = propertyElement.elementText("name");
-        defaultDecorator.setName(decoratorName);
-        defaultDecorator.setDefinition(document.asXML());
-        elementService.saveComponent(defaultDecorator);
-        
-        Component portletGroup = new Component();
-        portletGroup.setName("portlet组");
-        portletGroup.setIsGroup(true);
-        portletGroup.setType(Component.PORTLET_TYPE);
-        portletGroup.setParentId(PortalConstants.ROOT_ID);   
-        portletGroup = elementService.saveComponent(portletGroup);
-        
         // 新建一个应用菜单组（不依附于门户）
         Navigator appMenuGroup = new Navigator();
         appMenuGroup.setName("应用菜单组");
