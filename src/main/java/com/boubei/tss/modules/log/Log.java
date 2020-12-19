@@ -22,12 +22,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.boubei.tss.framework.persistence.IEntity;
@@ -37,6 +35,7 @@ import com.boubei.tss.framework.web.display.grid.IGridNode;
 import com.boubei.tss.framework.web.display.xform.IXForm;
 import com.boubei.tss.util.DateUtil;
 import com.boubei.tss.util.EasyUtils;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /** 
  * 日志表

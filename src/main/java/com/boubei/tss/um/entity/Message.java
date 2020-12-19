@@ -21,14 +21,13 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
 import com.boubei.tss.dm.record.workflow.WFUtil;
 import com.boubei.tss.framework.persistence.IEntity;
 import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.framework.web.display.grid.GridAttributesMap;
 import com.boubei.tss.framework.web.display.grid.IGridNode;
 import com.boubei.tss.util.EasyUtils;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  
 /**
  * 站内消息对象

@@ -22,8 +22,6 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
 import com.boubei.tss.framework.persistence.entityaop.IDecodable;
 import com.boubei.tss.framework.persistence.entityaop.OperateInfo;
 import com.boubei.tss.framework.web.display.tree.ILevelTreeNode;
@@ -31,6 +29,7 @@ import com.boubei.tss.framework.web.display.tree.TreeAttributesMap;
 import com.boubei.tss.framework.web.display.xform.IXForm;
 import com.boubei.tss.util.BeanUtil;
 import com.boubei.tss.util.EasyUtils;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * <p>

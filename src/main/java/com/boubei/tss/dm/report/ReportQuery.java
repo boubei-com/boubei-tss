@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import com.boubei.tss.EX;
 import com.boubei.tss.PX;
@@ -36,6 +35,7 @@ import com.boubei.tss.util.DateUtil;
 import com.boubei.tss.util.EasyUtils;
 import com.boubei.tss.util.MacrocodeCompiler;
 import com.boubei.tss.util.StringUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ReportQuery {
 	

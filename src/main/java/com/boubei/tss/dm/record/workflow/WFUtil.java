@@ -13,11 +13,10 @@ package com.boubei.tss.dm.record.workflow;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
 import com.boubei.tss.framework.exception.BusinessException;
 import com.boubei.tss.util.BeanUtil;
 import com.boubei.tss.util.EasyUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class WFUtil {
 

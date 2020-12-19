@@ -13,9 +13,8 @@ package com.boubei.tss.dm.report.permission;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
 import com.boubei.tss.um.permission.AbstractPermission;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /** 
  *报表资源权限表

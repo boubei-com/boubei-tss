@@ -190,15 +190,21 @@
 
 		<!-- Jackson JSON Mapper -->
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-jaxrs</artifactId>
-			<version>1.9.12</version>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>2.9.3</version>
 		</dependency>
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.9.12</version>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-core</artifactId>
+		    <version>2.9.3</version>
 		</dependency>
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-annotations</artifactId>
+		    <version>2.9.3</version>
+		</dependency>
+	
 		<dependency>
 		    <groupId>org.json</groupId>
 		    <artifactId>json</artifactId>
@@ -271,11 +277,12 @@
 		
 		<!-- Jetty DEPENDENCIES -->
 		<dependency>
-			<groupId>org.eclipse.jetty.aggregate</groupId>
-			<artifactId>jetty-all</artifactId>
-			<version>8.1.12.v20130726</version>
-			<scope>test</scope>
+		    <groupId>org.eclipse.jetty.aggregate</groupId>
+		    <artifactId>jetty-all-server</artifactId>
+		    <version>8.2.0.v20160908</version>
+		    <scope>test</scope>
 		</dependency>
+		
 		
 		<!-- provided -->
 		<dependency>
@@ -383,7 +390,7 @@
                  -->
 			</plugin>
 			
-			<plugin>
+<!-- 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>8.1.12.v20130726</version>
@@ -399,6 +406,22 @@
 					<stopPort>9966</stopPort>
 					<stopKey>tss</stopKey>
 				</configuration>
+			</plugin> -->
+			
+			<plugin>
+			    <groupId>org.eclipse.jetty</groupId>
+			    <artifactId>jetty-maven-plugin</artifactId>
+			    <version>9.4.5.v20170502</version>
+			    <configuration>
+			        <httpConnector>
+			            <port>9000</port>
+			        </httpConnector>
+			        <webApp>
+			            <contextPath>/tss</contextPath>
+			        </webApp>
+			        <!--热部署-->
+			        <scanIntervalSeconds>10</scanIntervalSeconds>
+			    </configuration>
 			</plugin>
 
 			<plugin>

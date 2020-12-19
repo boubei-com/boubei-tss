@@ -26,11 +26,11 @@ import java.util.TreeMap;
 import javax.script.ScriptEngineManager;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import com.boubei.tss.PX;
 import com.boubei.tss.framework.exception.BusinessException;
 import com.boubei.tss.modules.param.ParamConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;

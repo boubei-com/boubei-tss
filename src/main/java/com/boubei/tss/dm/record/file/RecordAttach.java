@@ -23,13 +23,13 @@ import javax.persistence.Table;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
 import com.boubei.tss.dm.DMUtil;
 import com.boubei.tss.framework.persistence.IEntity;
 import com.boubei.tss.framework.web.display.grid.GridAttributesMap;
 import com.boubei.tss.framework.web.display.grid.IGridNode;
 import com.boubei.tss.util.DateUtil;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * <p>

@@ -25,8 +25,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
 import com.boubei.tss.framework.persistence.entityaop.IDecodable;
 import com.boubei.tss.framework.persistence.entityaop.OperateInfo;
 import com.boubei.tss.framework.web.display.tree.TreeAttributesMap;
@@ -36,6 +34,7 @@ import com.boubei.tss.um.UMConstants;
 import com.boubei.tss.um.permission.IResource;
 import com.boubei.tss.util.BeanUtil;
 import com.boubei.tss.util.EasyUtils;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 用户组域对象

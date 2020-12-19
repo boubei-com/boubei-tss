@@ -18,7 +18,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
 
 import com.boubei.tss.framework.Global;
 import com.boubei.tss.framework.web.servlet.AfterUpload;
@@ -27,6 +26,7 @@ import com.boubei.tss.modules.menu.Navigator;
 import com.boubei.tss.util.BeanUtil;
 import com.boubei.tss.util.EasyUtils;
 import com.boubei.tss.util.FileHelper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class ImportMenu implements AfterUpload {

@@ -10,9 +10,30 @@
         http://www.springframework.org/schema/mvc/spring-mvc.xsd">
  
 	<!-- 第一步：开启MVC注解 -->
-	<mvc:annotation-driven />
-	
-	<!-- com.boubei.tss.framework.web.json下的两个Date转换器去掉了 -->
+	<mvc:annotation-driven>  
+    	<!-- 处理responseBody 里面日期类型 -->  
+        <mvc:message-converters>  
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">  
+                <property name="objectMapper">  
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">  
+                        <property name="dateFormat">  
+                            <bean class="java.text.SimpleDateFormat">  
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />  
+                            </bean>  
+                        </property>  
+                    </bean>  
+                </property>  
+            </bean>  
+        </mvc:message-converters>  
+    </mvc:annotation-driven>
+    
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">    
+        <property name="converters">    
+            <list>    
+                <bean class="com.boubei.tss.framework.web.json.DateConvert" />    
+            </list>    
+        </property>    
+    </bean>
 	  
 	<!-- 在springMVC配置文件中将Service注解给去掉，以免注入的service没有事务功能.注：过滤包目录需要spring-framework.xml里一致 -->
 	<context:component-scan base-package="com.boubei"> 

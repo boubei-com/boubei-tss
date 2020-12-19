@@ -13,8 +13,9 @@ package com.boubei.tss.dm.util;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Json2ListTest {
 	

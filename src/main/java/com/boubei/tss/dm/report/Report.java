@@ -23,8 +23,6 @@ import javax.persistence.Lob;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
 import com.boubei.tss.dm.DMConstants;
 import com.boubei.tss.dm.DMUtil;
 import com.boubei.tss.dm.report.permission.ReportResource;
@@ -36,6 +34,7 @@ import com.boubei.tss.modules.param.ParamConstants;
 import com.boubei.tss.um.permission.IResource;
 import com.boubei.tss.util.BeanUtil;
 import com.boubei.tss.util.EasyUtils;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "dm_report")

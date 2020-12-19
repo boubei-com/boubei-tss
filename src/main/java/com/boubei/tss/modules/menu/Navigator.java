@@ -25,7 +25,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.dom4j.Element;
 
 import com.boubei.tss.framework.persistence.entityaop.IDecodable;
@@ -36,6 +35,7 @@ import com.boubei.tss.modules.param.ParamConstants;
 import com.boubei.tss.um.permission.IResource;
 import com.boubei.tss.util.BeanUtil;
 import com.boubei.tss.util.XMLDocUtil;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * 导航栏内容定义器：描述导航栏（菜单）基本信息及内容定义信息

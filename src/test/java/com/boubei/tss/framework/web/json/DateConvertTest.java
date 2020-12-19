@@ -12,10 +12,10 @@ package com.boubei.tss.framework.web.json;
 
 import java.util.Date;
 
-import org.codehaus.jackson.JsonGenerator;
 import org.junit.Test;
 
 import com.boubei.tss.util.DateUtil;
+import com.fasterxml.jackson.core.JsonGenerator;
 
 import junit.framework.Assert;
 

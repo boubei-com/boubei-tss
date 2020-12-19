@@ -19,9 +19,8 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-
 import com.boubei.tss.framework.sso.Environment;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * <p> Temp.java </p>
