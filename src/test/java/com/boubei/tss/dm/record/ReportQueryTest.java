@@ -12,7 +12,7 @@ import com.boubei.tss.dm.report.Report;
 import com.boubei.tss.dm.report.ReportQuery;
 import com.boubei.tss.modules.sn.SerialNOer;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class ReportQueryTest extends AbstractTest4DM {
 	

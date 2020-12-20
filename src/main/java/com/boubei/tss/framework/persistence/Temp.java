@@ -16,8 +16,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 import com.boubei.tss.framework.sso.Environment;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -28,12 +29,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  */
 @Entity
 @Table(name = "TBL_TEMP_")
-@SequenceGenerator(name = "temp_sequence", sequenceName = "temp_sequence", initialValue = 1, allocationSize = 10)
 @JsonIgnoreProperties(value={"pk", "PK"})
 public class Temp implements IEntity {
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "temp_sequence")
+	@GenericGenerator(name = "temp_sequence", strategy = "native")
 	private Long pK;
     
 	private Long id; 

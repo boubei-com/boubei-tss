@@ -29,7 +29,7 @@ import com.boubei.tss.um.entity.User;
 import com.boubei.tss.util.DateUtil;
 import com.boubei.tss.util.MathUtil;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class ByIDETLJobTest extends AbstractTest4DM {
 	

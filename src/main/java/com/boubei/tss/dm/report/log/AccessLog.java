@@ -18,8 +18,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 import com.boubei.tss.framework.persistence.IEntity;
 import com.boubei.tss.framework.sso.Environment;
@@ -28,11 +29,11 @@ import com.boubei.tss.util.EasyUtils;
 
 @Entity
 @Table(name = "dm_access_log")
-@SequenceGenerator(name = "access_log_sequence", sequenceName = "access_log_sequence", initialValue = 10000, allocationSize = 10)
 public class AccessLog implements IEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "access_log_sequence")
+    @GenericGenerator(name = "access_log_sequence", strategy = "native")
     private Long id; 
 
     @Column(nullable = false)

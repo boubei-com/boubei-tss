@@ -19,7 +19,7 @@ import com.boubei.tss.framework.AbstractTest4F;
 import com.boubei.tss.modules.param.Param;
 import com.boubei.tss.modules.param.ParamManager;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class CacheActionTest extends AbstractTest4F {
 	

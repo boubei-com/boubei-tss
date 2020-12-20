@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import com.boubei.tss.framework.Config;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class IdentityGetterFactoryTest {
 	

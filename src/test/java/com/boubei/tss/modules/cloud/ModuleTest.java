@@ -38,7 +38,7 @@ import com.boubei.tss.um.service.IGroupService;
 import com.boubei.tss.util.BeanUtil;
 import com.boubei.tss.util.EasyUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class ModuleTest extends AbstractTest4DM {
 	
@@ -106,9 +106,9 @@ public class ModuleTest extends AbstractTest4DM {
 		BeanUtil.getProperties(module);
 		
 		Assert.assertNull(module.cal_experience_gold(0D));
-		Assert.assertEquals(10D, module.cal_experience_gold(100D));
+		Assert.assertEquals(new Double(10), module.cal_experience_gold(100D));
 		module.setExperience_gold("10.8");
-		Assert.assertEquals(10.8D, module.cal_experience_gold(100D));
+		Assert.assertEquals(new Double(10.8), module.cal_experience_gold(100D));
 		
 		action.listAvaliableModules();
 		

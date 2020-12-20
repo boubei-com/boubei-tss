@@ -39,7 +39,7 @@ import com.boubei.tss.util.DateUtil;
 import com.boubei.tss.util.EasyUtils;
 import com.boubei.tss.util.MathUtil;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class CloudOrderProxyTest extends AbstractTest4DM {
 	
@@ -140,7 +140,7 @@ public class CloudOrderProxyTest extends AbstractTest4DM {
 		oAction.payedOrders(co.getOrder_no(), null); // Admin pay
 		login( domainUser );
 		proxyAccount = accountAction.queryAccount();
-		Assert.assertEquals(200D, proxyAccount.getBalance());
+		Assert.assertEquals(new Double(200), proxyAccount.getBalance());
 		
 		// 代理为买家设置销售价=90
 		ProxyPrice pp = new ProxyPrice();
@@ -205,7 +205,7 @@ public class CloudOrderProxyTest extends AbstractTest4DM {
 		co1 = oAction.createOrder(request);
 		
 		Assert.assertEquals( 1, listOrders().size() );
-		Assert.assertEquals(90D, co1.getMoney_cal());
+		Assert.assertEquals(new Double(90), co1.getMoney_cal());
 		
 		login( UMConstants.ADMIN_USER );
 		oAction.payedOrders(co1.getOrder_no(), null); // Admin pay，应扣除代理商余额50元
@@ -223,14 +223,14 @@ public class CloudOrderProxyTest extends AbstractTest4DM {
 		oAction.payedOrders(co2.getOrder_no(), null); // Admin pay，应扣除代理商余额99元
 		login( buyer );
 		Account buyerAccount = accountAction.queryAccount();
-		Assert.assertEquals(99D, buyerAccount.getBalance());
+		Assert.assertEquals(new Double(99), buyerAccount.getBalance());
 		
 		// TODO 买家续费：余额 + 微信
 		
 		// 检查代理的账户资金是否准确：200 - 99（充值）- 50（代理扣费）
 		login(domainUser);
 		proxyAccount = accountAction.queryAccount();
-		Assert.assertEquals(51D, proxyAccount.getBalance());
+		Assert.assertEquals(new Double(51), proxyAccount.getBalance());
 		
 		Assert.assertEquals(1, oAction.listMyCustomer(1, 10, appid).get("total"));
 		

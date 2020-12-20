@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import com.boubei.tss.EX;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class ProgressPoolTest {
 	

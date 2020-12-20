@@ -351,7 +351,8 @@
 						-Xms256m -Xmx1024m -XX:MaxPermSize=256M
 					</argLine>
 					<forkCount>1</forkCount>
-        			<reuseForks>true</reuseForks> <!-- 表示一个测试进程执行完了之后是杀掉还是重用来继续执行后续的测试。 默认配置为forkCount=1/reuseForks=true -->
+        			<reuseForks>false</reuseForks> 
+        			<!-- reuseForks表示一个测试进程执行完了之后是杀掉还是重用来继续执行后续的测试。 默认配置为forkCount=1/reuseForks=true -->
 				</configuration>
 			</plugin>
 
@@ -389,24 +390,6 @@
                 </configuration>
                  -->
 			</plugin>
-			
-<!-- 			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>8.1.12.v20130726</version>
-				<configuration>
-					<webAppConfig>
-						<contextPath>/tss</contextPath>
-					</webAppConfig>
-					<connectors>
-						<connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
-							<port>9000</port>
-						</connector>
-					</connectors>
-					<stopPort>9966</stopPort>
-					<stopKey>tss</stopKey>
-				</configuration>
-			</plugin> -->
 			
 			<plugin>
 			    <groupId>org.eclipse.jetty</groupId>

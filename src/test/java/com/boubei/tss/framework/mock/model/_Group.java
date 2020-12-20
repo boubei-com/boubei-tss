@@ -16,9 +16,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.GenericGenerator;
 
 import com.boubei.tss.framework.persistence.entityaop.IDecodable;
 import com.boubei.tss.framework.web.display.tree.ILevelTreeNode;
@@ -26,13 +26,13 @@ import com.boubei.tss.framework.web.display.tree.TreeAttributesMap;
 
 @Entity
 @Table(name = "test_group", uniqueConstraints = { 
-        @UniqueConstraint(columnNames = { "code" })
+//        @UniqueConstraint(columnNames = { "code" })
     })
-@SequenceGenerator(name = "group_sequence", sequenceName = "group_sequence", initialValue = 1000, allocationSize = 10)
 public class _Group implements IDecodable, ILevelTreeNode {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "group_sequence")
+    @GeneratedValue(strategy = GenerationType.AUTO, generator = "test_group_sequence")
+    @GenericGenerator(name = "test_group_sequence", strategy = "native")
     private Long id;
     private String code;
     private String name;

@@ -15,7 +15,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import com.boubei.tss.util.FileHelper;
 import com.boubei.tss.util.URLUtil;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class ExcelTest {
 

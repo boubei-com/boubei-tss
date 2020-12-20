@@ -25,7 +25,7 @@ import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.modules.sn.SelfNO;
 import com.boubei.tss.modules.sn.SerialNO;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class BaseDaoTest extends AbstractTest4F { 
     

@@ -20,7 +20,7 @@ import com.boubei.tss.dm.DMConstants;
 import com.boubei.tss.modules.log.LogService;
 import com.boubei.tss.modules.param.ParamConstants;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class _RecorderTJTest extends AbstractTest4DM {
 	

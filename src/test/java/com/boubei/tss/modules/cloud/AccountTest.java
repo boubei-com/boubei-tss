@@ -22,7 +22,7 @@ import com.boubei.tss.modules.cloud.pay.Result;
 import com.boubei.tss.um.UMConstants;
 import com.boubei.tss.util.EasyUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class AccountTest extends AbstractTest4DM {
     @Autowired
@@ -43,21 +43,21 @@ public class AccountTest extends AbstractTest4DM {
         Account account = new Account();
         account.setBalance(100D);
         account.deduct(90D);
-        Assert.assertEquals(10D, account.getBalance());
+        Assert.assertEquals(new Double(10), account.getBalance());
 
         account = new Account();
         account.setBalance(100D);
         account.setBalance_freeze(70D);
         account.deduct(90D);
-        Assert.assertEquals(70D, account.getBalance_freeze());
-        Assert.assertEquals(10D, account.getBalance());
+        Assert.assertEquals(new Double(70), account.getBalance_freeze());
+        Assert.assertEquals(new Double(10), account.getBalance());
 
         account = new Account();
         account.setBalance(80D);
         account.setBalance_freeze(100D);
         account.deduct(90D);
-        Assert.assertEquals(90D, account.getBalance_freeze());
-        Assert.assertEquals(0D, account.getBalance());
+        Assert.assertEquals(new Double(90), account.getBalance_freeze());
+        Assert.assertEquals(new Double(0D), account.getBalance());
 
         account.addBalanceFreeze(1.1D);
         account.add(2.2D);
@@ -79,7 +79,7 @@ public class AccountTest extends AbstractTest4DM {
         cloudService.createOrder(cloudOrder);
 
         cloudAction.payedByAccountBalance(cloudOrder.getOrder_no());
-        Assert.assertEquals(20.0D, account.getBalance());
+        Assert.assertEquals(new Double(20.0), account.getBalance());
 
 
         // 设置安全额度10
@@ -118,7 +118,7 @@ public class AccountTest extends AbstractTest4DM {
 
         // 发起退款
         cloudService.refund(cloudOrder.getOrder_no(), cloudOrder.getMoney_real(), "退款单_002", null, true);
-        Assert.assertEquals(100.0D, account.getBalance());
+        Assert.assertEquals(new Double(100.0), account.getBalance());
         // 再次退款
         cloudOrder2.setStatus(CloudOrder.PART_PAYED);
         cloudService.refund(cloudOrder.getOrder_no(), cloudOrder.getMoney_real(), "退款单_002", null, true);

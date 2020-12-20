@@ -22,7 +22,7 @@ import org.junit.Test;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class URLUtilTest {
 	

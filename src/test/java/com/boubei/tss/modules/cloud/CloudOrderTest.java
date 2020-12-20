@@ -53,7 +53,7 @@ import com.boubei.tss.util.DateUtil;
 import com.boubei.tss.util.EasyUtils;
 import com.boubei.tss.util.MathUtil;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class CloudOrderTest extends AbstractTest4DM {
 
@@ -211,7 +211,7 @@ public class CloudOrderTest extends AbstractTest4DM {
         co1.setRebate(0.9D);
         co1.setDerate(100D);
         co1 = oAction.queryPrice(co1);
-        Assert.assertEquals(-100D, co1.getMoney_cal());
+        Assert.assertEquals(new Double(-100), co1.getMoney_cal());
 
         setParameters(co1);
         oAction.createOrder(request);
@@ -261,7 +261,7 @@ public class CloudOrderTest extends AbstractTest4DM {
         co2 = oAction.createOrder(request);
         Assert.assertEquals(1, listOrders().size());
 
-        Assert.assertEquals(10800D, co2.getMoney_cal());
+        Assert.assertEquals(new Double(10800), co2.getMoney_cal());
 
         co2.setAccount_num(2);
         oAction.updateOrder(co2);
@@ -385,7 +385,7 @@ public class CloudOrderTest extends AbstractTest4DM {
 
         oAction.updatePrice(co2.getId(), 0.9, 100d);
         co2 = (CloudOrder) commonDao.getEntity(CloudOrder.class, co2.getId());
-        Assert.assertEquals(money_cal * 0.9 - 100, co2.getMoney_cal()); // 价格变了，Admin能改价格
+        Assert.assertEquals(new Double(money_cal * 0.9 - 100), co2.getMoney_cal()); // 价格变了，Admin能改价格
 
         module2.setRoles(module2.getRoles() + ",999");
         commonDao.update(module2);
@@ -593,7 +593,7 @@ public class CloudOrderTest extends AbstractTest4DM {
 
         login(domainUser);
         domainUserAccount = accountAction.queryAccount();
-        Assert.assertEquals(balacne + reChargeMoney, domainUserAccount.getBalance());
+        Assert.assertEquals(new Double(balacne + reChargeMoney), domainUserAccount.getBalance());
     }
 
     @Test

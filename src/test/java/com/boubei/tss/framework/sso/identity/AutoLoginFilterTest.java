@@ -117,6 +117,7 @@ public class AutoLoginFilterTest {
     public void testDoFilter4AnonymousLogin() throws IOException, ServletException {
         request.addHeader(RequestContext.ANONYMOUS_REQUEST, "true"); // 允许匿名
         Context.initRequestContext(request);
+        Context.setResponse(response);
         filter.doFilter(request, response, chain);
 
         assertNotNull(Context.getRequestContext().getIdentityCard());
@@ -144,6 +145,7 @@ public class AutoLoginFilterTest {
         request.setCookies(cookies);
         
         Context.initRequestContext(request);
+        Context.setResponse(response);
         filter.doFilter(request, response, chain);
         
         assertEquals(Anonymous.one.getLoginName(), Environment.getUserCode());

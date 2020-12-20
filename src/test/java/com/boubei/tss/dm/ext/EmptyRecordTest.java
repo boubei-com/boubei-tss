@@ -6,7 +6,7 @@ import com.boubei.tss.dm.record.file.RecordImpTL;
 import com.boubei.tss.dm.report.Report;
 import com.boubei.tss.util.BeanUtil;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class EmptyRecordTest {
 	

@@ -22,6 +22,7 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.easymock.EasyMock;
 import org.easymock.IMocksControl;
 import org.junit.Assert;
+import org.springframework.test.annotation.Rollback;
 
 import com.boubei.tss.dm.DMUtil;
 import com.boubei.tss.dm.dml.SQLExcutor;
@@ -38,6 +39,7 @@ import com.boubei.tss.um.entity.Role;
 import com.boubei.tss.um.entity.User;
 import com.boubei.tss.util.FileHelper;
 
+@Rollback
 public abstract class AbstractTest4DM extends AbstractTest4TSS { 
     
     protected String getDefaultSource(){

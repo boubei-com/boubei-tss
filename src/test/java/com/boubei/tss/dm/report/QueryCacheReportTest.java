@@ -26,7 +26,7 @@ import com.boubei.tss.dm.dml.SqlConfig;
 import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.framework.sso.context.Context;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class QueryCacheReportTest extends AbstractTest4DM {
     

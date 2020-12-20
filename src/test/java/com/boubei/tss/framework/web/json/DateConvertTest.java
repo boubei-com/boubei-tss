@@ -12,12 +12,10 @@ package com.boubei.tss.framework.web.json;
 
 import java.util.Date;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.boubei.tss.util.DateUtil;
-import com.fasterxml.jackson.core.JsonGenerator;
-
-import junit.framework.Assert;
 
 public class DateConvertTest {
 	
@@ -27,18 +25,6 @@ public class DateConvertTest {
 		Date d = new DateConvert().convert(DateUtil.format(now));
 		Assert.assertEquals(DateUtil.noHMS(now), d);
 	}
-	
-	@Test
-	public void test2() {
-		TSSObjectMapper tom = new  TSSObjectMapper();
-		Assert.assertNotNull(tom);
-		
-		TSSJsonSerializer tjs = new TSSJsonSerializer();
-		JsonGenerator jsonGenerator = null;
-		try {
-			tjs.serialize(new Date(), jsonGenerator , null);
-		} catch (Exception e) {
-		}
-	}
+
 
 }

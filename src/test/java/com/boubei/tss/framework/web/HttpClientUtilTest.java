@@ -27,7 +27,7 @@ import com.boubei.tss.framework.sso.appserver.AppServer;
 import com.boubei.tss.framework.sso.context.Context;
 import com.boubei.tss.framework.sso.context.RequestContext;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class HttpClientUtilTest {
 	

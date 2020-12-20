@@ -19,7 +19,7 @@ import com.boubei.tss.cache.AbstractPool;
 import com.boubei.tss.cache.Pool;
 import com.boubei.tss.cache.extension.CacheHelper;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * 测试10分钟Cache

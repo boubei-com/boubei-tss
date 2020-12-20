@@ -20,7 +20,7 @@ import com.boubei.tss.framework.AbstractTest4F;
 import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.util.EasyUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * 往临时表插入数据后，直接用原生SQL无法读取到数据，要先刷新下hibernate的缓存

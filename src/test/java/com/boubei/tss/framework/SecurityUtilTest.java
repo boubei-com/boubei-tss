@@ -13,7 +13,7 @@ package com.boubei.tss.framework;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class SecurityUtilTest {
 	

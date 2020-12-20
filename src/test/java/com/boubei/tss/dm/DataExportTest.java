@@ -19,7 +19,7 @@ import org.junit.Test;
 import com.boubei.tss.AbstractTest4DM;
 import com.boubei.tss.util.FileHelper;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class DataExportTest extends AbstractTest4DM {
 	

@@ -20,7 +20,7 @@ import com.boubei.tss.modules.param.ParamConstants;
 import com.boubei.tss.um.UMConstants;
 import com.boubei.tss.um.entity.Group;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class PermissionHelperTest {
 	

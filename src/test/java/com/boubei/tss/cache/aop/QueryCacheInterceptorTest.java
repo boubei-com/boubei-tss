@@ -25,7 +25,7 @@ import com.boubei.tss.cache.extension.CacheHelper;
 import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.modules.param.ParamManager;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
 71 QueryCache【QC_com.boubei.tss.cache.aop.IService.f1()】first time executing...

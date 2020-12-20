@@ -32,7 +32,7 @@ import com.boubei.tss.um.service.IRoleService;
 import com.boubei.tss.um.service.IUserService;
 import com.boubei.tss.util.DateUtil;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class LoginServiceTest extends AbstractTest4UM {
 	

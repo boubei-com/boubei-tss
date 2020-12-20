@@ -17,7 +17,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 
 import com.boubei.tss.framework.web.wrapper.XHttpServletRequestWrapper;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class XHttpServletRequestWrapperTest {
 	

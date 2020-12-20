@@ -54,7 +54,7 @@ import com.boubei.tss.util.EasyUtils;
 import com.boubei.tss.util.FileHelper;
 import com.boubei.tss.util.MacrocodeCompiler;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * 每一步流程操作都邮件给创建人、及下一级审批人

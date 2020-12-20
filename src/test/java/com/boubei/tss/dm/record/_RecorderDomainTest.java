@@ -34,7 +34,7 @@ import com.boubei.tss.um.service.IRoleService;
 import com.boubei.tss.um.service.IUserService;
 import com.boubei.tss.util.EasyUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class _RecorderDomainTest extends AbstractTest4DM {
 	

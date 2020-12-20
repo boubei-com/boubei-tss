@@ -27,7 +27,7 @@ import com.boubei.tss.dm.record.Record;
 import com.boubei.tss.dm.record.RecordService;
 import com.boubei.tss.um.UMConstants;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class DomainReportTest extends AbstractTest4DM {
 	

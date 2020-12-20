@@ -23,7 +23,7 @@ import com.boubei.tss.cache.extension.threadpool.ThreadPoolCustomizer;
 import com.boubei.tss.cache.extension.workqueue.AbstractTask;
 import com.boubei.tss.cache.extension.workqueue.OutputRecordsManager;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class JCachePoolTest {
 	

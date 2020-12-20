@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.boubei.tss.EX;
 import com.boubei.tss.framework.exception.BusinessException;
+import com.boubei.tss.framework.sso.Environment;
 import com.boubei.tss.um.permission.IResource;
 import com.boubei.tss.um.permission.PermissionHelper;
 
@@ -34,7 +35,7 @@ public class PermissionFilter4Create implements IPermissionFilter {
 		
 		List<Long> permitedResourceIds = helper.getResourceIdsByOperation(application, resourceType, createOperation);
         if( !permitedResourceIds.contains(resource.getParentId()) ) {
-            throw new BusinessException(EX.parse(EX.U_14, resource.getParentId()));
+            throw new BusinessException( EX.parse(EX.U_14, resource.getParentId()) + Environment.getOwnRoleNames() + Environment.getUserCode());
         }
 	}
 

@@ -38,7 +38,7 @@ import com.boubei.tss.util.EasyUtils;
 import com.boubei.tss.util.FileHelper;
 import com.boubei.tss.util.MacrocodeCompiler;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * 企业域流程自定义Test

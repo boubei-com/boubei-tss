@@ -24,7 +24,7 @@ import com.boubei.tss.modules.log.Log;
 import com.boubei.tss.modules.log.LogAction;
 import com.boubei.tss.um.entity.Group;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class XFormTest {
 	

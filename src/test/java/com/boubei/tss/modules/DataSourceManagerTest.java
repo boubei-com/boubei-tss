@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.boubei.tss.AbstractTest4DM;
 import com.boubei.tss.modules.param.Param;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class DataSourceManagerTest extends AbstractTest4DM {
 	

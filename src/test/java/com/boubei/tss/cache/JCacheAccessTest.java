@@ -11,12 +11,11 @@
 package com.boubei.tss.cache;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.boubei.tss.cache.extension.CacheHelper;
-
-import junit.framework.Assert;
 
 /**
  * 测试缓存池的存取方式，FIFO、LIFO、LRU、LFU、Radom等。
@@ -64,7 +63,7 @@ public class JCacheAccessTest {
 		Assert.assertNull(item);
 		
 		// 测试命中率（上面10次getObject，9次命中，最后一次没有命中，命中率90%）
-		Assert.assertEquals(90.0f, pool.getHitRate());
+		Assert.assertTrue( 90.0f == pool.getHitRate());
 		
 		// 测试移除对象（按存取方式：FIFO、FILO、LRU、LFU、Radom等，当前配的存取方式是 LFU）
 		item = pool.remove();

@@ -21,7 +21,7 @@ import com.boubei.tss.framework.AbstractTest4F;
 import com.boubei.tss.framework.mock.model._Group;
 import com.boubei.tss.framework.mock.model._User;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class CommonServiceTest extends AbstractTest4F { 
     
